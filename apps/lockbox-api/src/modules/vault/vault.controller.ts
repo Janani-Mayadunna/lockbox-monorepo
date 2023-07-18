@@ -37,4 +37,39 @@ export class VaultController {
   async getAllUserVaults(@getCurrentUserId() userId: string): Promise<Vault[]> {
     return this.vaultService.getAllUserVaults(userId);
   }
+
+  //retrieve a single vault in the array and display
+  @Get(':id')
+  @UseGuards(AuthGuard())
+  async getOneUserVault(
+    @getCurrentUserId() userId: string,
+    @Param('id') vaultId: string,
+  ): Promise<Vault> {
+    return this.vaultService.getOneUserVault(userId, vaultId);
+  }
+
+  //update a single vault in the array and display
+  @Put(':id')
+  @UseGuards(AuthGuard())
+  async updateOneUserVault(
+    @getCurrentUserId() userId: string,
+    @Param('id') vaultId: string,
+    @Body() UpdateVaultData: UpdateVaultDto,
+  ): Promise<Vault> {
+    return this.vaultService.updateOneUserVault(
+      userId,
+      vaultId,
+      UpdateVaultData,
+    );
+  }
+
+  //delete a single vault in the array and display
+  @Delete('/delete')
+  @UseGuards(AuthGuard())
+  async deleteOneUserVault(
+    @getCurrentUserId() userId: string,
+    @Body() deleteVaultData: deleteVaultDto,
+  ): Promise<Vault> {
+    return this.vaultService.deleteOneUserVault(userId, deleteVaultData);
+  }
 }
