@@ -35,3 +35,11 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .env
+
+book.controller.ts
+book.module.ts
+book.service.ts
+book.schema.ts
+create-book.dto.ts
+update-book.dto.ts
+
