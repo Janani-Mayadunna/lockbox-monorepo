@@ -35,4 +35,19 @@ export class VaultService {
     await currentUser.save();
     return newVault;
   }
+
+  async getAllUserVaults(userId: string): Promise<Vault[]> {
+    const user = await this.userModel.findById(userId);
+
+    if (!user) {
+      logger.error(`User not found with id: ${userId}`);
+      console.log('User not found with id: ', userId);
+      return [];
+    }
+
+    // Retrieve all vaults for the user
+    const vaults = await this.vaultModel.find({ user: user._id });
+
+    return vaults;
+  }
 }

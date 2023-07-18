@@ -30,4 +30,11 @@ export class VaultController {
     console.log('req.user', userId);
     return this.vaultService.createVault(vault, userId);
   }
+
+  //retrieve all vaults in the array and display
+  @Get()
+  @UseGuards(AuthGuard())
+  async getAllUserVaults(@getCurrentUserId() userId: string): Promise<Vault[]> {
+    return this.vaultService.getAllUserVaults(userId);
+  }
 }
