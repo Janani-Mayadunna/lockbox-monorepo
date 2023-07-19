@@ -21,7 +21,6 @@
       "noFallthroughCasesInSwitch": true,
       "paths": {
         "@lockbox-api/*": ["./apps/lockbox-api/src/*"],
-        "@lockbox-frontend/*": ["./apps/lockbox-frontend/*"],
         "@lockbox-fe/*": ["./apps/lockbox-fe/*"],
       }
     },
