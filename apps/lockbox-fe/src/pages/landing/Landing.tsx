@@ -9,7 +9,14 @@ const Landing = () => {
       <Link to='/auth'>
         <button>Go to Auth</button>
       </Link>
+      <br />
+      <br />
 
+      <Link to='/signup'>
+        <button>Sign up</button>
+      </Link>
+
+      <br />
       <br />
 
       <Link to='/dashboard'>

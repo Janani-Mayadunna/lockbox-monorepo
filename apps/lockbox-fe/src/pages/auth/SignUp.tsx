@@ -1,57 +1,56 @@
-import { useState, useEffect, MouseEvent } from 'react';
+import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import ResponsiveAppBar from '../../components/global/AppBar';
-import { useAppDispatch } from '../../../src/store';
-import { getCurrentUser, loginRequest } from './redux/actions';
-import { LoginPayload } from './redux/types';
+import React, { useState } from 'react';
+import { Link, useNavigate} from 'react-router-dom';
+import { IUserSignIn } from './interfaces';
+import { authorizedFetch } from '../../../src/helpers/request-interceptor';
 import { hashPassword } from '../../../src/helpers/crypto';
 
-const Auth = () => {
+const SignUp = () => {
   const [user, setUser] = useState({
+    name: '',
     email: '',
     password: '',
   });
-const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+ const navigate = useNavigate();
 
-  const token = localStorage.getItem('jwt-lockbox');
-
-  useEffect(() => {
-    if (token) {
-      dispatch(getCurrentUser());
-      navigate('/dashboard');
-    }
-  }, [token]);
-
-  function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
+  function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
     const hashedPassword = hashPassword(user.password);
 
-
-    let data: LoginPayload = {
-      values: {
-        email: user.email,
-        password: hashedPassword,
-      },
+    const newUser: IUserSignIn = {
+      name: user.name,
+      email: user.email,
+      password: hashedPassword,
     };
-    dispatch(loginRequest(data));
 
-    const token = localStorage.getItem('jwt-blogapp');
-    console.log('TOKEN', token);
-    console.log(data);
+    authorizedFetch('http://localhost:4000/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUser),
+    })
+      .then((res) => {
+        console.log('res: ', res);
+        if(res.status === 201) {
+          navigate('/dashboard');
+        }
+      })
+      .catch((err) => {
+        console.log('err: ', err);
+      });
   }
-
   return (
     <div>
       <ResponsiveAppBar />
-      <h1 className='title'>{'Hello again!'}</h1>
+      <h1 className='title'>{'Welcome!'}</h1>
 
       <form>
       <Box
         sx={{
-          backgroundColor: 'rgb(110 170 240 / 50%)',
+          backgroundColor: 'rgb(173 167 179 / 54%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -64,8 +63,22 @@ const navigate = useNavigate();
         }}
       >
         <Typography variant='h4' paddingBottom={3} textAlign='center'>
-          {'Login'}
+          {'Sign Up'}
         </Typography>
+
+        <TextField
+          name='name'
+          value={user.name}
+          margin='normal'
+          type='text'
+          label='Name'
+          variant='outlined'
+          sx={{
+            backgroundColor: 'white', // Custom text box background color
+            borderRadius: '4px', // Custom border radius
+          }}
+          onChange={(e) => setUser({ ...user, name: e.target.value })}
+        />
 
         <TextField
           name='email'
@@ -103,15 +116,15 @@ const navigate = useNavigate();
               borderRadius: '4px', // Custom border radius
               marginTop: '20px', // Custom margin
               padding: '10px 20px', // Custom padding
-              backgroundColor: '#007bff', // Custom button color
+              backgroundColor: '#ff9800', // Custom button color
               color: '#fff', // Text color
               '&:hover': {
-                backgroundColor: '#0056b3', // Custom hover color
+                backgroundColor: '#f57c00', // Custom hover color
               },
             }}
             variant='contained'
           >
-            Login
+            Sign Up
           </Button>
         </Link>
 
@@ -126,7 +139,7 @@ const navigate = useNavigate();
             },
           }}
         >
-          <Link to='/'> New here? Sign Up</Link>
+          <Link to='/'> Already have an account? Login</Link>
         </Button>
       </Box>
     </form>
@@ -135,4 +148,5 @@ const navigate = useNavigate();
   );
 };
 
-export default Auth;
+export default SignUp;
+
