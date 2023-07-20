@@ -6,6 +6,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { VaultModule } from './modules/vault/vault.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -15,7 +17,7 @@ import { VaultModule } from './modules/vault/vault.module';
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
     // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '../..', 'lockbox-frontend', 'dist'),
+    //   rootPath: join(__dirname, '../..', 'lockbox-fe', 'dist'),
     // }),
 
     AuthModule,
