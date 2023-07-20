@@ -32,7 +32,9 @@ export class AuthService {
   }
 
   //login user
-  async login(loginDto: LoginDto): Promise<{ token: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ access_token: string; userId: string }> {
     const { email, password } = loginDto;
 
     const user = await this.userModel.findOne({ email });
@@ -46,6 +48,22 @@ export class AuthService {
     }
 
     const token = this.jwtService.sign({ id: user._id });
-    return { token };
+    return {
+      access_token: token,
+      userId: user._id,
+    };
+  }
+
+  //get current user
+  async getCurrentUser(token: string): Promise<{ user: User }> {
+    const { id } = this.jwtService.verify(token);
+
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new UnauthorizedException('Log in to access this endpoint');
+    }
+
+    return { user };
   }
 }

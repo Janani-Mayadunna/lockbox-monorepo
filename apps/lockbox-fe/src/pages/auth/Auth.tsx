@@ -1,113 +1,109 @@
-import  { useState } from 'react'
+import { useState, useEffect, MouseEvent } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ResponsiveAppBar from '../../components/global/AppBar';
-
+import { useAppDispatch } from '../../../src/store';
+import { getCurrentUser, loginRequest } from './redux/actions';
+import { LoginPayload } from './redux/types';
 
 const Auth = () => {
+  const [user, setUser] = useState({
+    email: '',
+    password: '',
+  });
+const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const [isSignup, setIsSignup] = useState(false);
+  const token = localStorage.getItem('jwt-lockbox');
+
+  useEffect(() => {
+    if (token) {
+      dispatch(getCurrentUser());
+      navigate('/dashboard');
+    }
+  }, [token]);
+
+  function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+
+    let data: LoginPayload = {
+      values: {
+        email: user.email,
+        password: user.password,
+      },
+    };
+    dispatch(loginRequest(data));
+
+    const token = localStorage.getItem('jwt-blogapp');
+    console.log('TOKEN', token);
+    console.log(data);
+  }
 
   return (
     <div>
-        <ResponsiveAppBar />
-        <h1 className="title">{isSignup ? 'Welcome!' : "Hello again!"}</h1>
+      <ResponsiveAppBar />
+      <h1 className='title'>{'Hello again!'}</h1>
 
-        <form>
+      <form>
         <Box
           sx={{
-            backgroundColor: "rgb(110 170 240 / 50%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            maxWidth: "45ch",
-            margin: "auto",
-            marginTop: "5ch",
-            padding: "5ch",
-            borderRadius: "2ch",
+            backgroundColor: 'rgb(110 170 240 / 50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '45ch',
+            margin: 'auto',
+            marginTop: '5ch',
+            padding: '5ch',
+            borderRadius: '2ch',
           }}
         >
-          <Typography variant="h4" paddingBottom={3} textAlign="center">
-            {isSignup ? "Sign Up" : "Login"}
+          <Typography variant='h4' paddingBottom={3} textAlign='center'>
+            {'Login'}
           </Typography>
 
-          {isSignup && (
-            <TextField
-            name="username"
-            // value={user.username}
-            margin="normal"
-            type={"text"}
-            label="Username"
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, username: e.target.value })}
-          />
-          )}
-
           <TextField
-            name="email"
-            // value={user.email}
-            margin="normal"
-            type={"text"}
-            label= {isSignup ? "Email" : "Username or Email"}
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, email: e.target.value })}
+            name='email'
+            value={user.email}
+            margin='normal'
+            type={'text'}
+            label={'Email'}
+            variant='outlined'
+            onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
 
           <TextField
-            name="password"
-            // value={user.password}
-            margin="normal"
-            type={"password"}
-            label="Password"
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, password: e.target.value })}
+            name='password'
+            value={user.password}
+            margin='normal'
+            type={'password'}
+            label='Password'
+            variant='outlined'
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          {isSignup && (
-            <TextField
-            name="comfirm_password"
-            // value={user.comfirm_password}
-            margin="normal"
-            type={"comfirm_password"}
-            label="Confirm Password"
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, comfirm_password: e.target.value })}
-          />
-          )}
-
-          <Link to="/home" style={{ textDecoration: "none" }}>
+          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
             <Button
-            //   endIcon={<LoginIcon />}
-            //   onClick={handleSubmit}
-              type="submit"
-              sx={{ borderRadius: 2, margin: 4, width: "50%", height: "3rem" }}
-              variant="contained"
-              color="warning"
+              //   endIcon={<LoginIcon />}
+              onClick={handleSubmit}
+              type='submit'
+              sx={{ borderRadius: 2, margin: 4, width: '50%', height: '3rem' }}
+              variant='contained'
+              color='warning'
             >
               Login
             </Button>
           </Link>
 
-          <div className="textSpan">
-                <span
-                  style={{ fontSize: "14px", cursor: "pointer" }}
-                  // change of form happens when clicked on this line
-                  onClick={() => {
-                    setIsSignup((prev) => !prev);
-                    // resetForm();
-                  }}
-                >
-                  {isSignup
-                    ? "Already have an account? Login!"
-                    : "Don't have an account? Sign Up"}
-                </span>
-              </div>
+          <Button sx={{ marginTop: 2, borderRadius: 2 }}>
+            <Link to='/'> New here? Sign Up</Link>
+          </Button>
         </Box>
       </form>
-        <br />
+      <br />
     </div>
-  )
-}
+  );
+};
 
 export default Auth;
