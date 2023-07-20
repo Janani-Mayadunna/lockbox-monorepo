@@ -1,50 +1,141 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { ICreateVault } from './interfaces';
+import { authorizedFetch } from '../../helpers/request-interceptor';
 
 const PasswordAdd = () => {
+  const [vaultData, setVaultData] = useState({
+    username: '',
+    password: '',
+    link: '',
+  });
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    const newVault: ICreateVault = {
+      link: vaultData.link,
+      username: vaultData.username,
+      password: vaultData.password,
+    };
+
+    authorizedFetch('http://localhost:4000/api/vault', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newVault),
+    })
+      .then((res) => {
+        console.log('res: ', res);
+      })
+      .catch((err) => {
+        console.log('err: ', err);
+      });
+  };
+
   return (
     <div>
       <h1 className='title'>Add Password</h1>
 
-      <form>
-        <label htmlFor='category'>Category</label>
-        <input type='text' id='category' name='category' />
-        <br />
+      <form
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          maxWidth: '300px',
+          margin: '0 auto',
+        }}
+      >
+        <label htmlFor='username' style={{ marginBottom: '10px' }}>
+          Username
+        </label>
+        <input
+          type='text'
+          id='username'
+          value={vaultData.username}
+          name='username'
+          style={{ marginBottom: '10px', padding: '5px' }}
+          onChange={(e) =>
+            setVaultData({ ...vaultData, username: e.target.value })
+          }
+        />
 
-        <label htmlFor='username'>Username</label>
-        <input type='text' id='username' name='username' />
-        <br />
+        <label htmlFor='password' style={{ marginBottom: '10px' }}>
+          Password
+        </label>
+        <input
+          type='password'
+          id='password'
+          value={vaultData.password}
+          name='password'
+          style={{ marginBottom: '10px', padding: '5px' }}
+          onChange={(e) =>
+            setVaultData({ ...vaultData, password: e.target.value })
+          }
+        />
 
-        <label htmlFor='password'>Password</label>
-        <input type='text' id='password' name='password' />
-        <br />
+        <label htmlFor='url' style={{ marginBottom: '10px' }}>
+          URI
+        </label>
+        <input
+          type='text'
+          value={vaultData.link}
+          id='link'
+          name='link'
+          style={{ marginBottom: '10px', padding: '5px' }}
+          onChange={(e) => setVaultData({ ...vaultData, link: e.target.value })}
+        />
 
-        <label htmlFor='url'>URL</label>
-        <input type='text' id='url' name='url' />
-        <br />
+        <button
+          type='submit'
+          onClick={handleSubmit}
+          style={{
+            marginBottom: '10px',
+            padding: '5px 10px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+          }}
+        >
+          Submit
+        </button>
 
-        <label htmlFor='notes'>Notes</label>
-        <input type='text' id='notes' name='notes' />
-        <br />
+        <button
+          type='reset'
+          onClick={() => setVaultData({ username: '', password: '', link: '' })}
+          style={{
+            marginBottom: '10px',
+            padding: '5px 10px',
+            backgroundColor: '#6c757d',
+            color: '#fff',
+            border: 'none',
+          }}
+        >
+          Reset
+        </button>
 
-        <button type='submit'>Submit</button>
-        <br />
-
-        <button type='reset'>Reset</button>
-        <br />
-
-        <button type='button'>Cancel</button>
-        <br />
-
+        <button
+          type='button'
+          style={{
+            marginBottom: '10px',
+            padding: '5px 10px',
+            backgroundColor: '#dc3545',
+            color: '#fff',
+            border: 'none',
+          }}
+        >
+          <Link
+            to='/dashboard'
+            style={{ textDecoration: 'none', color: 'white' }}
+          >
+            Back
+          </Link>
+        </button>
       </form>
 
       <br />
       <br />
       <br />
-
-      <Link to='/dashboard'>
-        <button>User Dashboard</button>
-      </Link>
     </div>
   );
 };

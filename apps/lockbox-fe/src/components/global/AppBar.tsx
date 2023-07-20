@@ -15,8 +15,8 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { Link } from 'react-router-dom';
 
 const pages = [
-  { title: 'Home', path: '/dash' },
-  { title: 'Password Category', path: '/' },
+  { title: 'Home', path: '/dashboard' },
+  // { title: 'Password Category', path: '/' },
   { title: 'Password Details', path: '/' },
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -48,14 +48,14 @@ function ResponsiveAppBar() {
     <AppBar position='static'>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 4 }} />
           <Typography
             variant='h6'
             noWrap
             component='a'
             href='/'
             sx={{
-              mr: 2,
+              mr: 10,
               display: { xs: 'none', md: 'flex' },
               fontFamily: 'monospace',
               fontWeight: 700,
@@ -64,7 +64,7 @@ function ResponsiveAppBar() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            LockBox
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

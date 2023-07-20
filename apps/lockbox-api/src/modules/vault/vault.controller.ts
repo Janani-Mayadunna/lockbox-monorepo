@@ -27,6 +27,7 @@ export class VaultController {
     @Body() vault: CreateVaultDto,
     @getCurrentUserId() userId: string,
   ): Promise<Vault> {
+    // vault.user = userId;
     console.log('req.user', userId);
     return this.vaultService.createVault(vault, userId);
   }

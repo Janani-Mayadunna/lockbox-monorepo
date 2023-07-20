@@ -5,7 +5,11 @@ import mongoose, { Model } from 'mongoose';
 import { User } from '../user/schemas/user.schema';
 import logger from '../../utils/logger';
 import { ObjectId } from 'mongodb';
-import { IDeleteVault, IUpdateVault } from './interfaces/vault.interfaces';
+import {
+  ICreateVault,
+  IDeleteVault,
+  IUpdateVault,
+} from './interfaces/vault.interfaces';
 
 @Injectable()
 export class VaultService {
@@ -16,7 +20,7 @@ export class VaultService {
     private userModel: Model<User>,
   ) {}
 
-  async createVault(vault: Vault, userId: string): Promise<Vault> {
+  async createVault(vault: ICreateVault, userId: string): Promise<Vault> {
     // Retrieve the user document
     const currentUser = await this.userModel.findById(userId);
     if (!currentUser) {
