@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router-dom';
 import Landing from '../pages/landing/Landing.tsx';
 import PasswordVault from '../pages/pw-vault/PasswordVault.tsx';
 import PasswordAdd from '../pages/pw-vault-add/PasswordAdd.tsx';
+import SignUp from '../pages/auth/SignUp.tsx';
 
 const routers = [
   {
@@ -14,6 +15,10 @@ const routers = [
   {
     path: ROUTE.AUTH,
     component: Auth,
+  },
+  {
+    path: ROUTE.SIGNUP,
+    component: SignUp,
   },
   {
     path: ROUTE.DASHBOARD,
