@@ -74,8 +74,8 @@ const SignUp = () => {
           label='Name'
           variant='outlined'
           sx={{
-            backgroundColor: 'white', // Custom text box background color
-            borderRadius: '4px', // Custom border radius
+            backgroundColor: 'white', 
+            borderRadius: '4px',
           }}
           onChange={(e) => setUser({ ...user, name: e.target.value })}
         />
@@ -88,8 +88,8 @@ const SignUp = () => {
           label='Email'
           variant='outlined'
           sx={{
-            backgroundColor: 'white', // Custom text box background color
-            borderRadius: '4px', // Custom border radius
+            backgroundColor: 'white', 
+            borderRadius: '4px',
           }}
           onChange={(e) => setUser({ ...user, email: e.target.value })}
         />
@@ -102,8 +102,8 @@ const SignUp = () => {
           label='Password'
           variant='outlined'
           sx={{
-            backgroundColor: 'white', // Custom text box background color
-            borderRadius: '4px', // Custom border radius
+            backgroundColor: 'white', 
+            borderRadius: '4px',
           }}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
         />
@@ -113,13 +113,13 @@ const SignUp = () => {
             onClick={handleSubmit}
             type='submit'
             sx={{
-              borderRadius: '4px', // Custom border radius
-              marginTop: '20px', // Custom margin
-              padding: '10px 20px', // Custom padding
-              backgroundColor: '#ff9800', // Custom button color
-              color: '#fff', // Text color
+              borderRadius: '4px',
+              marginTop: '20px', 
+              padding: '10px 20px', 
+              backgroundColor: '#ff9800', 
+              color: '#fff', 
               '&:hover': {
-                backgroundColor: '#f57c00', // Custom hover color
+                backgroundColor: '#f57c00',
               },
             }}
             variant='contained'
