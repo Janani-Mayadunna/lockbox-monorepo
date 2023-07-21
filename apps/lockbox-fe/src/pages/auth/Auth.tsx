@@ -1,33 +1,27 @@
-import { useState, useEffect, MouseEvent } from 'react';
+import { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ResponsiveAppBar from '../../components/global/AppBar';
 import { useAppDispatch } from '../../../src/store';
-import { getCurrentUser, loginRequest } from './redux/actions';
+import { loginRequest } from './redux/actions';
 import { LoginPayload } from './redux/types';
 import { generateVaultKey, hashPassword } from '../../../src/helpers/crypto';
+import {
+  authorizedFetch,
+  getUserSalt,
+} from '../../../src/helpers/request-interceptor';
 
 const Auth = () => {
   const [user, setUser] = useState({
     email: '',
     password: '',
   });
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const token = localStorage.getItem('jwt-lockbox');
+  const hashedPassword = hashPassword(user.password);
 
-  useEffect(() => {
-    if (token) {
-      dispatch(getCurrentUser());
-      navigate('/dashboard');
-    }
-  }, [dispatch, navigate, token]);
-
-  function handleSubmit(e: MouseEvent<HTMLButtonElement>) {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    const hashedPassword = hashPassword(user.password);
 
     let data: LoginPayload = {
       values: {
@@ -35,20 +29,44 @@ const Auth = () => {
         password: hashedPassword,
       },
     };
-    const vaultKey = generateVaultKey({
-      hashedPassword: data.values.password,
-      email: data.values.email,
-    });
 
-    //set vaultKey in local storage
-    localStorage.setItem('VK', vaultKey);
-
-    dispatch(loginRequest(data));
+    await dispatch(loginRequest(data));
 
     const token = localStorage.getItem('jwt-blogapp');
     console.log('TOKEN', token);
     console.log(data);
-  }
+
+    setTimeout(() => {
+      handleGetUser();
+    }, 2000);
+  };
+
+  const handleGetUser = async () => {
+    await authorizedFetch('http://localhost:4000/api/auth/current-user', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res?) => res.json())
+      .then((data) => {
+        localStorage.setItem('current-user', JSON.stringify(data.user));
+      })
+      .catch((err) => {
+        console.log('err: ', err);
+      });
+
+    const salt = getUserSalt();
+
+    const vaultKey = generateVaultKey({
+      hashedPassword: hashedPassword,
+      email: user.email,
+      salt: salt,
+    });
+
+    //set vaultKey in local storage
+    localStorage.setItem('VK', vaultKey);
+  };
 
   return (
     <div>
@@ -82,8 +100,8 @@ const Auth = () => {
             label='Email'
             variant='outlined'
             sx={{
-              backgroundColor: 'white', 
-              borderRadius: '4px', 
+              backgroundColor: 'white',
+              borderRadius: '4px',
             }}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
@@ -96,8 +114,8 @@ const Auth = () => {
             label='Password'
             variant='outlined'
             sx={{
-              backgroundColor: 'white', 
-              borderRadius: '4px', 
+              backgroundColor: 'white',
+              borderRadius: '4px',
             }}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
@@ -107,13 +125,13 @@ const Auth = () => {
               onClick={handleSubmit}
               type='submit'
               sx={{
-                borderRadius: '4px', 
-                marginTop: '20px', 
-                padding: '10px 20px', 
-                backgroundColor: '#007bff', 
-                color: '#fff', 
+                borderRadius: '4px',
+                marginTop: '20px',
+                padding: '10px 20px',
+                backgroundColor: '#007bff',
+                color: '#fff',
                 '&:hover': {
-                  backgroundColor: '#0056b3', 
+                  backgroundColor: '#0056b3',
                 },
               }}
               variant='contained'

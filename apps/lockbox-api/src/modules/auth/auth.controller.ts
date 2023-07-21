@@ -30,7 +30,7 @@ export class AuthController {
   @Get('current-user')
   getCurrentUser(
     @Headers('authorization') authorizationHeader: string,
-  ): Promise<{ user: User }> {
+  ): Promise<{ user: Partial<User> }> {
     const token = authorizationHeader?.replace('Bearer ', '');
 
     if (!token) {

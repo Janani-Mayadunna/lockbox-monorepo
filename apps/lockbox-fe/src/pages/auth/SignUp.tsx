@@ -1,9 +1,8 @@
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IUserSignIn } from './interfaces';
-import { authorizedFetch } from '../../../src/helpers/request-interceptor';
 import { hashPassword } from '../../../src/helpers/crypto';
 
 const SignUp = () => {
@@ -12,7 +11,7 @@ const SignUp = () => {
     email: '',
     password: '',
   });
- const navigate = useNavigate();
+  const navigate = useNavigate();
 
   function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -25,7 +24,7 @@ const SignUp = () => {
       password: hashedPassword,
     };
 
-    authorizedFetch('http://localhost:4000/api/auth/signup', {
+    fetch('http://localhost:4000/api/auth/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,9 +32,8 @@ const SignUp = () => {
       body: JSON.stringify(newUser),
     })
       .then((res) => {
-        console.log('res: ', res);
-        if(res.status === 201) {
-          navigate('/dashboard');
+        if (res.status === 201) {
+          navigate('/auth');
         }
       })
       .catch((err) => {
@@ -48,105 +46,104 @@ const SignUp = () => {
       <h1 className='title'>{'Welcome!'}</h1>
 
       <form>
-      <Box
-        sx={{
-          backgroundColor: 'rgb(173 167 179 / 54%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxWidth: '45ch',
-          margin: 'auto',
-          marginTop: '5ch',
-          padding: '5ch',
-          borderRadius: '2ch',
-        }}
-      >
-        <Typography variant='h4' paddingBottom={3} textAlign='center'>
-          {'Sign Up'}
-        </Typography>
-
-        <TextField
-          name='name'
-          value={user.name}
-          margin='normal'
-          type='text'
-          label='Name'
-          variant='outlined'
+        <Box
           sx={{
-            backgroundColor: 'white', 
-            borderRadius: '4px',
-          }}
-          onChange={(e) => setUser({ ...user, name: e.target.value })}
-        />
-
-        <TextField
-          name='email'
-          value={user.email}
-          margin='normal'
-          type='text'
-          label='Email'
-          variant='outlined'
-          sx={{
-            backgroundColor: 'white', 
-            borderRadius: '4px',
-          }}
-          onChange={(e) => setUser({ ...user, email: e.target.value })}
-        />
-
-        <TextField
-          name='password'
-          value={user.password}
-          margin='normal'
-          type='password'
-          label='Password'
-          variant='outlined'
-          sx={{
-            backgroundColor: 'white', 
-            borderRadius: '4px',
-          }}
-          onChange={(e) => setUser({ ...user, password: e.target.value })}
-        />
-
-        <Link to='/dashboard' style={{ textDecoration: 'none' }}>
-          <Button
-            onClick={handleSubmit}
-            type='submit'
-            sx={{
-              borderRadius: '4px',
-              marginTop: '20px', 
-              padding: '10px 20px', 
-              backgroundColor: '#ff9800', 
-              color: '#fff', 
-              '&:hover': {
-                backgroundColor: '#f57c00',
-              },
-            }}
-            variant='contained'
-          >
-            Sign Up
-          </Button>
-        </Link>
-
-        <Button
-          sx={{
-            marginTop: 2,
-            borderRadius: 2,
-            backgroundColor: 'transparent',
-            textDecoration: 'underline',
-            '&:hover': {
-              textDecoration: 'none',
-            },
+            backgroundColor: 'rgb(173 167 179 / 54%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '45ch',
+            margin: 'auto',
+            marginTop: '5ch',
+            padding: '5ch',
+            borderRadius: '2ch',
           }}
         >
-          <Link to='/'> Already have an account? Login</Link>
-        </Button>
-      </Box>
-    </form>
+          <Typography variant='h4' paddingBottom={3} textAlign='center'>
+            {'Sign Up'}
+          </Typography>
+
+          <TextField
+            name='name'
+            value={user.name}
+            margin='normal'
+            type='text'
+            label='Name'
+            variant='outlined'
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '4px',
+            }}
+            onChange={(e) => setUser({ ...user, name: e.target.value })}
+          />
+
+          <TextField
+            name='email'
+            value={user.email}
+            margin='normal'
+            type='text'
+            label='Email'
+            variant='outlined'
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '4px',
+            }}
+            onChange={(e) => setUser({ ...user, email: e.target.value })}
+          />
+
+          <TextField
+            name='password'
+            value={user.password}
+            margin='normal'
+            type='password'
+            label='Password'
+            variant='outlined'
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '4px',
+            }}
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
+          />
+
+          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
+            <Button
+              onClick={handleSubmit}
+              type='submit'
+              sx={{
+                borderRadius: '4px',
+                marginTop: '20px',
+                padding: '10px 20px',
+                backgroundColor: '#ff9800',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#f57c00',
+                },
+              }}
+              variant='contained'
+            >
+              Sign Up
+            </Button>
+          </Link>
+
+          <Button
+            sx={{
+              marginTop: 2,
+              borderRadius: 2,
+              backgroundColor: 'transparent',
+              textDecoration: 'underline',
+              '&:hover': {
+                textDecoration: 'none',
+              },
+            }}
+          >
+            <Link to='/'> Already have an account? Login</Link>
+          </Button>
+        </Box>
+      </form>
       <br />
     </div>
   );
 };
 
 export default SignUp;
-

@@ -15,6 +15,9 @@ export class User extends Document {
   @Prop()
   password: string;
 
+  @Prop()
+  salt: string;
+
   @Prop({ type: [{ type: Types.ObjectId, ref: Vault.name }] })
   vaults: Types.Array<Vault>;
 }
