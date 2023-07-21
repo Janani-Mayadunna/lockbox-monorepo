@@ -92,30 +92,9 @@ export const PasswordVault = () => {
               </Button>
             </Grid>
             <Grid item xs={8}>
-              <CustomizedMenus />
+              <CustomizedMenus password={row.password} />
             </Grid>
           </Grid>
-
-          {/* edit */}
-          {/* <Link to={`/ao/updatefertilizer/${row._id}`}>
-            <Button className='editBtnAo'>
-              <EditIcon />
-            </Button>
-          </Link> */}
-
-          {/* delete */}
-          {/* <Button
-            // onClick={(e) => deleteHandler(row._id)}
-            className='deleteBtnAo'
-          >
-            <DeleteIcon />
-          </Button> */}
-
-          {/* share */}
-
-          {/* <Button>
-            <SendIcon />
-          </Button> */}
         </>
       ),
     },

@@ -9,6 +9,8 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Snackbar } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -53,14 +55,42 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }));
 
-export default function CustomizedMenus() {
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
+
+export default function CustomizedMenus(password: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+
+  const handleSnackbarClose = (
+    e?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackbarOpen(false);
+  };
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(password.password);
+    setSnackbarOpen(true);
+
+    handleClose();
   };
 
   return (
@@ -70,12 +100,24 @@ export default function CustomizedMenus() {
         aria-controls={open ? 'demo-customized-menu' : undefined}
         aria-haspopup='true'
         aria-expanded={open ? 'true' : undefined}
-        // variant='contained'
         disableElevation
         onClick={handleClick}
       >
         <MoreVertIcon />
       </Button>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1500}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity='success'
+          sx={{ width: '100%' }}
+        >
+          Password Copied to Clipboard
+        </Alert>
+      </Snackbar>
       <StyledMenu
         id='demo-customized-menu'
         MenuListProps={{
@@ -89,10 +131,11 @@ export default function CustomizedMenus() {
           <EditIcon />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem onClick={handleCopyToClipboard} disableRipple>
           <FileCopyIcon />
-          Copy
+          Copy Password
         </MenuItem>
+
         <MenuItem onClick={handleClose} disableRipple>
           <SendIcon />
           Share
