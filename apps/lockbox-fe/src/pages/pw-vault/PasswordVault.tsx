@@ -2,12 +2,16 @@ import { Link } from 'react-router-dom';
 import { Button, Container } from '@mui/material';
 import DataTable from 'react-data-table-component';
 import { tableCustomStyles } from '../../../src/components/global/TableCustomStyles';
-import { authorizedFetch } from '../../../src/helpers/request-interceptor';
+import {
+  authorizedFetch,
+  getVaultKey,
+} from '../../../src/helpers/request-interceptor';
 import { useEffect, useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SendIcon from '@mui/icons-material/Send';
+import { decryptVault } from '../../../src/helpers/crypto';
 
 export const PasswordVault = () => {
   const [vaultData, setVaultData] = useState([]);
@@ -22,7 +26,6 @@ export const PasswordVault = () => {
       .then((res) => res.json())
       .then((data) => {
         setVaultData(data);
-        console.log('vault', vaultData);
       })
       .catch((err) => {
         console.log('err: ', err);
@@ -33,7 +36,22 @@ export const PasswordVault = () => {
     getAllVaults();
   }, []);
 
-  const vaults = vaultData.map((row: any, index: any) => ({
+  //loop through vaultData array and decrypt each password
+  const decryptedVaults = vaultData.map((row: any) => {
+    const vaultKey = getVaultKey();
+
+    const decryptedVaultPW = decryptVault({
+      vault: row.password,
+      vaultKey: vaultKey,
+    });
+
+    return {
+      ...row,
+      password: decryptedVaultPW,
+    };
+  });
+
+  const vaults = decryptedVaults.map((row: any, index: any) => ({
     ...row,
     id: index + 1,
   }));
@@ -107,8 +125,8 @@ export const PasswordVault = () => {
         columns={columns}
         data={vaults}
         pagination={true}
-        paginationPerPage={5}
-        paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
+        paginationPerPage={10}
+        paginationRowsPerPageOptions={[10, 20, 30]}
         noDataComponent='No Products Found'
       />
     </Container>

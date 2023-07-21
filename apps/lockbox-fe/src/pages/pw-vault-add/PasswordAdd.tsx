@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ICreateVault } from './interfaces';
-import { authorizedFetch } from '../../helpers/request-interceptor';
+import {
+  authorizedFetch,
+  getVaultKey,
+} from '../../helpers/request-interceptor';
+import { decryptVault, encryptVault } from '../../../src/helpers/crypto';
 
 const PasswordAdd = () => {
   const [vaultData, setVaultData] = useState({
@@ -13,11 +17,27 @@ const PasswordAdd = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
+    const vaultKey = getVaultKey();
+
+    const vaultPW = vaultData.password;
+
+    const encryptedVaultPW = encryptVault({
+      vault: vaultPW,
+      vaultKey,
+    });
+
     const newVault: ICreateVault = {
       link: vaultData.link,
       username: vaultData.username,
-      password: vaultData.password,
+      password: encryptedVaultPW,
     };
+
+    const decryptedPW = decryptVault({
+      vault: encryptedVaultPW,
+      vaultKey: 'test',
+    });
+    console.log('encryptedVaultPW', encryptedVaultPW);
+    console.log('decryptedPW', decryptedPW);
 
     authorizedFetch('http://localhost:4000/api/vault', {
       method: 'POST',

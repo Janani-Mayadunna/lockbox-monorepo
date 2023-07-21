@@ -17,3 +17,9 @@ export function authorizedFetch(
   const interceptedRequest = authInterceptor(request);
   return fetch(interceptedRequest);
 }
+
+export function getVaultKey(): string {
+  const storedVaultKey = localStorage.getItem('VK');
+  const vaultKey = storedVaultKey!;
+  return vaultKey;
+}
