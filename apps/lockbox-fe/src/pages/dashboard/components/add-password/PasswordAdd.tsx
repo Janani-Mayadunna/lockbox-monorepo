@@ -4,8 +4,8 @@ import { ICreateVault } from './interfaces';
 import {
   authorizedFetch,
   getVaultKey,
-} from '../../helpers/request-interceptor';
-import { decryptVault, encryptVault } from '../../../src/helpers/crypto';
+} from '../../../../helpers/request-interceptor';
+import { decryptVault, encryptVault } from '../../../../helpers/crypto';
 
 const PasswordAdd = () => {
   const [vaultData, setVaultData] = useState({
