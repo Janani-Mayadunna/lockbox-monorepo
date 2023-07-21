@@ -23,3 +23,10 @@ export function getVaultKey(): string {
   const vaultKey = storedVaultKey!;
   return vaultKey;
 }
+
+export function getUserSalt(): string {
+  const storedVaultKey = localStorage.getItem('current-user');
+  const userData = JSON.parse(storedVaultKey!);
+  const salt = userData.salt;
+  return salt;
+}

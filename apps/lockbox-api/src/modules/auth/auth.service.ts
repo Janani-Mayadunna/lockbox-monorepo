@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/schemas/user.schema';
+import * as argon2 from 'argon2';
+import { generateSalt } from '../../utils/helper-functions';
 
 @Injectable()
 export class AuthService {
@@ -19,12 +21,15 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto): Promise<{ token: string }> {
     const { name, email, password } = signUpDto;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const userSalt = generateSalt();
+
+    const hashedPassword = await argon2.hash(`${email}:${password}`);
 
     const user = await this.userModel.create({
       name,
       email,
       password: hashedPassword,
+      salt: userSalt,
     });
 
     const token = this.jwtService.sign({ id: user._id });
@@ -42,7 +47,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    const isPasswordMatched = await argon2.verify(
+      user.password,
+      `${email}:${password}`,
+    );
+
     if (!isPasswordMatched) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -55,7 +64,7 @@ export class AuthService {
   }
 
   //get current user
-  async getCurrentUser(token: string): Promise<{ user: User }> {
+  async getCurrentUser(token: string): Promise<{ user: Partial<User> }> {
     const { id } = this.jwtService.verify(token);
 
     const user = await this.userModel.findById(id);
@@ -64,6 +73,14 @@ export class AuthService {
       throw new UnauthorizedException('Log in to access this endpoint');
     }
 
-    return { user };
+    //send all the values except usr.password
+    const filteredUser: Partial<User> = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      salt: user.salt ? user.salt : '',
+    };
+
+    return { user: filteredUser };
   }
 }

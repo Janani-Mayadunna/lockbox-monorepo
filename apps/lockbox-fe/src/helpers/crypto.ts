@@ -5,19 +5,19 @@ export function hashPassword(password: string) {
   return CryptoJS.SHA256(password).toString();
 }
 
-//to generate the vault key original passowrd, email and the salt stored on server is needed
+//to generate the vault key original passowrd, email and the randomly generated salt stored on server is needed
 // to get the salt original password and email is needed
 export function generateVaultKey({
   email,
   hashedPassword,
-}: // salt,
-{
+  salt,
+}: {
   email: string;
 
   hashedPassword: string;
-  // salt: number;
+  salt: any;
 }) {
-  return CryptoJS.PBKDF2(`${email}:${hashedPassword}`, '10', {
+  return CryptoJS.PBKDF2(`${email}:${hashedPassword}`, salt, {
     keySize: 32,
   }).toString();
 }
