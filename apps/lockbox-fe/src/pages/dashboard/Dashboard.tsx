@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Container } from '@mui/material';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
-import PasswordVault from '../pw-vault/PasswordVault';
+import PasswordVault from './components/vault/PasswordVault';
 
 const Dashboard = () => {
   const handleGetAll = async () => {

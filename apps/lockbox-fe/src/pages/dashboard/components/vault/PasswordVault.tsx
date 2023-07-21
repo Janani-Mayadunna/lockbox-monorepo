@@ -1,17 +1,14 @@
-import { Link } from 'react-router-dom';
-import { Button, Container } from '@mui/material';
+import { Button, Container, Grid } from '@mui/material';
 import DataTable from 'react-data-table-component';
-import { tableCustomStyles } from '../../../src/components/global/TableCustomStyles';
+import { tableCustomStyles } from '../../../../components/global/TableCustomStyles';
 import {
   authorizedFetch,
   getVaultKey,
-} from '../../../src/helpers/request-interceptor';
+} from '../../../../helpers/request-interceptor';
 import { useEffect, useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import SendIcon from '@mui/icons-material/Send';
-import { decryptVault } from '../../../src/helpers/crypto';
+import { decryptVault } from '../../../../helpers/crypto';
+import CustomizedMenus from '../options-menu/OptionsMenu';
 
 export const PasswordVault = () => {
   const [vaultData, setVaultData] = useState([]);
@@ -87,30 +84,38 @@ export const PasswordVault = () => {
       selector: (row: any) => (
         <>
           {/* visibility */}
-          <Button>
-            <VisibilityIcon />
-          </Button>
+
+          <Grid container spacing={0} columns={16}>
+            <Grid item xs={8}>
+              <Button>
+                <VisibilityIcon />
+              </Button>
+            </Grid>
+            <Grid item xs={8}>
+              <CustomizedMenus />
+            </Grid>
+          </Grid>
 
           {/* edit */}
-          <Link to={`/ao/updatefertilizer/${row._id}`}>
+          {/* <Link to={`/ao/updatefertilizer/${row._id}`}>
             <Button className='editBtnAo'>
               <EditIcon />
             </Button>
-          </Link>
+          </Link> */}
 
           {/* delete */}
-          <Button
+          {/* <Button
             // onClick={(e) => deleteHandler(row._id)}
             className='deleteBtnAo'
           >
             <DeleteIcon />
-          </Button>
+          </Button> */}
 
           {/* share */}
 
-          <Button>
+          {/* <Button>
             <SendIcon />
-          </Button>
+          </Button> */}
         </>
       ),
     },
