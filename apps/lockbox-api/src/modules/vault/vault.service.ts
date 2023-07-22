@@ -4,12 +4,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { User } from '../user/schemas/user.schema';
 import logger from '../../utils/logger';
-import { ObjectId } from 'mongodb';
 import {
   ICreateVault,
   IDeleteVault,
   IUpdateVault,
 } from './interfaces/vault.interfaces';
+import { JwtService } from '@nestjs/jwt';
+import { generateSalt } from '../../utils/helper-functions';
 
 @Injectable()
 export class VaultService {
@@ -18,6 +19,7 @@ export class VaultService {
     private vaultModel: Model<Vault>,
     @InjectModel(User.name)
     private userModel: Model<User>,
+    private jwtService: JwtService,
   ) {}
 
   async createVault(vault: ICreateVault, userId: string): Promise<Vault> {
@@ -135,5 +137,32 @@ export class VaultService {
     // await user.save();
 
     return deletedVault;
+  }
+
+  async shareVaultPassword(encryptedSharedPassword: string): Promise<any> {
+    // create one time link valid for 15 mins
+    const payload = {
+      salt: generateSalt(),
+      encryptedSharedPassword,
+    };
+
+    const shareToken = this.jwtService.sign(payload, {
+      expiresIn: '1m',
+      secret: process.env.JWT_SHARED_SECRET,
+    });
+
+    const link = `http://localhost:3000/vault/shared/${shareToken}`;
+    return link;
+  }
+
+  async verifyShareLink(shareToken: any): Promise<any> {
+    try {
+      const decoded = this.jwtService.verify(shareToken, {
+        secret: process.env.JWT_SHARED_SECRET,
+      });
+      return decoded;
+    } catch (error) {
+      return error;
+    }
   }
 }

@@ -6,6 +6,7 @@ import Landing from '../pages/landing/Landing.tsx';
 import PasswordVault from '../pages/dashboard/components/vault/PasswordVault.tsx';
 import PasswordAdd from '../pages/dashboard/components/add-password/PasswordAdd.tsx';
 import SignUp from '../pages/auth/SignUp.tsx';
+import SharedVault from '../pages/shared/index.tsx';
 
 const routers = [
   {
@@ -31,6 +32,10 @@ const routers = [
   {
     path: ROUTE.PASSWORD_VAULT_ADD,
     component: PasswordAdd,
+  },
+  {
+    path: ROUTE.SHARED,
+    component: SharedVault,
   },
 ];
 

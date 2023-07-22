@@ -27,8 +27,6 @@ export class VaultController {
     @Body() vault: CreateVaultDto,
     @getCurrentUserId() userId: string,
   ): Promise<Vault> {
-    // vault.user = userId;
-    console.log('req.user', userId);
     return this.vaultService.createVault(vault, userId);
   }
 
@@ -37,6 +35,19 @@ export class VaultController {
   @UseGuards(AuthGuard())
   async getAllUserVaults(@getCurrentUserId() userId: string): Promise<Vault[]> {
     return this.vaultService.getAllUserVaults(userId);
+  }
+
+  // share a password
+  @Post('/shared')
+  @UseGuards(AuthGuard())
+  async getSharedVault(@Body() encryptedSharedPassword: string): Promise<any> {
+    return this.vaultService.shareVaultPassword(encryptedSharedPassword);
+  }
+
+  //verify password share link validity and expiration
+  @Get('/verify-link/:id')
+  async getSharedLink(@Param('id') shareToken: string): Promise<any> {
+    return this.vaultService.verifyShareLink(shareToken);
   }
 
   //retrieve a single vault in the array and display

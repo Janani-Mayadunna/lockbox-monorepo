@@ -11,6 +11,9 @@ import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { authorizedFetch, getVaultKey } from '../../../../../src/helpers/request-interceptor';
+import { encryptVault } from '../../../../../src/helpers/crypto';
+import ShareModal from '../modals/ShareModal';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -64,8 +67,13 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
 export default function CustomizedMenus(password: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [shareLink, setShareLink] = React.useState('');
+
   const open = Boolean(anchorEl);
 
+  // handlers of the menu
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -73,8 +81,7 @@ export default function CustomizedMenus(password: any) {
     setAnchorEl(null);
   };
 
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-
+  // handler of snackbar
   const handleSnackbarClose = (
     e?: React.SyntheticEvent | Event,
     reason?: string
@@ -82,19 +89,54 @@ export default function CustomizedMenus(password: any) {
     if (reason === 'clickaway') {
       return;
     }
-
     setSnackbarOpen(false);
   };
 
+  // handler of copy
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(password.password);
     setSnackbarOpen(true);
-
     handleClose();
+  };
+
+  // handler of share modal
+  const handleModalOpen = () => {
+    setOpenModal(true);
+  };
+
+  // handler of share
+  const handleShare = () => {
+    handleModalOpen();
+
+    const vaultKey = getVaultKey();
+
+    const encryptedSharedPassword = encryptVault({
+      vault: password.password,
+      vaultKey: vaultKey,
+    });
+
+    authorizedFetch('http://localhost:4000/api/vault/shared', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: encryptedSharedPassword }),
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        setShareLink(data);
+      })
+      .catch((err) => {
+        console.log('err: ', err);
+      });
+
+      handleClose();
   };
 
   return (
     <div>
+      <ShareModal open={openModal} setOpenModal={setOpenModal} data={shareLink} />
+
       <Button
         id='demo-customized-button'
         aria-controls={open ? 'demo-customized-menu' : undefined}
@@ -107,7 +149,7 @@ export default function CustomizedMenus(password: any) {
       </Button>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={1500}
+        autoHideDuration={2500}
         onClose={handleSnackbarClose}
       >
         <Alert
@@ -127,7 +169,7 @@ export default function CustomizedMenus(password: any) {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem onClick={handleModalOpen} disableRipple>
           <EditIcon />
           Edit
         </MenuItem>
@@ -136,7 +178,7 @@ export default function CustomizedMenus(password: any) {
           Copy Password
         </MenuItem>
 
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem onClick={handleShare} disableRipple>
           <SendIcon />
           Share
         </MenuItem>

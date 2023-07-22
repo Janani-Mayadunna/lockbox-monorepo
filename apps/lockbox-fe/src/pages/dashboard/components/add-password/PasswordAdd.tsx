@@ -32,13 +32,6 @@ const PasswordAdd = () => {
       password: encryptedVaultPW,
     };
 
-    const decryptedPW = decryptVault({
-      vault: encryptedVaultPW,
-      vaultKey: 'test',
-    });
-    console.log('encryptedVaultPW', encryptedVaultPW);
-    console.log('decryptedPW', decryptedPW);
-
     authorizedFetch('http://localhost:4000/api/vault', {
       method: 'POST',
       headers: {

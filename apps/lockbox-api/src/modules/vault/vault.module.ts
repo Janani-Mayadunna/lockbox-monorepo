@@ -4,9 +4,8 @@ import { VaultService } from './vault.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VaultSchema } from './schemas/vault.schema';
 import { AuthModule } from '../auth/auth.module';
-import { UserModule } from '../user/user.module';
 import { UserSchema } from '../user/schemas/user.schema';
-import { PassportModule } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -15,6 +14,6 @@ import { PassportModule } from '@nestjs/passport';
     forwardRef(() => AuthModule),
   ],
   controllers: [VaultController],
-  providers: [VaultService],
+  providers: [VaultService, JwtService],
 })
 export class VaultModule {}

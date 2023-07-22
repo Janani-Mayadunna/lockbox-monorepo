@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ResponsiveAppBar from '../../components/global/AppBar';
 import { useAppDispatch } from '../../../src/store';
 import { loginRequest } from './redux/actions';
@@ -12,11 +12,19 @@ import {
 } from '../../../src/helpers/request-interceptor';
 
 const Auth = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (localStorage.getItem('jwt-lockbox')) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   const [user, setUser] = useState({
     email: '',
     password: '',
   });
-  const dispatch = useAppDispatch();
 
   const hashedPassword = hashPassword(user.password);
 
@@ -151,7 +159,7 @@ const Auth = () => {
               },
             }}
           >
-            <Link to='/'> New here? Sign Up</Link>
+            <Link to='/signup'> New here? Sign Up</Link>
           </Button>
         </Box>
       </form>
