@@ -4,8 +4,8 @@ import { ICreateVault } from './interfaces';
 import {
   authorizedFetch,
   getVaultKey,
-} from '../../../../helpers/request-interceptor';
-import { encryptVault } from '../../../../helpers/crypto';
+} from '../../helpers/request-interceptor';
+import { encryptVault } from '../../helpers/crypto';
 import {
   Box,
   Button,
@@ -16,7 +16,8 @@ import {
   Typography,
 } from '@mui/material';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
-import ResponsiveAppBar from '../../../../../src/components/global/AppBar';
+import ResponsiveAppBar from '../../components/global/AppBar';
+import GenPassModal from '../dashboard/components/modals/GenPassModal';
 
 const PasswordAdd = () => {
   const [vaultData, setVaultData] = useState({
@@ -24,6 +25,12 @@ const PasswordAdd = () => {
     password: '',
     link: '',
   });
+  const [openModal, setOpenModal] = useState(false);
+
+  // handler of modal
+  const handleModalOpen = () => {
+    setOpenModal(true);
+  };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -60,6 +67,8 @@ const PasswordAdd = () => {
   return (
     <div>
       <ResponsiveAppBar />
+
+      <GenPassModal open={openModal} setOpenModal={setOpenModal} />
 
       <Box
         sx={{
@@ -102,6 +111,7 @@ const PasswordAdd = () => {
             <Grid container spacing={1} alignItems='center'>
               <Grid item>
                 <TextField
+                  id='password'
                   label='Password'
                   variant='outlined'
                   type='password'
@@ -115,7 +125,12 @@ const PasswordAdd = () => {
               </Grid>
               <Grid item>
                 <Tooltip title='Generate safe password' arrow>
-                  <Button type='button' variant='text' sx={{ color: 'green' }}>
+                  <Button
+                    onClick={handleModalOpen}
+                    type='button'
+                    variant='text'
+                    sx={{ color: 'green' }}
+                  >
                     <AutoAwesomeTwoToneIcon sx={{ fontSize: '2rem' }} />
                   </Button>
                 </Tooltip>
