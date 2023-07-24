@@ -1,9 +1,13 @@
 import { all, call, put, takeLatest } from 'redux-saga/effects';
 import API from '../constants';
-import { LOGIN_REQUEST } from './actionTypes';
-import { loginFailure, loginSuccess } from './actions';
+import { LOGIN_REQUEST, LOGOUT_REQUEST } from './actionTypes';
+import {
+  loginFailure,
+  loginSuccess,
+  logoutFailure,
+  logoutSuccess,
+} from './actions';
 import { LoginPayload } from './types';
-import { push } from 'connected-react-router';
 
 const login = async (payload: LoginPayload) => {
   try {
@@ -27,8 +31,6 @@ const login = async (payload: LoginPayload) => {
       localStorage.setItem('isLoggedIn', JSON.stringify(true));
 
       console.log('Successfully Logged In!');
-      console.log(token);
-      
       return token;
     } else {
       console.log('Failed to Login');
@@ -45,13 +47,25 @@ function* loginSaga(action: any) {
     });
 
     yield put(loginSuccess({ token: response.token }));
-
-    yield put(push('/'));
   } catch (e: any) {
     yield put(loginFailure({ error: e.message }));
   }
 }
 
+function* logoutSaga() {
+  try {
+    localStorage.removeItem('jwt-lockbox');
+    localStorage.setItem('isLoggedIn', JSON.stringify(false));
+    localStorage.removeItem('current-user');
+    localStorage.removeItem('VK');
+
+    yield put(logoutSuccess());
+  } catch (error) {
+    yield put(logoutFailure(error));
+  }
+}
+
 export function* authSaga() {
   yield all([takeLatest(LOGIN_REQUEST, loginSaga)]);
+  yield all([takeLatest(LOGOUT_REQUEST, logoutSaga)]);
 }
