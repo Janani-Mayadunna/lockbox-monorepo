@@ -137,7 +137,7 @@ const SignUp = () => {
               },
             }}
           >
-            <Link to='/'> Already have an account? Login</Link>
+            <Link to='/auth'> Already have an account? Login</Link>
           </Button>
         </Box>
       </form>

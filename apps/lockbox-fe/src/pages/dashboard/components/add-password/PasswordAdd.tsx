@@ -5,7 +5,18 @@ import {
   authorizedFetch,
   getVaultKey,
 } from '../../../../helpers/request-interceptor';
-import { decryptVault, encryptVault } from '../../../../helpers/crypto';
+import { encryptVault } from '../../../../helpers/crypto';
+import {
+  Box,
+  Button,
+  Card,
+  Grid,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
+import ResponsiveAppBar from '../../../../../src/components/global/AppBar';
 
 const PasswordAdd = () => {
   const [vaultData, setVaultData] = useState({
@@ -18,7 +29,6 @@ const PasswordAdd = () => {
     e.preventDefault();
 
     const vaultKey = getVaultKey();
-
     const vaultPW = vaultData.password;
 
     const encryptedVaultPW = encryptVault({
@@ -49,102 +59,125 @@ const PasswordAdd = () => {
 
   return (
     <div>
-      <h1 className='title'>Add Password</h1>
+      <ResponsiveAppBar />
 
-      <form
-        style={{
+      <Box
+        sx={{
           display: 'flex',
-          flexDirection: 'column',
-          maxWidth: '300px',
-          margin: '0 auto',
+          justifyContent: 'center',
+          marginTop: '30px',
+          marginBottom: '30px',
         }}
       >
-        <label htmlFor='username' style={{ marginBottom: '10px' }}>
-          Username
-        </label>
-        <input
-          type='text'
-          id='username'
-          value={vaultData.username}
-          name='username'
-          style={{ marginBottom: '10px', padding: '5px' }}
-          onChange={(e) =>
-            setVaultData({ ...vaultData, username: e.target.value })
-          }
-        />
+        <Typography variant='h5'>Add Passwords</Typography>
+      </Box>
 
-        <label htmlFor='password' style={{ marginBottom: '10px' }}>
-          Password
-        </label>
-        <input
-          type='password'
-          id='password'
-          value={vaultData.password}
-          name='password'
-          style={{ marginBottom: '10px', padding: '5px' }}
-          onChange={(e) =>
-            setVaultData({ ...vaultData, password: e.target.value })
-          }
-        />
-
-        <label htmlFor='url' style={{ marginBottom: '10px' }}>
-          URI
-        </label>
-        <input
-          type='text'
-          value={vaultData.link}
-          id='link'
-          name='link'
-          style={{ marginBottom: '10px', padding: '5px' }}
-          onChange={(e) => setVaultData({ ...vaultData, link: e.target.value })}
-        />
-
-        <button
-          type='submit'
-          onClick={handleSubmit}
-          style={{
-            marginBottom: '10px',
-            padding: '5px 10px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+      >
+        <Card
+          sx={{
+            padding: '50px',
+            maxWidth: '700px',
+            backgroundColor: 'rgb(234 234 234 / 50%)',
           }}
         >
-          Submit
-        </button>
-
-        <button
-          type='reset'
-          onClick={() => setVaultData({ username: '', password: '', link: '' })}
-          style={{
-            marginBottom: '10px',
-            padding: '5px 10px',
-            backgroundColor: '#6c757d',
-            color: '#fff',
-            border: 'none',
-          }}
-        >
-          Reset
-        </button>
-
-        <button
-          type='button'
-          style={{
-            marginBottom: '10px',
-            padding: '5px 10px',
-            backgroundColor: '#dc3545',
-            color: '#fff',
-            border: 'none',
-          }}
-        >
-          <Link
-            to='/dashboard'
-            style={{ textDecoration: 'none', color: 'white' }}
+          <form
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
           >
-            Back
-          </Link>
-        </button>
-      </form>
+            <TextField
+              label='Username'
+              variant='outlined'
+              value={vaultData.username}
+              name='username'
+              sx={{ marginBottom: '10px', padding: '5px' }}
+              onChange={(e) =>
+                setVaultData({ ...vaultData, username: e.target.value })
+              }
+            />
+
+            <Grid container spacing={1} alignItems='center'>
+              <Grid item>
+                <TextField
+                  label='Password'
+                  variant='outlined'
+                  type='password'
+                  value={vaultData.password}
+                  name='password'
+                  sx={{ marginBottom: '10px', padding: '5px' }}
+                  onChange={(e) =>
+                    setVaultData({ ...vaultData, password: e.target.value })
+                  }
+                />
+              </Grid>
+              <Grid item>
+                <Tooltip title='Generate safe password' arrow>
+                  <Button type='button' variant='text' sx={{ color: 'green' }}>
+                    <AutoAwesomeTwoToneIcon sx={{ fontSize: '2rem' }} />
+                  </Button>
+                </Tooltip>
+              </Grid>
+            </Grid>
+
+            <TextField
+              label='URI'
+              variant='outlined'
+              type='text'
+              value={vaultData.link}
+              name='link'
+              sx={{ marginBottom: '10px', padding: '5px' }}
+              onChange={(e) =>
+                setVaultData({ ...vaultData, link: e.target.value })
+              }
+            />
+
+            <Button
+              type='submit'
+              onClick={handleSubmit}
+              variant='contained'
+              sx={{
+                marginBottom: '10px',
+                backgroundColor: '#007bff',
+                color: 'black',
+              }}
+            >
+              Submit
+            </Button>
+
+            <Button
+              type='reset'
+              onClick={() =>
+                setVaultData({ username: '', password: '', link: '' })
+              }
+              variant='contained'
+              sx={{
+                marginBottom: '10px',
+                backgroundColor: '#6c757d',
+                color: 'black',
+              }}
+            >
+              Reset
+            </Button>
+
+            <Button
+              type='button'
+              variant='contained'
+              sx={{
+                marginBottom: '10px',
+                backgroundColor: '#dc3545',
+                color: 'black',
+              }}
+              component={Link}
+              to='/dashboard'
+            >
+              View All
+            </Button>
+          </form>
+        </Card>
+      </Box>
 
       <br />
       <br />

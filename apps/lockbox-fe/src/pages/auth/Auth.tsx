@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import ResponsiveAppBar from '../../components/global/AppBar';
 import { useAppDispatch } from '../../../src/store';
@@ -26,6 +33,13 @@ const Auth = () => {
     password: '',
   });
 
+  const [backdropOpen, setBackdropOpen] = React.useState(false);
+
+  //handler backdrop loading state
+  const handleClose = () => {
+    setBackdropOpen(false);
+  };
+
   const hashedPassword = hashPassword(user.password);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,7 +52,18 @@ const Auth = () => {
       },
     };
 
-    await dispatch(loginRequest(data));
+    console.log('DATA', data);
+
+    try {
+      await dispatch(loginRequest(data));
+      setBackdropOpen(true);
+      setTimeout(() => {
+        setBackdropOpen(false);
+        navigate('/dashboard');
+      }, 2000);
+    } catch (err) {
+      console.log('err: ', err);
+    }
 
     const token = localStorage.getItem('jwt-blogapp');
     console.log('TOKEN', token);
@@ -78,6 +103,14 @@ const Auth = () => {
 
   return (
     <div>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backdropOpen}
+        onClick={handleClose}
+      >
+        <CircularProgress color='inherit' />
+      </Backdrop>
+
       <ResponsiveAppBar />
       <h1 className='title'>{'Hello again!'}</h1>
 

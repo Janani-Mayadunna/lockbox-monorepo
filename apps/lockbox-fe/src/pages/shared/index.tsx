@@ -66,9 +66,7 @@ const SharedVault = () => {
           <h1 className='title'>Shared Page</h1>
           <h3>Shared password is : {decryptedSharedPW}</h3>
 
-          <p>
-            This link expires after 1 minute and cannot be viewed after that
-          </p>
+          <p>This link expires after 1 minute and cannot be viewed again</p>
         </Box>
       )}
     </Container>
