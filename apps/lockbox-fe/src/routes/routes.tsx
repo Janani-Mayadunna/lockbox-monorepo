@@ -4,7 +4,7 @@ import Dashboard from '../pages/dashboard/Dashboard.tsx';
 import { Route, Routes } from 'react-router-dom';
 import Landing from '../pages/landing/Landing.tsx';
 import PasswordVault from '../pages/dashboard/components/vault/PasswordVault.tsx';
-import PasswordAdd from '../pages/dashboard/components/add-password/PasswordAdd.tsx';
+import PasswordAdd from '../pages/add-password/PasswordAdd.tsx';
 import SignUp from '../pages/auth/SignUp.tsx';
 import SharedVault from '../pages/shared/index.tsx';
 
