@@ -30,3 +30,9 @@ export function getUserSalt(): string {
   const salt = userData.salt;
   return salt;
 }
+
+export function getLoggedIn(): boolean {
+  const isLoggedIn = localStorage.getItem('isLoggedIn');
+  const loggedIn = isLoggedIn === 'true' ? true : false;
+  return loggedIn;
+}

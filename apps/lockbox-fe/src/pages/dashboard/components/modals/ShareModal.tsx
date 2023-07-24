@@ -47,6 +47,10 @@ export default function ShareModal({
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(data);
     setSnackbarOpen(true);
+
+    setTimeout(() => {
+      handleClose();
+    }, 200);
   };
 
   // handler of snackbar

@@ -102,8 +102,6 @@ export const PasswordVault = () => {
 
   return (
     <Container sx={{ marginY: 10, marginTop: 4 }}>
-      <h3 className='title'>Password Vault</h3>
-
       <DataTable
         customStyles={tableCustomStyles}
         columns={columns}
