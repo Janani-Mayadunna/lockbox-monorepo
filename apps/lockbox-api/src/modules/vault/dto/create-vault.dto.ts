@@ -1,19 +1,19 @@
-import { IsEmpty, IsNotEmpty, IsString } from 'class-validator';
-import { User } from '../../user/schemas/user.schema';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+// import { User } from '../../user/schemas/user.schema';
 
 export class CreateVaultDto {
   @IsNotEmpty()
   @IsString()
-  readonly link: string;
+  link: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly username: string;
+  username: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly password: string;
+  password: string;
 
-  @IsEmpty({ message: 'You cannot pass user id' })
-  readonly user: User;
+  // @IsOptional({ message: 'You cannot pass user id' })
+  // user: string;
 }

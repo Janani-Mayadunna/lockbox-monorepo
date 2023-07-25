@@ -12,16 +12,28 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../../src/store';
+import { logoutRequest } from '../../../src/pages/auth/redux/actions';
+import { getLoggedIn } from '../../../src/helpers/request-interceptor';
 
 const pages = [
-  { title: 'Home', path: '/dash' },
-  { title: 'Password Category', path: '/' },
-  { title: 'Password Details', path: '/' },
+  { title: 'Home', path: '/' },
+  { title: 'Password Vault', path: '/dashboard' },
 ];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Profile', 'Password Vault', 'Logout'];
 
 function ResponsiveAppBar() {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [isLogged, setIsLogged] = React.useState(false);
+
+  React.useEffect(() => {
+    const isUserLogged = getLoggedIn();
+    setIsLogged(isUserLogged);
+    console.log('isUserLogged: ', isLogged);
+  }, [isLogged]);
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -44,18 +56,40 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  const handleSettingsItemClick = (item: string) => {
+    if (item === 'Dashboard') {
+      handleCloseUserMenu();
+      navigate('/dashboard');
+    }
+    if (item === 'Logout') {
+      handleCloseUserMenu();
+      localStorage.removeItem('jwt-lockbox');
+      dispatch(logoutRequest());
+      navigate('/');
+    }
+  };
+
   return (
     <AppBar position='static'>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <img
+            style={{
+              height: '3rem',
+              width: '3rem',
+              marginRight: '1rem',
+              marginLeft: '1rem',
+            }}
+            src='https://clipart.coolclips.com/480/vectors/tf05191/CoolClips_vc017972.png'
+            alt='logo'
+          />
           <Typography
-            variant='h6'
+            variant='h5'
             noWrap
             component='a'
             href='/'
             sx={{
-              mr: 2,
+              mr: 10,
               display: { xs: 'none', md: 'flex' },
               fontFamily: 'monospace',
               fontWeight: 700,
@@ -64,7 +98,7 @@ function ResponsiveAppBar() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            LockBox
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -128,19 +162,26 @@ function ResponsiveAppBar() {
           >
             LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page.title}
-                component={Link}
-                to={page.path}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page.title}
-              </Button>
-            ))}
-          </Box>
+
+          {isLogged ? (
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              {pages.map((page) => (
+                <Button
+                  key={page.title}
+                  component={Link}
+                  to={page.path}
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  {page.title}
+                </Button>
+              ))}
+            </Box>
+          ) : (
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              {' '}
+            </Box>
+          )}
 
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title='Open settings'>
@@ -165,7 +206,10 @@ function ResponsiveAppBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() => handleSettingsItemClick(setting)}
+                >
                   <Typography textAlign='center'>{setting}</Typography>
                 </MenuItem>
               ))}

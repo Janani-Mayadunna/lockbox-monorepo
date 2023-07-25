@@ -1,113 +1,204 @@
-import  { useState } from 'react'
-import { Box, Button, TextField, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import ResponsiveAppBar from '../../components/global/AppBar';
-
+import { useAppDispatch } from '../../../src/store';
+import { loginRequest } from './redux/actions';
+import { LoginPayload } from './redux/types';
+import { generateVaultKey, hashPassword } from '../../../src/helpers/crypto';
+import {
+  authorizedFetch,
+  getUserSalt,
+} from '../../../src/helpers/request-interceptor';
 
 const Auth = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const [isSignup, setIsSignup] = useState(false);
+  React.useEffect(() => {
+    if (localStorage.getItem('jwt-lockbox')) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
+  const [user, setUser] = useState({
+    email: '',
+    password: '',
+  });
+
+  const [backdropOpen, setBackdropOpen] = React.useState(false);
+
+  //handler backdrop loading state
+  const handleClose = () => {
+    setBackdropOpen(false);
+  };
+
+  const hashedPassword = hashPassword(user.password);
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    let data: LoginPayload = {
+      values: {
+        email: user.email,
+        password: hashedPassword,
+      },
+    };
+
+    console.log('DATA', data);
+
+    try {
+      await dispatch(loginRequest(data));
+      setBackdropOpen(true);
+      setTimeout(() => {
+        setBackdropOpen(false);
+        navigate('/dashboard');
+      }, 2000);
+    } catch (err) {
+      console.log('err: ', err);
+    }
+
+    const token = localStorage.getItem('jwt-blogapp');
+    console.log('TOKEN', token);
+    console.log(data);
+
+    setTimeout(() => {
+      handleGetUser();
+    }, 2000);
+  };
+
+  const handleGetUser = async () => {
+    await authorizedFetch('http://localhost:4000/api/auth/current-user', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res?) => res.json())
+      .then((data) => {
+        localStorage.setItem('current-user', JSON.stringify(data.user));
+      })
+      .catch((err) => {
+        console.log('err: ', err);
+      });
+
+    const salt = getUserSalt();
+
+    const vaultKey = generateVaultKey({
+      hashedPassword: hashedPassword,
+      email: user.email,
+      salt: salt,
+    });
+
+    //set vaultKey in local storage
+    localStorage.setItem('VK', vaultKey);
+  };
 
   return (
     <div>
-        <ResponsiveAppBar />
-        <h1 className="title">{isSignup ? 'Welcome!' : "Hello again!"}</h1>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={backdropOpen}
+        onClick={handleClose}
+      >
+        <CircularProgress color='inherit' />
+      </Backdrop>
 
-        <form>
+      <ResponsiveAppBar />
+      <h1 className='title'>{'Hello again!'}</h1>
+
+      <form>
         <Box
           sx={{
-            backgroundColor: "rgb(110 170 240 / 50%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            maxWidth: "45ch",
-            margin: "auto",
-            marginTop: "5ch",
-            padding: "5ch",
-            borderRadius: "2ch",
+            backgroundColor: 'rgb(110 170 240 / 50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '45ch',
+            margin: 'auto',
+            marginTop: '5ch',
+            padding: '5ch',
+            borderRadius: '2ch',
           }}
         >
-          <Typography variant="h4" paddingBottom={3} textAlign="center">
-            {isSignup ? "Sign Up" : "Login"}
+          <Typography variant='h4' paddingBottom={3} textAlign='center'>
+            {'Login'}
           </Typography>
 
-          {isSignup && (
-            <TextField
-            name="username"
-            // value={user.username}
-            margin="normal"
-            type={"text"}
-            label="Username"
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, username: e.target.value })}
-          />
-          )}
-
           <TextField
-            name="email"
-            // value={user.email}
-            margin="normal"
-            type={"text"}
-            label= {isSignup ? "Email" : "Username or Email"}
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, email: e.target.value })}
+            name='email'
+            value={user.email}
+            margin='normal'
+            type='text'
+            label='Email'
+            variant='outlined'
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '4px',
+            }}
+            onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
 
           <TextField
-            name="password"
-            // value={user.password}
-            margin="normal"
-            type={"password"}
-            label="Password"
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, password: e.target.value })}
+            name='password'
+            value={user.password}
+            margin='normal'
+            type='password'
+            label='Password'
+            variant='outlined'
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: '4px',
+            }}
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          {isSignup && (
-            <TextField
-            name="comfirm_password"
-            // value={user.comfirm_password}
-            margin="normal"
-            type={"comfirm_password"}
-            label="Confirm Password"
-            variant="outlined"
-            // onChange={(e) => setUser({ ...user, comfirm_password: e.target.value })}
-          />
-          )}
-
-          <Link to="/home" style={{ textDecoration: "none" }}>
+          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
             <Button
-            //   endIcon={<LoginIcon />}
-            //   onClick={handleSubmit}
-              type="submit"
-              sx={{ borderRadius: 2, margin: 4, width: "50%", height: "3rem" }}
-              variant="contained"
-              color="warning"
+              onClick={handleSubmit}
+              type='submit'
+              sx={{
+                borderRadius: '4px',
+                marginTop: '20px',
+                padding: '10px 20px',
+                backgroundColor: '#007bff',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#0056b3',
+                },
+              }}
+              variant='contained'
             >
               Login
             </Button>
           </Link>
 
-          <div className="textSpan">
-                <span
-                  style={{ fontSize: "14px", cursor: "pointer" }}
-                  // change of form happens when clicked on this line
-                  onClick={() => {
-                    setIsSignup((prev) => !prev);
-                    // resetForm();
-                  }}
-                >
-                  {isSignup
-                    ? "Already have an account? Login!"
-                    : "Don't have an account? Sign Up"}
-                </span>
-              </div>
+          <Button
+            sx={{
+              marginTop: 2,
+              borderRadius: 2,
+              backgroundColor: 'transparent',
+              textDecoration: 'underline',
+              '&:hover': {
+                textDecoration: 'none',
+              },
+            }}
+          >
+            <Link to='/signup'> New here? Sign Up</Link>
+          </Button>
         </Box>
       </form>
-        <br />
+      <br />
     </div>
-  )
-}
+  );
+};
 
 export default Auth;

@@ -3,8 +3,10 @@ import Auth from '../pages/auth/Auth.tsx';
 import Dashboard from '../pages/dashboard/Dashboard.tsx';
 import { Route, Routes } from 'react-router-dom';
 import Landing from '../pages/landing/Landing.tsx';
-import PasswordVault from '../pages/pw-vault/PasswordVault.tsx';
-import PasswordAdd from '../pages/pw-vault-add/PasswordAdd.tsx';
+import PasswordVault from '../pages/dashboard/components/vault/PasswordVault.tsx';
+import PasswordAdd from '../pages/add-password/PasswordAdd.tsx';
+import SignUp from '../pages/auth/SignUp.tsx';
+import SharedVault from '../pages/shared/index.tsx';
 
 const routers = [
   {
@@ -14,6 +16,10 @@ const routers = [
   {
     path: ROUTE.AUTH,
     component: Auth,
+  },
+  {
+    path: ROUTE.SIGNUP,
+    component: SignUp,
   },
   {
     path: ROUTE.DASHBOARD,
@@ -27,10 +33,11 @@ const routers = [
     path: ROUTE.PASSWORD_VAULT_ADD,
     component: PasswordAdd,
   },
+  {
+    path: ROUTE.SHARED,
+    component: SharedVault,
+  },
 ];
-// useEffect(() => {
-//   fetch('/api').then((res) => res.text());
-// }, []);
 
 const Router = () => (
   <Routes>
