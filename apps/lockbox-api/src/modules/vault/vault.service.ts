@@ -142,7 +142,7 @@ export class VaultService {
     return deletedVault;
   }
 
-  async shareVaultPassword(encryptedSharedPassword: string): Promise<any> {
+  async shareVaultPassword(encryptedSharedPassword: string): Promise<string> {
     // create one time link valid for 1 minute
     const payload = {
       salt: generateSalt(),

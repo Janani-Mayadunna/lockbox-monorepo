@@ -23,7 +23,7 @@ export class VaultController {
 
   //create a 1 vault in the vaults array of user
   @Post()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async createVault(
     @Body() vault: CreateVaultDto,
     @getCurrentUserId() userId: string,
@@ -33,15 +33,17 @@ export class VaultController {
 
   //retrieve all vaults in the array and display
   @Get()
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async getAllUserVaults(@getCurrentUserId() userId: string): Promise<Vault[]> {
     return this.vaultService.getAllUserVaults(userId);
   }
 
   // share a password
   @Post('/shared')
-  @UseGuards(AuthGuard())
-  async getSharedVault(@Body() encryptedSharedPassword: string): Promise<any> {
+  @UseGuards(AuthGuard('jwt'))
+  async getSharedVault(
+    @Body() encryptedSharedPassword: string,
+  ): Promise<string> {
     return this.vaultService.shareVaultPassword(encryptedSharedPassword);
   }
 
@@ -53,7 +55,7 @@ export class VaultController {
 
   //retrieve a single vault in the array and display
   @Get(':id')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async getOneUserVault(
     @getCurrentUserId() userId: string,
     @Param('id') vaultId: string,
@@ -63,7 +65,7 @@ export class VaultController {
 
   //update a single vault in the array and display
   @Put(':id')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async updateOneUserVault(
     @getCurrentUserId() userId: string,
     @Param('id') vaultId: string,
@@ -78,7 +80,7 @@ export class VaultController {
 
   //delete a single vault in the array and display
   @Delete('/delete')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async deleteOneUserVault(
     @getCurrentUserId() userId: string,
     @Body() deleteVaultData: deleteVaultDto,
