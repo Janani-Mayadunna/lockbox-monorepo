@@ -12,7 +12,6 @@ export interface ICreateVault {
   link: string;
   username: string;
   password: string;
-  // user: string;
 }
 
 export interface IUpdateVault {
@@ -23,4 +22,9 @@ export interface IUpdateVault {
 
 export interface IDeleteVault {
   id: string;
+}
+
+export interface ICreateVaultResponse {
+  username: string;
+  link: string;
 }
