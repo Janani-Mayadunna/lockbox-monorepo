@@ -15,6 +15,7 @@ import { CreateVaultDto } from './dto/create-vault.dto';
 import { getCurrentUserId } from '../auth/decorators/currentUserId';
 import { UpdateVaultDto } from './dto/update-vault.dto';
 import { deleteVaultDto } from './dto/delete-vault.dto';
+import { ICreateVaultResponse } from './interfaces/vault.interfaces';
 
 @Controller('vault')
 export class VaultController {
@@ -26,7 +27,7 @@ export class VaultController {
   async createVault(
     @Body() vault: CreateVaultDto,
     @getCurrentUserId() userId: string,
-  ): Promise<Vault> {
+  ): Promise<ICreateVaultResponse> {
     return this.vaultService.createVault(vault, userId);
   }
 

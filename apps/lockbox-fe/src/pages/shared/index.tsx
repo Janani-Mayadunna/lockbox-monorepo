@@ -20,20 +20,17 @@ const SharedVault = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('verify data: ', data);
         if (data.name! === 'TokenExpiredError') {
           setTokenExpired(true);
-          console.log('Token expired - true');
         } else {
           setTokenExpired(false);
           setEncryptedSharedPW(data.encryptedSharedPassword.password);
           const sharedPW = decryptSharedPassword();
           setDecryptedSharedPW(sharedPW);
-          console.log('Token expired - false');
         }
       })
-      .catch((err) => {
-        console.log('err: ', err);
+      .catch((error: any) => {
+        throw new Error(error);
       });
   };
 
@@ -56,14 +53,14 @@ const SharedVault = () => {
       {tokenExpired ? (
         // Show this box if token is expired
         <Box>
-          <h1 className='title'>Shared Page</h1>
+          <h1 className="title">Shared Page</h1>
           <h2>Oppss... </h2>
           <h3>Seems the link has expired</h3>
         </Box>
       ) : (
         // Show this box if token is not expired
         <Box>
-          <h1 className='title'>Shared Page</h1>
+          <h1 className="title">Shared Page</h1>
           <h3>Shared password is : {decryptedSharedPW}</h3>
 
           <p>This link expires after 1 minute and cannot be viewed again</p>

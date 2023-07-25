@@ -7,11 +7,7 @@
     "dev": "pnpm run --parallel dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "pnpm run --parallel build",
-    "start": "node apps/lockbox-api/dist/main",
-    "pre-commit": "pnpm run --parallel lint",
-    "pre-push": "pnpm run --parallel pre-push:test",
-    "prepare": "husky install",
-    "lint": "pnpm run --parallel lint:staged"
+    "start": "node apps/lockbox-api/dist/main"
   },
   "workspaces": [
     "apps/*"

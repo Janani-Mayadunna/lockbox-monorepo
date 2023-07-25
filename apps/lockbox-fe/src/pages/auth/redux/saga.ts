@@ -22,21 +22,18 @@ const login = async (payload: LoginPayload) => {
       }),
     });
 
-    console.log('Response here', response);
-
     if (response.status === 201) {
       const token = await response.json();
 
       localStorage.setItem('jwt-lockbox', JSON.stringify(token));
       localStorage.setItem('isLoggedIn', JSON.stringify(true));
 
-      console.log('Successfully Logged In!');
       return token;
     } else {
-      console.log('Failed to Login');
+      throw new Error('Login failed');
     }
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 };
 
@@ -47,8 +44,8 @@ function* loginSaga(action: any) {
     });
 
     yield put(loginSuccess({ token: response.token }));
-  } catch (e: any) {
-    yield put(loginFailure({ error: e.message }));
+  } catch (error: any) {
+    yield put(loginFailure({ error: error.message }));
   }
 }
 
@@ -60,7 +57,7 @@ function* logoutSaga() {
     localStorage.removeItem('VK');
 
     yield put(logoutSuccess());
-  } catch (error) {
+  } catch (error: any) {
     yield put(logoutFailure(error));
   }
 }

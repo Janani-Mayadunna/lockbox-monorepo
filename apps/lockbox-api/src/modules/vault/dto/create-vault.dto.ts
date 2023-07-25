@@ -1,5 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-// import { User } from '../../user/schemas/user.schema';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateVaultDto {
   @IsNotEmpty()
@@ -13,7 +12,4 @@ export class CreateVaultDto {
   @IsNotEmpty()
   @IsString()
   password: string;
-
-  // @IsOptional({ message: 'You cannot pass user id' })
-  // user: string;
 }

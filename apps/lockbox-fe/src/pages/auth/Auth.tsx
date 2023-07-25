@@ -34,13 +34,12 @@ const Auth = () => {
   });
 
   const [backdropOpen, setBackdropOpen] = React.useState(false);
+  const hashedPassword = hashPassword(user.password);
 
   //handler backdrop loading state
   const handleClose = () => {
     setBackdropOpen(false);
   };
-
-  const hashedPassword = hashPassword(user.password);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -52,8 +51,6 @@ const Auth = () => {
       },
     };
 
-    console.log('DATA', data);
-
     try {
       await dispatch(loginRequest(data));
       setBackdropOpen(true);
@@ -61,13 +58,11 @@ const Auth = () => {
         setBackdropOpen(false);
         navigate('/dashboard');
       }, 2000);
-    } catch (err) {
-      console.log('err: ', err);
+    } catch (err: any) {
+      throw new Error(err);
     }
 
-    const token = localStorage.getItem('jwt-blogapp');
-    console.log('TOKEN', token);
-    console.log(data);
+    localStorage.getItem('jwt-blogapp');
 
     setTimeout(() => {
       handleGetUser();
@@ -85,8 +80,8 @@ const Auth = () => {
       .then((data) => {
         localStorage.setItem('current-user', JSON.stringify(data.user));
       })
-      .catch((err) => {
-        console.log('err: ', err);
+      .catch((err: any) => {
+        throw new Error(err);
       });
 
     const salt = getUserSalt();
@@ -96,8 +91,6 @@ const Auth = () => {
       email: user.email,
       salt: salt,
     });
-
-    //set vaultKey in local storage
     localStorage.setItem('VK', vaultKey);
   };
 
@@ -108,11 +101,11 @@ const Auth = () => {
         open={backdropOpen}
         onClick={handleClose}
       >
-        <CircularProgress color='inherit' />
+        <CircularProgress color="inherit" />
       </Backdrop>
 
       <ResponsiveAppBar />
-      <h1 className='title'>{'Hello again!'}</h1>
+      <h1 className="title">{'Hello again!'}</h1>
 
       <form>
         <Box
@@ -129,17 +122,17 @@ const Auth = () => {
             borderRadius: '2ch',
           }}
         >
-          <Typography variant='h4' paddingBottom={3} textAlign='center'>
+          <Typography variant="h4" paddingBottom={3} textAlign="center">
             {'Login'}
           </Typography>
 
           <TextField
-            name='email'
+            name="email"
             value={user.email}
-            margin='normal'
-            type='text'
-            label='Email'
-            variant='outlined'
+            margin="normal"
+            type="text"
+            label="Email"
+            variant="outlined"
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -148,12 +141,12 @@ const Auth = () => {
           />
 
           <TextField
-            name='password'
+            name="password"
             value={user.password}
-            margin='normal'
-            type='password'
-            label='Password'
-            variant='outlined'
+            margin="normal"
+            type="password"
+            label="Password"
+            variant="outlined"
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -161,10 +154,10 @@ const Auth = () => {
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
+          <Link to="/dashboard" style={{ textDecoration: 'none' }}>
             <Button
               onClick={handleSubmit}
-              type='submit'
+              type="submit"
               sx={{
                 borderRadius: '4px',
                 marginTop: '20px',
@@ -175,7 +168,7 @@ const Auth = () => {
                   backgroundColor: '#0056b3',
                 },
               }}
-              variant='contained'
+              variant="contained"
             >
               Login
             </Button>
@@ -192,7 +185,7 @@ const Auth = () => {
               },
             }}
           >
-            <Link to='/signup'> New here? Sign Up</Link>
+            <Link to="/signup"> New here? Sign Up</Link>
           </Button>
         </Box>
       </form>
