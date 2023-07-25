@@ -11,7 +11,10 @@ import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import { authorizedFetch, getVaultKey } from '../../../../../src/helpers/request-interceptor';
+import {
+  authorizedFetch,
+  getVaultKey,
+} from '../../../../../src/helpers/request-interceptor';
 import { encryptVault } from '../../../../../src/helpers/crypto';
 import ShareModal from '../modals/ShareModal';
 
@@ -51,7 +54,7 @@ const StyledMenu = styled((props: MenuProps) => (
       '&:active': {
         backgroundColor: alpha(
           theme.palette.primary.main,
-          theme.palette.action.selectedOpacity
+          theme.palette.action.selectedOpacity,
         ),
       },
     },
@@ -60,9 +63,9 @@ const StyledMenu = styled((props: MenuProps) => (
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
-  ref
+  ref,
 ) {
-  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 export default function CustomizedMenus(password: any) {
@@ -84,7 +87,7 @@ export default function CustomizedMenus(password: any) {
   // handler of snackbar
   const handleSnackbarClose = (
     e?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === 'clickaway') {
       return;
@@ -126,21 +129,25 @@ export default function CustomizedMenus(password: any) {
       .then((data) => {
         setShareLink(data);
       })
-      .catch((err) => {
-        console.log('err: ', err);
+      .catch((err: any) => {
+        throw new Error(err);
       });
 
-      handleClose();
+    handleClose();
   };
 
   return (
     <div>
-      <ShareModal open={openModal} setOpenModal={setOpenModal} data={shareLink} />
+      <ShareModal
+        open={openModal}
+        setOpenModal={setOpenModal}
+        data={shareLink}
+      />
 
       <Button
-        id='demo-customized-button'
+        id="demo-customized-button"
         aria-controls={open ? 'demo-customized-menu' : undefined}
-        aria-haspopup='true'
+        aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         disableElevation
         onClick={handleClick}
@@ -154,14 +161,14 @@ export default function CustomizedMenus(password: any) {
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity='success'
+          severity="success"
           sx={{ width: '100%' }}
         >
           Password Copied to Clipboard
         </Alert>
       </Snackbar>
       <StyledMenu
-        id='demo-customized-menu'
+        id="demo-customized-menu"
         MenuListProps={{
           'aria-labelledby': 'demo-customized-button',
         }}

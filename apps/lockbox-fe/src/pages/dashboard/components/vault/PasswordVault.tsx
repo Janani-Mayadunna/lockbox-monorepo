@@ -24,8 +24,8 @@ export const PasswordVault = () => {
       .then((data) => {
         setVaultData(data);
       })
-      .catch((err) => {
-        console.log('err: ', err);
+      .catch((err: any) => {
+        throw new Error(err);
       });
   };
 
@@ -109,7 +109,7 @@ export const PasswordVault = () => {
         pagination={true}
         paginationPerPage={10}
         paginationRowsPerPageOptions={[10, 20, 30]}
-        noDataComponent='No Products Found'
+        noDataComponent="No Products Found"
       />
     </Container>
   );

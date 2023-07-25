@@ -36,14 +36,14 @@ const SignUp = () => {
           navigate('/auth');
         }
       })
-      .catch((err) => {
-        console.log('err: ', err);
+      .catch((err: any) => {
+        throw new Error(err);
       });
   }
   return (
     <div>
       <ResponsiveAppBar />
-      <h1 className='title'>{'Welcome!'}</h1>
+      <h1 className="title">{'Welcome!'}</h1>
 
       <form>
         <Box
@@ -60,17 +60,17 @@ const SignUp = () => {
             borderRadius: '2ch',
           }}
         >
-          <Typography variant='h4' paddingBottom={3} textAlign='center'>
+          <Typography variant="h4" paddingBottom={3} textAlign="center">
             {'Sign Up'}
           </Typography>
 
           <TextField
-            name='name'
+            name="name"
             value={user.name}
-            margin='normal'
-            type='text'
-            label='Name'
-            variant='outlined'
+            margin="normal"
+            type="text"
+            label="Name"
+            variant="outlined"
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -79,12 +79,12 @@ const SignUp = () => {
           />
 
           <TextField
-            name='email'
+            name="email"
             value={user.email}
-            margin='normal'
-            type='text'
-            label='Email'
-            variant='outlined'
+            margin="normal"
+            type="text"
+            label="Email"
+            variant="outlined"
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -93,12 +93,12 @@ const SignUp = () => {
           />
 
           <TextField
-            name='password'
+            name="password"
             value={user.password}
-            margin='normal'
-            type='password'
-            label='Password'
-            variant='outlined'
+            margin="normal"
+            type="password"
+            label="Password"
+            variant="outlined"
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -106,10 +106,10 @@ const SignUp = () => {
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
+          <Link to="/dashboard" style={{ textDecoration: 'none' }}>
             <Button
               onClick={handleSubmit}
-              type='submit'
+              type="submit"
               sx={{
                 borderRadius: '4px',
                 marginTop: '20px',
@@ -120,7 +120,7 @@ const SignUp = () => {
                   backgroundColor: '#f57c00',
                 },
               }}
-              variant='contained'
+              variant="contained"
             >
               Sign Up
             </Button>
@@ -137,7 +137,7 @@ const SignUp = () => {
               },
             }}
           >
-            <Link to='/auth'> Already have an account? Login</Link>
+            <Link to="/auth"> Already have an account? Login</Link>
           </Button>
         </Box>
       </form>
