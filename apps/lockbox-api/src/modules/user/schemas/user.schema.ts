@@ -18,7 +18,7 @@ export class User extends Document {
   @Prop()
   salt: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: Vault.name }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Vault' }] })
   vaults: Types.Array<Vault>;
 }
 
