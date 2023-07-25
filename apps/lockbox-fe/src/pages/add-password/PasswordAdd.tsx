@@ -34,6 +34,7 @@ const PasswordAdd = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    handleReset();
 
     const vaultKey = getVaultKey();
     const vaultPW = vaultData.password;
@@ -57,19 +58,29 @@ const PasswordAdd = () => {
       body: JSON.stringify(newVault),
     })
       .then((res) => {
-        console.log('res: ', res);
+        if (res.status !== 201) {
+          throw new Error('Failed to create vault');
+        } else {
+          return res.json();
+        }
       })
       .catch((err) => {
-        console.log('err: ', err);
+        throw new Error('Failed to create vault' + err.message);
       });
+  };
+
+  const handleReset = () => {
+    setVaultData({
+      username: '',
+      password: '',
+      link: '',
+    });
   };
 
   return (
     <div>
       <ResponsiveAppBar />
-
       <GenPassModal open={openModal} setOpenModal={setOpenModal} />
-
       <Box
         sx={{
           display: 'flex',
@@ -78,9 +89,8 @@ const PasswordAdd = () => {
           marginBottom: '30px',
         }}
       >
-        <Typography variant='h5'>Add Passwords</Typography>
+        <Typography variant="h5">Add Passwords</Typography>
       </Box>
-
       <Box
         sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
       >
@@ -98,25 +108,25 @@ const PasswordAdd = () => {
             }}
           >
             <TextField
-              label='Username'
-              variant='outlined'
+              label="Username"
+              variant="outlined"
               value={vaultData.username}
-              name='username'
+              name="username"
               sx={{ marginBottom: '10px', padding: '5px' }}
               onChange={(e) =>
                 setVaultData({ ...vaultData, username: e.target.value })
               }
             />
 
-            <Grid container spacing={1} alignItems='center'>
+            <Grid container spacing={1} alignItems="center">
               <Grid item>
                 <TextField
-                  id='password'
-                  label='Password'
-                  variant='outlined'
-                  type='password'
+                  id="password"
+                  label="Password"
+                  variant="outlined"
+                  type="password"
                   value={vaultData.password}
-                  name='password'
+                  name="password"
                   sx={{ marginBottom: '10px', padding: '5px' }}
                   onChange={(e) =>
                     setVaultData({ ...vaultData, password: e.target.value })
@@ -124,11 +134,11 @@ const PasswordAdd = () => {
                 />
               </Grid>
               <Grid item>
-                <Tooltip title='Generate safe password' arrow>
+                <Tooltip title="Generate safe password" arrow>
                   <Button
                     onClick={handleModalOpen}
-                    type='button'
-                    variant='text'
+                    type="button"
+                    variant="text"
                     sx={{ color: 'green' }}
                   >
                     <AutoAwesomeTwoToneIcon sx={{ fontSize: '2rem' }} />
@@ -138,11 +148,11 @@ const PasswordAdd = () => {
             </Grid>
 
             <TextField
-              label='URI'
-              variant='outlined'
-              type='text'
+              label="URI"
+              variant="outlined"
+              type="text"
               value={vaultData.link}
-              name='link'
+              name="link"
               sx={{ marginBottom: '10px', padding: '5px' }}
               onChange={(e) =>
                 setVaultData({ ...vaultData, link: e.target.value })
@@ -150,9 +160,9 @@ const PasswordAdd = () => {
             />
 
             <Button
-              type='submit'
+              type="submit"
               onClick={handleSubmit}
-              variant='contained'
+              variant="contained"
               sx={{
                 marginBottom: '10px',
                 backgroundColor: '#007bff',
@@ -163,11 +173,9 @@ const PasswordAdd = () => {
             </Button>
 
             <Button
-              type='reset'
-              onClick={() =>
-                setVaultData({ username: '', password: '', link: '' })
-              }
-              variant='contained'
+              type="reset"
+              onClick={() => handleReset()}
+              variant="contained"
               sx={{
                 marginBottom: '10px',
                 backgroundColor: '#6c757d',
@@ -178,25 +186,21 @@ const PasswordAdd = () => {
             </Button>
 
             <Button
-              type='button'
-              variant='contained'
+              type="button"
+              variant="contained"
               sx={{
                 marginBottom: '10px',
                 backgroundColor: '#dc3545',
                 color: 'black',
               }}
               component={Link}
-              to='/dashboard'
+              to="/dashboard"
             >
               View All
             </Button>
           </form>
         </Card>
       </Box>
-
-      <br />
-      <br />
-      <br />
     </div>
   );
 };

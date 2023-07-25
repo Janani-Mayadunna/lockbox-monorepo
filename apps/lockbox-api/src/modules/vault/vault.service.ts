@@ -6,6 +6,7 @@ import { User } from '../user/schemas/user.schema';
 import logger from '../../utils/logger';
 import {
   ICreateVault,
+  ICreateVaultResponse,
   IDeleteVault,
   IUpdateVault,
 } from './interfaces/vault.interfaces';
@@ -22,12 +23,16 @@ export class VaultService {
     private jwtService: JwtService,
   ) {}
 
-  async createVault(vault: ICreateVault, userId: string): Promise<Vault> {
+  async createVault(
+    vault: ICreateVault,
+    userId: string,
+  ): Promise<ICreateVaultResponse> {
     // Retrieve the user document
     const currentUser = await this.userModel.findById(userId);
     if (!currentUser) {
       // Handle user not found
       logger.error(`User not found with id: ${userId}`);
+      throw new NotFoundException(`User not found`);
     }
 
     Object.assign(vault, { user: currentUser._id });
@@ -39,16 +44,20 @@ export class VaultService {
 
     // Save the updated user document
     await currentUser.save();
-    return newVault;
+
+    const vaultWithoutPassword: ICreateVaultResponse = {
+      username: newVault.username,
+      link: newVault.link,
+    };
+
+    return vaultWithoutPassword;
   }
 
   async getAllUserVaults(userId: string): Promise<Vault[]> {
     const user = await this.userModel.findById(userId);
 
     if (!user) {
-      logger.error(`User not found with id: ${userId}`);
-      console.log('User not found with id: ', userId);
-      return [];
+      throw new NotFoundException(`User not found`);
     }
 
     // Retrieve all vaults for the user
@@ -61,12 +70,10 @@ export class VaultService {
     const user = await this.userModel.findById(userId);
 
     if (!user) {
-      logger.error(`User not found with id: ${userId}`);
-      return null;
+      throw new NotFoundException(`User not found`);
     }
 
     if (user.vaults.length === 0) {
-      logger.error(`User has no vaults`);
       throw new NotFoundException(`User has no vaults`);
     }
 
@@ -87,21 +94,17 @@ export class VaultService {
     const user = await this.userModel.findById(userId);
 
     if (!user) {
-      logger.error(`User not found with id: ${userId}`);
-      return null;
+      throw new NotFoundException(`User not found`);
     }
 
     if (user.vaults.length === 0) {
-      logger.error(`User has no vaults`);
       throw new NotFoundException(`User has no vaults`);
     }
 
     if (!mongoose.Types.ObjectId.isValid(vaultId)) {
       logger.error(`Invalid vault id: ${vaultId}`);
-      throw new NotFoundException(`Invalid vault id: ${vaultId}`);
+      throw new NotFoundException(`Invalid vault id`);
     }
-
-    //if vaultId is not in user's vaults array, throw error
 
     // Retrieve the vault for the user
     const updatedVault = await this.vaultModel.findOneAndUpdate(
@@ -132,15 +135,15 @@ export class VaultService {
       _id: deleteVaultData.id,
     });
 
-    // //remove that from element from user's vaults array
-    // user.vaults.pull(deletedVault._id);
-    // await user.save();
+    if (!deletedVault) {
+      throw new NotFoundException(`Vault not found`);
+    }
 
     return deletedVault;
   }
 
-  async shareVaultPassword(encryptedSharedPassword: string): Promise<any> {
-    // create one time link valid for 15 mins
+  async shareVaultPassword(encryptedSharedPassword: string): Promise<string> {
+    // create one time link valid for 1 minute
     const payload = {
       salt: generateSalt(),
       encryptedSharedPassword,
@@ -160,9 +163,13 @@ export class VaultService {
       const decoded = this.jwtService.verify(shareToken, {
         secret: process.env.JWT_SHARED_SECRET,
       });
+
+      if (!decoded) {
+        throw new NotFoundException('Could not verify share link');
+      }
       return decoded;
     } catch (error) {
-      return error;
+      throw new NotFoundException('Could not verify share link');
     }
   }
 }

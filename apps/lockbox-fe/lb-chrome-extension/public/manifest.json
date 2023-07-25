@@ -4,9 +4,31 @@
     "version": "1.0.0",
     "description": "Chrome extension test 1",
     "action": {
-      "default_popup": "popup.html"
+      "default_icon": {
+        "16": "./logo.png",
+        "24": "./logo.png",
+        "32": "./logo.png"
+    },
+      "default_popup": "popup.html",
+      "default_title": "LockBox Chrome Extension"
+
+    },
+    "icons": {
+      "16": "./logo.png",
+      "48": "./logo.png",
+      "128": "./logo.png"
     },
     "permissions": [
-      "storage"
+      "storage",
+      "tabs",
+      "webNavigation",
+      "scripting"
+    ],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "host_permissions": [
+      "https://*/*",
+      "http://*/*"
     ]
-  }
+}

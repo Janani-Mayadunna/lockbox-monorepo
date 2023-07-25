@@ -8,7 +8,6 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { useState } from 'react';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-import { Add } from '@mui/icons-material';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -43,9 +42,9 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
-    ref
+    ref,
   ) {
-    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
   // handlers of the modal
@@ -56,7 +55,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
   // handler of snackbar
   const handleSnackbarClose = (
     e?: React.SyntheticEvent | Event,
-    reason?: string
+    reason?: string,
   ) => {
     if (reason === 'clickaway') {
       return;
@@ -95,13 +94,13 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
 
     if (isUppercase) {
       chars.push(
-        upperCaseLetters[Math.floor(Math.random() * upperCaseLetters.length)]
+        upperCaseLetters[Math.floor(Math.random() * upperCaseLetters.length)],
       );
     }
 
     if (isLowercase) {
       chars.push(
-        lowerCaseLetters[Math.floor(Math.random() * lowerCaseLetters.length)]
+        lowerCaseLetters[Math.floor(Math.random() * lowerCaseLetters.length)],
       );
     }
 
@@ -147,7 +146,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity='success'
+          severity="success"
           sx={{ width: '100%' }}
         >
           Link Copied to Clipboard
@@ -157,14 +156,14 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby='modal-modal-title'
-        aria-describedby='modal-modal-description'
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id='modal-modal-title' variant='h6' component='h2'>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
             Generate Your Password
           </Typography>
-          <div className='generator'>
+          <div className="generator">
             <Box
               sx={{
                 display: 'flex',
@@ -175,9 +174,9 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               }}
             >
               <Typography
-                variant='h6'
+                variant="h6"
                 sx={{
-                    width: '50%',
+                  width: '50%',
                   color: 'black',
                   fontWeight: 'bold',
                   marginBottom: '1.5rem',
@@ -191,48 +190,48 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               </Typography>
             </Box>
             <Container>
-              <div className='generator__form-controls'>
+              <div className="generator__form-controls">
                 <Box>
-                  <label htmlFor='uppercase'>Uppercase</label>
+                  <label htmlFor="uppercase">Uppercase</label>
                   <input
                     checked={isUppercase}
                     onChange={(e) => setIsUppercase(e.target.checked)}
-                    type='checkbox'
-                    id='uppercase'
-                    name='uppercase'
+                    type="checkbox"
+                    id="uppercase"
+                    name="uppercase"
                   />
                 </Box>
 
                 <Box>
-                  <label htmlFor='lowercase'>Lowercase</label>
+                  <label htmlFor="lowercase">Lowercase</label>
                   <input
                     checked={isLowercase}
                     onChange={(e) => setIsLowercase(e.target.checked)}
-                    type='checkbox'
-                    id='lowercase'
-                    name='lowercase'
+                    type="checkbox"
+                    id="lowercase"
+                    name="lowercase"
                   />
                 </Box>
 
                 <Box>
-                  <label htmlFor='numbers'>Numbers</label>
+                  <label htmlFor="numbers">Numbers</label>
                   <input
                     checked={isNumber}
                     onChange={(e) => setIsNumber(e.target.checked)}
-                    type='checkbox'
-                    id='numbers'
-                    name='numbers'
+                    type="checkbox"
+                    id="numbers"
+                    name="numbers"
                   />
                 </Box>
 
                 <Box>
-                  <label htmlFor='symbols'>Symbols</label>
+                  <label htmlFor="symbols">Symbols</label>
                   <input
                     checked={isSymbol}
                     onChange={(e) => setIsSymbol(e.target.checked)}
-                    type='checkbox'
-                    id='symbols'
-                    name='symbols'
+                    type="checkbox"
+                    id="symbols"
+                    name="symbols"
                   />
                 </Box>
 
@@ -241,7 +240,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
                 <Typography sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
                   Select Password Length
                 </Typography>
-                <div className='generator__length-counter'>
+                <div className="generator__length-counter">
                   <Button onClick={decreaseCounter}>
                     <RemoveIcon />
                   </Button>
@@ -268,7 +267,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               marginTop: '30px',
             }}
           >
-            <Button variant='contained' onClick={handleClose}>
+            <Button variant="contained" onClick={handleClose}>
               Close
             </Button>
           </Box>

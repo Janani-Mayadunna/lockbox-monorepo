@@ -1,13 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/schemas/user.schema';
 import * as argon2 from 'argon2';
 import { generateSalt } from '../../utils/helper-functions';
+import logger from '../../utils/logger';
 
 @Injectable()
 export class AuthService {
@@ -57,6 +57,7 @@ export class AuthService {
     }
 
     const token = this.jwtService.sign({ id: user._id });
+    logger.info('Logged in');
     return {
       access_token: token,
       userId: user._id,
@@ -80,7 +81,7 @@ export class AuthService {
       name: user.name,
       salt: user.salt ? user.salt : '',
     };
-
+    logger.info('Current user fetched');
     return { user: filteredUser };
   }
 }

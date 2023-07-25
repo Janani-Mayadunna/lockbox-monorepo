@@ -37,13 +37,13 @@ const AddPassword = () => {
     })
       .then((res) => {
         if(res.status !== 201) {
-          throw new Error('Network response was not ok');
+          throw new Error('Failed to create vault');
         } else {
           return res.json();
         }
       })
       .catch((err) => {
-        throw new Error(err);
+          throw new Error('Failed to create vault');
       });
   };
 
