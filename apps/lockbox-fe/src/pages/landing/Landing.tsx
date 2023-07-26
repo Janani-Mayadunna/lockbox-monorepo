@@ -1,27 +1,28 @@
-import { Link } from 'react-router-dom';
+import { Box, Container, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
+  const navigate = useNavigate();
+
   return (
     <div>
-      <h1 className='title'>Landing</h1>
-      <br />
+      <Container>
+        <Box sx={{ marginTop: '3rem', marginBottom: '2rem' }}>
+          <Typography variant="h3">Landing Page</Typography>
+        </Box>
+        <br />
 
-      <Link to='/auth'>
-        <button>Go to Auth</button>
-      </Link>
-      <br />
-      <br />
+        <button
+          onClick={() => navigate('/auth')}
+          style={{ marginBottom: '2rem' }}
+        >
+          Go to Auth
+        </button>
 
-      <Link to='/signup'>
-        <button>Sign up</button>
-      </Link>
+        <br />
 
-      <br />
-      <br />
-
-      <Link to='/dashboard'>
-        <button>User Dashboard</button>
-      </Link>
+        <button onClick={() => navigate('/signup')}>Sign up</button>
+      </Container>
     </div>
   );
 };
