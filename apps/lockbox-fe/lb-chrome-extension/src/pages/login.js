@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { generateVaultKey, hashPassword } from '../helpers/crypto';
 import { authorizedFetch, getUserSalt } from '../helpers/request-interceptor';
@@ -48,7 +49,7 @@ const Login = () => {
         });
       })
       .catch((error) => {
-        throw new Error(error);
+        console.log(error);
       });
   };
 
@@ -65,7 +66,7 @@ const Login = () => {
         navigate('/vault');
       })
       .catch((err) => {
-        throw new Error(err);
+        console.log(err);
       });
 
     const salt = getUserSalt();
