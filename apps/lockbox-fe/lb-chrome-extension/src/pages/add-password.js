@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react';
 import { authorizedFetch, getVaultKey } from '../helpers/request-interceptor';
 import { encryptVault } from '../helpers/crypto';
@@ -37,13 +38,13 @@ const AddPassword = () => {
     })
       .then((res) => {
         if(res.status !== 201) {
-          throw new Error('Failed to create vault');
+          console.log('Failed to add password');
         } else {
           return res.json();
         }
       })
       .catch((err) => {
-          throw new Error('Failed to create vault');
+          console.log(err);
       });
   };
 
