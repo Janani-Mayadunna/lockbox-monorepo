@@ -37,10 +37,10 @@ export function decryptVault({
         return str;
       }
     } catch (error: any) {
-      throw new Error(error);
+      throw new Error('Unable to decrypt',error.message);
     }
   } else {
-    throw new Error('Could not decrypt vault password');
+    throw new Error('Unable to decrypt vault');
   }
 }
 
