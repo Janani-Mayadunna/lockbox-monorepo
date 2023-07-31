@@ -105,7 +105,8 @@ const Auth = () => {
       </Backdrop>
 
       <ResponsiveAppBar />
-      <h1 className="title">{'Hello again!'}</h1>
+      {/* <h1 className="title">{'Hello again!'}</h1> */}
+      <br/>
 
       <form>
         <Box
