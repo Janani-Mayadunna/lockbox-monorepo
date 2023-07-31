@@ -43,7 +43,8 @@ const SignUp = () => {
   return (
     <div>
       <ResponsiveAppBar />
-      <h1 className="title">{'Welcome!'}</h1>
+      {/* <h1 className="title">{'Welcome!'}</h1> */}
+      <br/>
 
       <form>
         <Box

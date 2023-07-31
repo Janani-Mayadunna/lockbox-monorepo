@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authorizedFetch } from '../helpers/request-interceptor';
@@ -20,7 +21,7 @@ const Vault = () => {
         setVaultData(data);
       })
       .catch((err) => {
-        throw new Error(err);
+        console.log(err);
       });
   };
 
@@ -49,7 +50,7 @@ const Vault = () => {
       localStorage.removeItem('current-user');
       localStorage.removeItem('VK');
     } catch (error) {
-      throw new Error(error);
+      console.log(error);
     }
     navigate('/');
   };
@@ -59,29 +60,92 @@ const Vault = () => {
       <h1>Vault</h1>
 
       <div style={{ width: '100%', marginTop: '20px' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
-        <thead>
-          <tr>
-            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left', backgroundColor: '#f2f2f2', fontWeight: 'bold', color: '#333' }}>Link</th>
-            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left', backgroundColor: '#f2f2f2', fontWeight: 'bold', color: '#333' }}>Username</th>
-            <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left', backgroundColor: '#f2f2f2', fontWeight: 'bold', color: '#333' }}>Password</th>
-          </tr>
-        </thead>
-        <tbody>
-          {decryptedVaults.map((row, index) => (
-            <tr key={index}>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>{row.link}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>{row.username}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>{row.password}</td>
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            border: '1px solid #ddd',
+          }}
+        >
+          <thead>
+            <tr>
+              <th
+                style={{
+                  border: '1px solid #ddd',
+                  padding: '8px',
+                  textAlign: 'left',
+                  backgroundColor: '#f2f2f2',
+                  fontWeight: 'bold',
+                  color: '#333',
+                }}
+              >
+                Link
+              </th>
+              <th
+                style={{
+                  border: '1px solid #ddd',
+                  padding: '8px',
+                  textAlign: 'left',
+                  backgroundColor: '#f2f2f2',
+                  fontWeight: 'bold',
+                  color: '#333',
+                }}
+              >
+                Username
+              </th>
+              <th
+                style={{
+                  border: '1px solid #ddd',
+                  padding: '8px',
+                  textAlign: 'left',
+                  backgroundColor: '#f2f2f2',
+                  fontWeight: 'bold',
+                  color: '#333',
+                }}
+              >
+                Password
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {decryptedVaults.map((row, index) => (
+              <tr key={index}>
+                <td
+                  style={{
+                    border: '1px solid #ddd',
+                    padding: '8px',
+                    textAlign: 'left',
+                  }}
+                >
+                  {row.link}
+                </td>
+                <td
+                  style={{
+                    border: '1px solid #ddd',
+                    padding: '8px',
+                    textAlign: 'left',
+                  }}
+                >
+                  {row.username}
+                </td>
+                <td
+                  style={{
+                    border: '1px solid #ddd',
+                    padding: '8px',
+                    textAlign: 'left',
+                  }}
+                >
+                  {row.password}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <button
         onClick={() => navigate('/add')}
-        id='add'
+        id="add"
         style={{
           marginTop: '10px',
           marginBottom: '10px',
@@ -91,10 +155,10 @@ const Vault = () => {
       >
         Add Password
       </button>
-        <br/>
+      <br />
       <button
         onClick={handleLogout}
-        id='add'
+        id="add"
         style={{
           marginBottom: '10px',
           backgroundColor: 'red',

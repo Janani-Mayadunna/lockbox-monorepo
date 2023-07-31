@@ -13,7 +13,6 @@ export function generateVaultKey({
   salt,
 }: {
   email: string;
-
   hashedPassword: string;
   salt: any;
 }) {
@@ -36,14 +35,13 @@ export function decryptVault({
       const str = decrypted.toString(CryptoJS.enc.Utf8);
       if (str.length > 0) {
         return str;
-      } else {
-        return 'error 1';
       }
-    } catch (e) {
-      return 'error 2';
+    } catch (error: any) {
+      throw new Error('Unable to decrypt',error.message);
     }
+  } else {
+    throw new Error('Unable to decrypt vault');
   }
-  return 'error 3';
 }
 
 export function encryptVault({
