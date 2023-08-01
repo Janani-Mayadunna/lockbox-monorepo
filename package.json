@@ -10,7 +10,8 @@
     "start": "node apps/lockbox-api/dist/main"
   },
   "workspaces": [
-    "apps/*"
+    "apps/lockbox-api",
+    "apps/lockbox-fe"
   ],
   "keywords": [],
   "author": "",
