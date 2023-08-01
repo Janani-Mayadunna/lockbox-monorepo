@@ -19,7 +19,7 @@ const AddPassword = () => {
     const vaultPW = vaultData.password;
 
     const encryptedVaultPW = encryptVault({
-      vault: vaultPW,
+      vaultPassword: vaultPW,
       vaultKey,
     });
 

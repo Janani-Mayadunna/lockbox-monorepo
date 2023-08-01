@@ -37,7 +37,7 @@ const SharedVault = () => {
 
   const decryptSharedPassword = () => {
     const decryptedSharedPassword = decryptVault({
-      vault: encryptedSharedPW,
+      vaultPassword: encryptedSharedPW,
       vaultKey: vaultKey,
     });
     if (decryptedSharedPassword) {
