@@ -33,7 +33,7 @@ const Vault = () => {
     const vaultKey = getVaultKey();
 
     const decryptedVaultPW = decryptVault({
-      vault: row.password,
+      vaultPassword: row.password,
       vaultKey: vaultKey,
     });
 

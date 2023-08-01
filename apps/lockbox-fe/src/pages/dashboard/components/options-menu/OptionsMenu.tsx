@@ -114,7 +114,7 @@ export default function CustomizedMenus(password: any) {
     const vaultKey = getVaultKey();
 
     const encryptedSharedPassword = encryptVault({
-      vault: password.password,
+      vaultPassword: password.password,
       vaultKey: vaultKey,
     });
 
