@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { getVaultKey } from '../../../src/helpers/request-interceptor';
 import { decryptVault } from '../../../src/helpers/crypto';
@@ -7,9 +8,9 @@ import { useParams } from 'react-router-dom';
 
 const SharedVault = () => {
   const { sharedToken } = useParams();
-  const [tokenExpired, setTokenExpired] = useState(false);
   const [encryptedSharedPW, setEncryptedSharedPW] = useState('');
   const [decryptedSharedPW, setDecryptedSharedPW] = useState('');
+  const [linkExpired, setLinkExpired] = useState(false);
 
   const verifySharedLink = () => {
     fetch(`http://localhost:4000/api/vault/verify-link/${sharedToken}`, {
@@ -20,17 +21,15 @@ const SharedVault = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.name! === 'TokenExpiredError') {
-          setTokenExpired(true);
-        } else {
-          setTokenExpired(false);
-          setEncryptedSharedPW(data.encryptedSharedPassword.password);
-          const sharedPW = decryptSharedPassword();
-          setDecryptedSharedPW(sharedPW);
-        }
+        setLinkExpired(false);
+        setEncryptedSharedPW(data.encryptedSharedPassword.password);
+
+        const sharedPW = decryptSharedPassword();
+        setDecryptedSharedPW(sharedPW!);
       })
       .catch((error: any) => {
-        throw new Error(error);
+        setLinkExpired(true);
+        console.log(error);
       });
   };
 
@@ -38,24 +37,26 @@ const SharedVault = () => {
 
   const decryptSharedPassword = () => {
     const decryptedSharedPassword = decryptVault({
-      vault: encryptedSharedPW,
+      vaultPassword: encryptedSharedPW,
       vaultKey: vaultKey,
     });
-    return decryptedSharedPassword;
+    if (decryptedSharedPassword) {
+      return decryptedSharedPassword;
+    }
   };
 
   useEffect(() => {
     verifySharedLink();
-  }, [decryptedSharedPW, tokenExpired]);
+  }, [decryptedSharedPW]);
 
   return (
     <Container>
-      {tokenExpired ? (
+      {linkExpired ? (
         // Show this box if token is expired
         <Box>
           <h1 className="title">Shared Page</h1>
           <h2>Oppss... </h2>
-          <h3>Seems the link has expired</h3>
+          <h3>Seems like the link has expired or invalid</h3>
         </Box>
       ) : (
         // Show this box if token is not expired
