@@ -6,7 +6,11 @@ import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../user/schemas/user.schema';
 import * as argon2 from 'argon2';
-import { generateSalt } from '../../utils/helper-functions';
+import {
+  generateSalt,
+  generateUserPrivateKey,
+  generateUserPublicKey,
+} from '../../utils/helper-functions';
 import logger from '../../utils/logger';
 
 @Injectable()
@@ -22,6 +26,8 @@ export class AuthService {
     const { name, email, password } = signUpDto;
 
     const userSalt = generateSalt();
+    const ecdhPublicKey = generateUserPublicKey();
+    const ecdhPrivateKey = generateUserPrivateKey();
 
     const hashedPassword = await argon2.hash(`${email}:${password}`);
 
@@ -29,6 +35,8 @@ export class AuthService {
       name,
       email,
       password: hashedPassword,
+      publicKey: ecdhPublicKey,
+      privateKey: ecdhPrivateKey,
       salt: userSalt,
     });
 

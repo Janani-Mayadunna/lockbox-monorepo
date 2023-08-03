@@ -18,6 +18,12 @@ export class User extends Document {
   @Prop()
   salt: string;
 
+  @Prop()
+  publicKey: string;
+
+  @Prop()
+  privateKey: Buffer;
+
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Vault' }] })
   vaults: Types.Array<Vault>;
 }
