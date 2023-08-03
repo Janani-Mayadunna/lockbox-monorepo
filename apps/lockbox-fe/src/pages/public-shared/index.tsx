@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getVaultKey } from '../../../src/helpers/request-interceptor';
-import { decryptVault } from '../../../src/helpers/crypto';
+import { getVaultKey } from '../../helpers/request-interceptor';
+import { decryptVault } from '../../helpers/crypto';
 import { Box, Container } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-const SharedVault = () => {
+const PublicSharedVault = () => {
   const { sharedToken } = useParams();
   const [encryptedSharedPW, setEncryptedSharedPW] = useState('');
   const [decryptedSharedPW, setDecryptedSharedPW] = useState('');
@@ -71,4 +71,4 @@ const SharedVault = () => {
   );
 };
 
-export default SharedVault;
+export default PublicSharedVault;

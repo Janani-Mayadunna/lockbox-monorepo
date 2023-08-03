@@ -118,10 +118,6 @@ export default function DirectShareModal({
       });
   };
 
-  React.useEffect(() => {
-    console.log('xx', computeSecret);
-  }, [computeSecret]);
-
   return (
     <div>
       <Snackbar

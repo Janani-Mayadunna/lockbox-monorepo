@@ -8,15 +8,15 @@ import {
   Typography,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import ResponsiveAppBar from '../../components/global/AppBar';
-import { useAppDispatch } from '../../../src/store';
-import { loginRequest } from './redux/actions';
-import { LoginPayload } from './redux/types';
-import { generateVaultKey, hashPassword } from '../../../src/helpers/crypto';
+import ResponsiveAppBar from '../../../components/global/AppBar';
+import { useAppDispatch } from '../../../store';
+import { loginRequest } from '../redux/actions';
+import { LoginPayload } from '../redux/types';
+import { generateVaultKey, hashPassword } from '../../../helpers/crypto';
 import {
   authorizedFetch,
   getUserSalt,
-} from '../../../src/helpers/request-interceptor';
+} from '../../../helpers/request-interceptor';
 
 const Auth = () => {
   const dispatch = useAppDispatch();
