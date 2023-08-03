@@ -19,6 +19,11 @@ import { encryptVault } from '../../../../../src/helpers/crypto';
 import LinkShareModal from '../modals/LinkShareModal';
 import DirectShareModal from '../modals/DirectShareModal';
 
+interface MenuParameters {
+  password: string;
+  username: string;
+}
+
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
     elevation={0}
@@ -69,7 +74,12 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-export default function CustomizedMenus(password: any) {
+//props for the menu
+
+export default function CustomizedMenus({
+  password,
+  username,
+}: MenuParameters) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [openLinkShareModal, setOpenLinkShareModal] = React.useState(false);
@@ -99,7 +109,7 @@ export default function CustomizedMenus(password: any) {
 
   // handler of copy
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(password.password);
+    navigator.clipboard.writeText(password);
     setSnackbarOpen(true);
     handleClose();
   };
@@ -120,7 +130,7 @@ export default function CustomizedMenus(password: any) {
     const vaultKey = getVaultKey();
 
     const encryptedSharedPassword = encryptVault({
-      vaultPassword: password.password,
+      vaultPassword: password,
       vaultKey: vaultKey,
     });
 
@@ -155,6 +165,7 @@ export default function CustomizedMenus(password: any) {
       <DirectShareModal
         open={openDirectShareModal}
         setOpenModal={setOpenDirectShareModal}
+        data={{ password, username } as MenuParameters}
       />
 
       <Button

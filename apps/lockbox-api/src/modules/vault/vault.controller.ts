@@ -16,6 +16,8 @@ import { getCurrentUserId } from '../auth/decorators/currentUserId';
 import { UpdateVaultDto } from './dto/update-vault.dto';
 import { deleteVaultDto } from './dto/delete-vault.dto';
 import { ICreateVaultResponse } from './interfaces/vault.interfaces';
+import { create } from 'domain';
+import { ICreateSharedVault } from '../user/user.interfaces';
 
 @Controller('vault')
 export class VaultController {
@@ -80,6 +82,18 @@ export class VaultController {
     @Body() encryptedSharedPassword: string,
   ): Promise<string> {
     return await this.vaultService.shareVaultPassword(encryptedSharedPassword);
+  }
+
+  @Post('/direct-share')
+  @UseGuards(AuthGuard('jwt'))
+  async directShareVault(
+    @Body() createSharedVaultData: ICreateSharedVault,
+    @getCurrentUserId() userId: string,
+  ): Promise<any> {
+    return await this.vaultService.directShareVaultPassword(
+      createSharedVaultData,
+      userId,
+    );
   }
 
   //update a single vault in the array and display

@@ -16,6 +16,8 @@ import {
   generateKeyPair,
   generateSalt,
 } from '../../utils/helper-functions';
+import { SharedVaultDto } from '../user/dto/shared-vault.dto';
+import { ICreateSharedVault } from '../user/user.interfaces';
 
 @Injectable()
 export class VaultService {
@@ -202,12 +204,47 @@ export class VaultService {
     return userPrivateKey;
   }
 
-  async computeSecret(email: string, userId: string) {
+  async computeSecret(email: string, userId: string): Promise<string> {
     const userPrivateKey = await this.getUserPrivateKey(userId);
     const otherPublicKey = await this.getOtherUserPublicKey(email);
 
     const sharedSecret = computeSharedSecret(userPrivateKey, otherPublicKey);
     console.log('Shared Secret from service: ', sharedSecret);
     return sharedSecret;
+  }
+
+  async directShareVaultPassword(
+    createSharedVaultData: ICreateSharedVault,
+    userId: string,
+  ) {
+    const currentUser = await this.userModel.findById(userId);
+    if (!currentUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    const senderName = currentUser.name;
+    const senderEmail = currentUser.email;
+
+    const OtherUser = await this.userModel.findOne({
+      email: createSharedVaultData.receiverEmail,
+    });
+    if (!OtherUser) {
+      throw new NotFoundException(`Other user not found`);
+    }
+
+    const newSharedVaultData: SharedVaultDto = {
+      vaultId: new mongoose.Types.ObjectId(),
+      vaultUsername: createSharedVaultData.vaultUsername,
+      vaultPassword: createSharedVaultData.vaultPassword,
+      sharedUserEmail: senderEmail,
+      sharedUserName: senderName,
+    };
+
+    OtherUser.sharedVault.push(newSharedVaultData);
+    await OtherUser.save();
+    logger.info(
+      `Shared vault password with ${createSharedVaultData.receiverEmail}`,
+    );
+    return true;
   }
 }
