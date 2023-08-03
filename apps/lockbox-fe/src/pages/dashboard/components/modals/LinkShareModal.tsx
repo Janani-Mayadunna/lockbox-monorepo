@@ -24,7 +24,7 @@ interface ShareModalProps {
   data: string;
 }
 
-export default function ShareModal({
+export default function LinkShareModal({
   open,
   setOpenModal,
   data,
