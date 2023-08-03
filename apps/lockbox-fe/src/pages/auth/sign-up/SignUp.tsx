@@ -1,9 +1,9 @@
-import ResponsiveAppBar from '../../../src/components/global/AppBar';
+import ResponsiveAppBar from '../../../components/global/AppBar';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { IUserSignIn } from './interfaces';
-import { hashPassword } from '../../../src/helpers/crypto';
+import { IUserSignIn } from '../interfaces';
+import { hashPassword } from '../../../helpers/crypto';
 
 const SignUp = () => {
   const [user, setUser] = useState({
