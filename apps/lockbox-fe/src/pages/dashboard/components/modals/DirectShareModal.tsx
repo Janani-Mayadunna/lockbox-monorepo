@@ -7,6 +7,7 @@ import Modal from '@mui/material/Modal';
 import { Grid, Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
+import { encryptVault } from '../../../../../src/helpers/crypto';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -22,14 +23,21 @@ const style = {
 interface ShareModalProps {
   open: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  data: {
+    username: string;
+    password: string;
+  };
 }
 
 export default function DirectShareModal({
   open,
   setOpenModal,
+  data,
 }: ShareModalProps) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [shareEmail, setShareEmail] = React.useState('');
+  const [computeSecret, setComputeSecret] = React.useState('');
+  const [isEmailFieldEmpty, setIsEmailFieldEmpty] = React.useState(false);
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
@@ -40,6 +48,8 @@ export default function DirectShareModal({
 
   // handlers of the modal
   const handleClose = () => {
+    setShareEmail('');
+    setIsEmailFieldEmpty(false);
     setOpenModal(false);
   };
 
@@ -54,33 +64,69 @@ export default function DirectShareModal({
     setSnackbarOpen(false);
   };
 
-  //handler of direct share
-  const handleDirectShare = () => {
+  const computeAgreedSecret = async () => {
     console.log('shareEmail', shareEmail);
 
-    authorizedFetch('http://localhost:4000/api/vault/shared-secret', {
+    await authorizedFetch('http://localhost:4000/api/vault/shared-secret', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email: shareEmail }),
-    }).then((res) => {
-      if (res.status !== 201) {
-        console.log('res', res);
-      } else {
-        setSnackbarOpen(true);
-        console.log('res', res);
-        setShareEmail('');
-        return res.json();
-      }
-    });
+    })
+      .then((res) => res.text())
+      .then((data) => {
+        setComputeSecret(data);
+      });
   };
+
+  //handler of direct share
+  const handleDirectShare = async () => {
+    if (shareEmail === '') {
+      setIsEmailFieldEmpty(true);
+    } else {
+    }
+    await computeAgreedSecret();
+
+    const encryptedSharePassword = encryptVault({
+      vaultPassword: data.password,
+      vaultKey: computeSecret,
+    });
+
+    console.log('vaultPassword', encryptedSharePassword);
+
+    await authorizedFetch('http://localhost:4000/api/vault/direct-share', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        vaultUsername: data.username,
+        vaultPassword: encryptedSharePassword,
+        receiverEmail: shareEmail,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data === true) {
+          setShareEmail('');
+          setSnackbarOpen(true);
+          handleClose();
+        } else {
+          console.log('error on sharing');
+        }
+      });
+  };
+
+  React.useEffect(() => {
+    console.log('xx', computeSecret);
+  }, [computeSecret]);
 
   return (
     <div>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={2500}
+        autoHideDuration={2000}
         onClose={handleSnackbarClose}
       >
         <Alert
@@ -102,6 +148,18 @@ export default function DirectShareModal({
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Enter the email of the person you want to share this password with
           </Typography>
+
+          {isEmailFieldEmpty ? (
+            <Typography
+              variant="caption"
+              component="h6"
+              sx={{ color: 'red', mt: 4 }}
+            >
+              Please enter an email to share
+            </Typography>
+          ) : (
+            ''
+          )}
 
           <Typography
             id="modal-modal-description"
