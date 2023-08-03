@@ -9,14 +9,15 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Snackbar } from '@mui/material';
+import { Snackbar, Tooltip } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import {
   authorizedFetch,
   getVaultKey,
 } from '../../../../../src/helpers/request-interceptor';
 import { encryptVault } from '../../../../../src/helpers/crypto';
-import ShareModal from '../modals/ShareModal';
+import LinkShareModal from '../modals/LinkShareModal';
+import DirectShareModal from '../modals/DirectShareModal';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -71,7 +72,8 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 export default function CustomizedMenus(password: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [openModal, setOpenModal] = React.useState(false);
+  const [openLinkShareModal, setOpenLinkShareModal] = React.useState(false);
+  const [openDirectShareModal, setOpenDirectShareModal] = React.useState(false);
   const [shareLink, setShareLink] = React.useState('');
 
   const open = Boolean(anchorEl);
@@ -103,13 +105,17 @@ export default function CustomizedMenus(password: any) {
   };
 
   // handler of share modal
-  const handleModalOpen = () => {
-    setOpenModal(true);
+  const handleLinkShareModalOpen = () => {
+    setOpenLinkShareModal(true);
+  };
+
+  const handleDirectShareModalOpen = () => {
+    setOpenDirectShareModal(true);
   };
 
   // handler of share
-  const handleShare = () => {
-    handleModalOpen();
+  const handleDirectShare = () => {
+    handleLinkShareModalOpen();
 
     const vaultKey = getVaultKey();
 
@@ -136,12 +142,19 @@ export default function CustomizedMenus(password: any) {
     handleClose();
   };
 
+  //handle direct share
+
   return (
     <div>
-      <ShareModal
-        open={openModal}
-        setOpenModal={setOpenModal}
+      <LinkShareModal
+        open={openLinkShareModal}
+        setOpenModal={setOpenLinkShareModal}
         data={shareLink}
+      />
+
+      <DirectShareModal
+        open={openDirectShareModal}
+        setOpenModal={setOpenDirectShareModal}
       />
 
       <Button
@@ -176,21 +189,31 @@ export default function CustomizedMenus(password: any) {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleModalOpen} disableRipple>
+        <MenuItem>
           <EditIcon />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleCopyToClipboard} disableRipple>
+        <MenuItem onClick={handleCopyToClipboard}>
           <FileCopyIcon />
           Copy Password
         </MenuItem>
 
-        <MenuItem onClick={handleShare} disableRipple>
-          <SendIcon />
-          Share
-        </MenuItem>
+        <Tooltip title="Share password with non-users" arrow>
+          <MenuItem onClick={handleDirectShare}>
+            <SendIcon />
+            Share Via Link
+          </MenuItem>
+        </Tooltip>
+
+        <Tooltip title="Share password with other users" arrow>
+          <MenuItem onClick={handleDirectShareModalOpen}>
+            <SendIcon />
+            Direct Share
+          </MenuItem>
+        </Tooltip>
+
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem onClick={handleClose}>
           <DeleteIcon />
           Delete
         </MenuItem>
