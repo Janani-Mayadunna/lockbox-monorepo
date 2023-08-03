@@ -21,36 +21,22 @@ import { ICreateVaultResponse } from './interfaces/vault.interfaces';
 export class VaultController {
   constructor(private vaultService: VaultService) {}
 
-  //create a 1 vault in the vaults array of user
-  @Post()
-  @UseGuards(AuthGuard('jwt'))
-  async createVault(
-    @Body() vault: CreateVaultDto,
-    @getCurrentUserId() userId: string,
-  ): Promise<ICreateVaultResponse> {
-    return this.vaultService.createVault(vault, userId);
-  }
-
   //retrieve all vaults in the array and display
   @Get()
   @UseGuards(AuthGuard('jwt'))
   async getAllUserVaults(@getCurrentUserId() userId: string): Promise<Vault[]> {
-    return this.vaultService.getAllUserVaults(userId);
+    return await this.vaultService.getAllUserVaults(userId);
   }
 
-  // share a password
-  @Post('/shared')
-  @UseGuards(AuthGuard('jwt'))
-  async getSharedVault(
-    @Body() encryptedSharedPassword: string,
-  ): Promise<string> {
-    return this.vaultService.shareVaultPassword(encryptedSharedPassword);
+  @Get('/key')
+  async generateKeyPair(): Promise<any> {
+    return this.vaultService.getKeyPair();
   }
 
   //verify password share link validity and expiration
   @Get('/verify-link/:id')
   async getSharedLink(@Param('id') shareToken: string): Promise<any> {
-    return this.vaultService.verifyShareLink(shareToken);
+    return await this.vaultService.verifyShareLink(shareToken);
   }
 
   //retrieve a single vault in the array and display
@@ -60,7 +46,40 @@ export class VaultController {
     @getCurrentUserId() userId: string,
     @Param('id') vaultId: string,
   ): Promise<Vault> {
-    return this.vaultService.getOneUserVault(userId, vaultId);
+    return await this.vaultService.getOneUserVault(userId, vaultId);
+  }
+
+  //create a 1 vault in the vaults array of user
+  @Post()
+  @UseGuards(AuthGuard('jwt'))
+  async createVault(
+    @Body() vault: CreateVaultDto,
+    @getCurrentUserId() userId: string,
+  ): Promise<ICreateVaultResponse> {
+    return await this.vaultService.createVault(vault, userId);
+  }
+
+  @Post('/shared-secret')
+  @UseGuards(AuthGuard('jwt'))
+  async computeSecret(
+    @getCurrentUserId() userId: string,
+    @Body() { email },
+  ): Promise<any> {
+    return this.vaultService.computeSecret(email, userId);
+  }
+
+  @Post('get-key')
+  async getOtherUserPublicKey(@Body() { email }): Promise<any> {
+    return this.vaultService.getOtherUserPublicKey(email);
+  }
+
+  // share a password
+  @Post('/shared')
+  @UseGuards(AuthGuard('jwt'))
+  async getSharedVault(
+    @Body() encryptedSharedPassword: string,
+  ): Promise<string> {
+    return await this.vaultService.shareVaultPassword(encryptedSharedPassword);
   }
 
   //update a single vault in the array and display
@@ -71,7 +90,7 @@ export class VaultController {
     @Param('id') vaultId: string,
     @Body() UpdateVaultData: UpdateVaultDto,
   ): Promise<Vault> {
-    return this.vaultService.updateOneUserVault(
+    return await this.vaultService.updateOneUserVault(
       userId,
       vaultId,
       UpdateVaultData,
@@ -85,6 +104,6 @@ export class VaultController {
     @getCurrentUserId() userId: string,
     @Body() deleteVaultData: deleteVaultDto,
   ): Promise<Vault> {
-    return this.vaultService.deleteOneUserVault(userId, deleteVaultData);
+    return await this.vaultService.deleteOneUserVault(userId, deleteVaultData);
   }
 }

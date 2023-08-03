@@ -11,7 +11,11 @@ import {
   IUpdateVault,
 } from './interfaces/vault.interfaces';
 import { JwtService } from '@nestjs/jwt';
-import { generateSalt } from '../../utils/helper-functions';
+import {
+  computeSharedSecret,
+  generateKeyPair,
+  generateSalt,
+} from '../../utils/helper-functions';
 
 @Injectable()
 export class VaultService {
@@ -149,7 +153,7 @@ export class VaultService {
       encryptedSharedPassword,
     };
 
-    const shareToken = this.jwtService.sign(payload, {
+    const shareToken = await this.jwtService.sign(payload, {
       expiresIn: '1m',
       secret: process.env.JWT_SHARED_SECRET,
     });
@@ -160,7 +164,7 @@ export class VaultService {
 
   async verifyShareLink(shareToken: any): Promise<any> {
     try {
-      const decoded = this.jwtService.verify(shareToken, {
+      const decoded = await this.jwtService.verify(shareToken, {
         secret: process.env.JWT_SHARED_SECRET,
       });
 
@@ -171,5 +175,39 @@ export class VaultService {
     } catch (error) {
       throw new NotFoundException('Could not verify share link');
     }
+  }
+
+  // delete later
+  getKeyPair() {
+    const keyPair = generateKeyPair();
+    return keyPair;
+  }
+  // delete later
+
+  async getOtherUserPublicKey(email: string): Promise<string> {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException(`Other user not found`);
+    }
+    const otherUserPublicKey = user.publicKey;
+    return otherUserPublicKey;
+  }
+
+  async getUserPrivateKey(userId: string): Promise<Buffer> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(`User not found to fetch private key`);
+    }
+    const userPrivateKey = user.privateKey;
+    return userPrivateKey;
+  }
+
+  async computeSecret(email: string, userId: string) {
+    const userPrivateKey = await this.getUserPrivateKey(userId);
+    const otherPublicKey = await this.getOtherUserPublicKey(email);
+
+    const sharedSecret = computeSharedSecret(userPrivateKey, otherPublicKey);
+    console.log('Shared Secret from service: ', sharedSecret);
+    return sharedSecret;
   }
 }
