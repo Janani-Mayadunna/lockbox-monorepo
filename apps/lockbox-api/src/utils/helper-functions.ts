@@ -43,6 +43,5 @@ export function computeSharedSecret(
     'base64',
     'hex',
   );
-  console.log('Shared Secret: ', sharedSecret);
   return sharedSecret;
 }

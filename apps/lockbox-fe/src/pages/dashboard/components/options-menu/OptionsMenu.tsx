@@ -165,7 +165,7 @@ export default function CustomizedMenus({
       <DirectShareModal
         open={openDirectShareModal}
         setOpenModal={setOpenDirectShareModal}
-        data={{ password, username } as MenuParameters}
+        ModalData={{ password, username } as MenuParameters}
       />
 
       <Button
