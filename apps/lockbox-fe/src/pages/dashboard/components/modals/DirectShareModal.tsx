@@ -66,16 +66,18 @@ export default function DirectShareModal({
 
   const computeAgreedSecret = async () => {
     console.log('shareEmail', shareEmail);
+    const email = shareEmail;
 
     await authorizedFetch('http://localhost:4000/api/vault/shared-secret', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email: shareEmail }),
+      body: JSON.stringify({ email: email }),
     })
       .then((res) => res.text())
       .then((data) => {
+        console.log('data', data);
         setComputeSecret(data);
       });
   };
@@ -86,14 +88,25 @@ export default function DirectShareModal({
       setIsEmailFieldEmpty(true);
     } else {
     }
-    await computeAgreedSecret();
+    // await computeAgreedSecret();
+
+    Promise.all([computeAgreedSecret()]).then(() => {
+      console.log('computeSecret', computeSecret);
+      if (computeSecret === '') {
+        computeAgreedSecret();
+        console.log('computeSecret is empty');
+        console.log('computeSecret', computeSecret);
+      } else {
+      }
+    });
 
     const encryptedSharePassword = encryptVault({
       vaultPassword: data.password,
       vaultKey: computeSecret,
     });
 
-    console.log('vaultPassword', encryptedSharePassword);
+    console.log('vaultPassword from add', encryptedSharePassword);
+    console.log('computeSecret from add', computeSecret);
 
     await authorizedFetch('http://localhost:4000/api/vault/direct-share', {
       method: 'POST',

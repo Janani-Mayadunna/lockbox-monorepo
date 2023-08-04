@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import CryptoJS from 'crypto-js';
 
 export function hashPassword(password: string) {
@@ -60,9 +61,11 @@ export function decryptVault({
         return str;
       }
     } catch (error: any) {
-      throw new Error('Unable to decrypt', error.message);
+      console.log('unable to decrypt', error.message);
+      // throw new Error('Unable to decrypt', error.message);
     }
   } else {
+    console.log('unable to decrypt');
     throw new Error('Unable to decrypt vault');
   }
 }
