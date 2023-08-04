@@ -13,11 +13,13 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import {
   computeSharedSecret,
-  generateKeyPair,
   generateSalt,
 } from '../../utils/helper-functions';
 import { SharedVaultDto } from '../user/dto/shared-vault.dto';
-import { ICreateSharedVault } from '../user/user.interfaces';
+import {
+  ICreateSharedVault,
+  IGetReceivedVaultResponse,
+} from '../user/user.interfaces';
 
 @Injectable()
 export class VaultService {
@@ -179,13 +181,6 @@ export class VaultService {
     }
   }
 
-  // delete later
-  getKeyPair() {
-    const keyPair = generateKeyPair();
-    return keyPair;
-  }
-  // delete later
-
   async getOtherUserPublicKey(email: string): Promise<string> {
     const user = await this.userModel.findOne({ email });
     if (!user) {
@@ -209,14 +204,13 @@ export class VaultService {
     const otherPublicKey = await this.getOtherUserPublicKey(email);
 
     const sharedSecret = computeSharedSecret(userPrivateKey, otherPublicKey);
-    console.log('Shared Secret from service: ', sharedSecret);
     return sharedSecret;
   }
 
   async directShareVaultPassword(
     createSharedVaultData: ICreateSharedVault,
     userId: string,
-  ) {
+  ): Promise<boolean> {
     const currentUser = await this.userModel.findById(userId);
     if (!currentUser) {
       throw new NotFoundException(`User not found`);
@@ -246,5 +240,33 @@ export class VaultService {
       `Shared vault password with ${createSharedVaultData.receiverEmail}`,
     );
     return true;
+  }
+
+  async getReceivedVaults(
+    userId: string,
+  ): Promise<IGetReceivedVaultResponse[]> {
+    const currentUser = await this.userModel.findById(userId);
+    if (!currentUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    const receivedVaults: SharedVaultDto[] = currentUser.sharedVault;
+
+    //map through each received vault and compute their secret
+    const computedReceivedVaults: IGetReceivedVaultResponse[] =
+      await Promise.all(
+        receivedVaults.map(async (receivedVault) => {
+          const sharedSecret = await this.computeSecret(
+            receivedVault.sharedUserEmail,
+            userId,
+          );
+          return {
+            ...receivedVault,
+            sharedSecret,
+          };
+        }),
+      );
+
+    return computedReceivedVaults;
   }
 }

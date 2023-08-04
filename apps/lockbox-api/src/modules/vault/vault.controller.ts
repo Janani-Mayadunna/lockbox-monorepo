@@ -30,11 +30,6 @@ export class VaultController {
     return await this.vaultService.getAllUserVaults(userId);
   }
 
-  @Get('/key')
-  async generateKeyPair(): Promise<any> {
-    return this.vaultService.getKeyPair();
-  }
-
   //verify password share link validity and expiration
   @Get('/verify-link/:id')
   async getSharedLink(@Param('id') shareToken: string): Promise<any> {
@@ -42,13 +37,19 @@ export class VaultController {
   }
 
   //retrieve a single vault in the array and display
-  @Get(':id')
+  @Get('/vaults/:id')
   @UseGuards(AuthGuard('jwt'))
   async getOneUserVault(
     @getCurrentUserId() userId: string,
     @Param('id') vaultId: string,
   ): Promise<Vault> {
     return await this.vaultService.getOneUserVault(userId, vaultId);
+  }
+
+  @Get('/received-vaults')
+  @UseGuards(AuthGuard('jwt'))
+  async getReceivedVaults(@getCurrentUserId() userId: string): Promise<any> {
+    return await this.vaultService.getReceivedVaults(userId);
   }
 
   //create a 1 vault in the vaults array of user

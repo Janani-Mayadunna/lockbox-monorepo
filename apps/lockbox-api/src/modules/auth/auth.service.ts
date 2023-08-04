@@ -8,8 +8,7 @@ import { User } from '../user/schemas/user.schema';
 import * as argon2 from 'argon2';
 import {
   generateSalt,
-  generateUserPrivateKey,
-  generateUserPublicKey,
+  generateUserKeyPair,
 } from '../../utils/helper-functions';
 import logger from '../../utils/logger';
 
@@ -26,8 +25,7 @@ export class AuthService {
     const { name, email, password } = signUpDto;
 
     const userSalt = generateSalt();
-    const ecdhPublicKey = generateUserPublicKey();
-    const ecdhPrivateKey = generateUserPrivateKey();
+    const userECDHKeyPair = generateUserKeyPair();
 
     const hashedPassword = await argon2.hash(`${email}:${password}`);
 
@@ -35,8 +33,8 @@ export class AuthService {
       name,
       email,
       password: hashedPassword,
-      publicKey: ecdhPublicKey,
-      privateKey: ecdhPrivateKey,
+      publicKey: userECDHKeyPair.userPublicKey,
+      privateKey: userECDHKeyPair.userPrivateKey,
       salt: userSalt,
     });
 
