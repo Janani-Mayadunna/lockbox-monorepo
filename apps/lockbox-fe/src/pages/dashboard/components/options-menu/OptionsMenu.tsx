@@ -11,12 +11,6 @@ import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Snackbar, Tooltip } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import {
-  authorizedFetch,
-  getVaultKey,
-} from '../../../../../src/helpers/request-interceptor';
-import { encryptVault } from '../../../../../src/helpers/crypto';
-import LinkShareModal from '../modals/LinkShareModal';
 import DirectShareModal from '../modals/DirectShareModal';
 
 interface MenuParameters {
@@ -82,9 +76,9 @@ export default function CustomizedMenus({
 }: MenuParameters) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [openLinkShareModal, setOpenLinkShareModal] = React.useState(false);
   const [openDirectShareModal, setOpenDirectShareModal] = React.useState(false);
-  const [shareLink, setShareLink] = React.useState('');
+  // const [shareLink, setShareLink] = React.useState('');
+  // const [openLinkShareModal, setOpenLinkShareModal] = React.useState(false);
 
   const open = Boolean(anchorEl);
 
@@ -114,53 +108,53 @@ export default function CustomizedMenus({
     handleClose();
   };
 
-  // handler of share modal
-  const handleLinkShareModalOpen = () => {
-    setOpenLinkShareModal(true);
-  };
-
   const handleDirectShareModalOpen = () => {
     setOpenDirectShareModal(true);
   };
 
-  // handler of share
-  const handleDirectShare = () => {
-    handleLinkShareModalOpen();
+  // handler of link share modal
+  // const handleLinkShareModalOpen = () => {
+  //   setOpenLinkShareModal(true);
+  // };
 
-    const vaultKey = getVaultKey();
+  // handler of link share
+  // const handleLinkShare = () => {
+  //   handleLinkShareModalOpen();
 
-    const encryptedSharedPassword = encryptVault({
-      vaultPassword: password,
-      vaultKey: vaultKey,
-    });
+  //   const vaultKey = getVaultKey();
 
-    authorizedFetch('http://localhost:4000/api/vault/shared', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ password: encryptedSharedPassword }),
-    })
-      .then((res) => res.text())
-      .then((data) => {
-        setShareLink(data);
-      })
-      .catch((err: any) => {
-        throw new Error(err);
-      });
+  //   const encryptedSharedPassword = encryptVault({
+  //     vaultPassword: password,
+  //     vaultKey: vaultKey,
+  //   });
 
-    handleClose();
-  };
+  //   authorizedFetch('http://localhost:4000/api/vault/shared', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ password: encryptedSharedPassword }),
+  //   })
+  //     .then((res) => res.text())
+  //     .then((data) => {
+  //       setShareLink(data);
+  //     })
+  //     .catch((err: any) => {
+  //       throw new Error(err);
+  //     });
+
+  //   handleClose();
+  // };
 
   //handle direct share
 
   return (
     <div>
-      <LinkShareModal
+      {/* <LinkShareModal
         open={openLinkShareModal}
         setOpenModal={setOpenLinkShareModal}
         data={shareLink}
-      />
+      /> */}
 
       <DirectShareModal
         open={openDirectShareModal}
@@ -209,12 +203,12 @@ export default function CustomizedMenus({
           Copy Password
         </MenuItem>
 
-        <Tooltip title="Share password with non-users" arrow>
-          <MenuItem onClick={handleDirectShare}>
+        {/* <Tooltip title="Share password with non-users" arrow>
+          <MenuItem onClick={handleLinkShare}>
             <SendIcon />
             Share Via Link
           </MenuItem>
-        </Tooltip>
+        </Tooltip> */}
 
         <Tooltip title="Share password with other users" arrow>
           <MenuItem onClick={handleDirectShareModalOpen}>

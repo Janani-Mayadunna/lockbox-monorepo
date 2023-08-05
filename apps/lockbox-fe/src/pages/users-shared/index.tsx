@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import {
@@ -13,6 +14,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { authorizedFetch } from '../../../src/helpers/request-interceptor';
 import { useEffect, useState } from 'react';
 import { decryptVault } from '../../../src/helpers/crypto';
+import AddToVaultModal from './components/modals/AddToVaultModal';
 
 interface VaultData {
   vaultUsername: string;
@@ -33,6 +35,15 @@ const ReceivedPasswordsVault = () => {
     },
   ]);
   const [receivedVaults, setReceivedVaults] = useState([]);
+  const [openAddToVaultModal, setOpenAddToVaultModal] = useState(false);
+  const [selectedVault, setSelectedVault] = useState({
+    vaultUsername: '',
+    vaultPassword: '',
+  });
+
+  const handleAddToVaultModalOpen = () => {
+    setOpenAddToVaultModal(true);
+  };
 
   const getAllReceivedVaults = async () => {
     await authorizedFetch('http://localhost:4000/api/vault/received-vaults', {
@@ -82,9 +93,25 @@ const ReceivedPasswordsVault = () => {
     getDecryptedVaults();
   }, [receivedVaults]);
 
+  useEffect(() => {
+    console.log('selected', selectedVault);
+
+    if (
+      selectedVault.vaultPassword !== '' &&
+      selectedVault.vaultUsername !== ''
+    ) {
+      handleAddToVaultModalOpen();
+    }
+  }, [selectedVault]);
+
   return (
     <>
       <ResponsiveAppBar />
+      <AddToVaultModal
+        open={openAddToVaultModal}
+        setOpenModal={setOpenAddToVaultModal}
+        ModalData={selectedVault}
+      />
       <Container sx={{ width: 1000 }}>
         <div>
           <Typography
@@ -98,7 +125,6 @@ const ReceivedPasswordsVault = () => {
 
           <Box>
             {/* map over vaultData array and display */}
-
             {decryptedVaults.map((data: any, index: any) => (
               <Accordion key={index} sx={{ mb: 1 }}>
                 <AccordionSummary
@@ -149,6 +175,13 @@ const ReceivedPasswordsVault = () => {
                         variant="contained"
                         color="primary"
                         sx={{ mt: 4, mb: 4 }}
+                        onClick={() => {
+                          setSelectedVault({
+                            vaultUsername: data.vaultUsername,
+                            vaultPassword: data.vaultPassword,
+                          });
+                          // handleAddToVaultModalOpen();
+                        }}
                       >
                         Add to My Vault
                       </Button>
