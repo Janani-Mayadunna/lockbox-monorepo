@@ -5,7 +5,6 @@ import {
   authorizedFetch,
   getVaultKey,
 } from '../../helpers/request-interceptor';
-import { encryptVault } from '../../helpers/crypto';
 import {
   Box,
   Button,
@@ -18,6 +17,7 @@ import {
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import ResponsiveAppBar from '../../components/global/AppBar';
 import GenPassModal from '../dashboard/components/modals/GenPassModal';
+import CustomCrypto from '../../../src/helpers/custom-crypto';
 
 const PasswordAdd = () => {
   const [vaultData, setVaultData] = useState({
@@ -32,23 +32,30 @@ const PasswordAdd = () => {
     setOpenModal(true);
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     handleReset();
 
     const vaultKey = getVaultKey();
     const vaultPW = vaultData.password;
 
-    const encryptedVaultPW = encryptVault({
-      vaultPassword: vaultPW,
-      vaultKey,
-    });
+    // const encryptedVaultPW = encryptVault({
+    //   vaultPassword: vaultPW,
+    //   vaultKey,
+    // });
+
+    const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
 
     const newVault: ICreateVault = {
       link: vaultData.link,
       username: vaultData.username,
       password: encryptedVaultPW,
     };
+
+    // console.log('newVault', newVault)
+
+    // const decryptedDataj = await CustomCrypto.decrypt(vaultKey, encryptedVaultPW);
+    //   console.log('decrypted data', decryptedDataj);
 
     authorizedFetch('http://localhost:4000/api/vault', {
       method: 'POST',

@@ -13,10 +13,10 @@ import {
   authorizedFetch,
   getVaultKey,
 } from '../../../../../src/helpers/request-interceptor';
-import { decryptVault } from '../../../../../src/helpers/crypto';
 import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 
 interface Column {
   id: 'id' | 'link' | 'username' | 'password' | 'actions';
@@ -77,6 +77,14 @@ export default function UserVaultTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [vaultData, setVaultData] = React.useState([]);
+  const [decryptedVaults, setDecryptedVaults] = React.useState([
+    {
+      id: '',
+      link: '',
+      username: '',
+      password: '',
+    },
+  ]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -106,21 +114,6 @@ export default function UserVaultTable() {
       });
   };
 
-  //loop through vaultData array and decrypt each password
-  const decryptedVaults = vaultData.map((row: Row) => {
-    const vaultKey = getVaultKey();
-
-    const decryptedVaultPW = decryptVault({
-      vaultPassword: row.password,
-      vaultKey: vaultKey,
-    });
-
-    return {
-      ...row,
-      password: decryptedVaultPW,
-    };
-  });
-
   const vaults = decryptedVaults.map((row: any, index: number) => ({
     ...row,
     id: index + 1,
@@ -134,6 +127,34 @@ export default function UserVaultTable() {
     getAllVaults();
   }, []);
 
+  React.useEffect(() => {
+    const decryptedPasswords = async (vaultData: Row[]) => {
+      const vaultKey = getVaultKey();
+
+      const decryptedData = await Promise.all(
+        vaultData.map(async (row: Row) => {
+          const decryptedVaultPW = await CustomCrypto.decrypt(
+            vaultKey,
+            row.password,
+          );
+
+          return {
+            ...row,
+            password: decryptedVaultPW,
+          };
+        }),
+      );
+      return decryptedData;
+    };
+
+    async function test() {
+      const decryptedData = await decryptedPasswords(vaultData);
+      setDecryptedVaults(decryptedData);
+    }
+
+    test();
+  }, [vaultData]);
+
   return (
     <Paper sx={{ width: '90%', overflow: 'hidden', px: 4, py: 2 }}>
       <TableContainer sx={{ maxHeight: 500 }}>
@@ -144,7 +165,11 @@ export default function UserVaultTable() {
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth, fontWeight: 'bold', fontSize: '1rem' }}
+                  style={{
+                    minWidth: column.minWidth,
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                  }}
                 >
                   {column.label}
                 </TableCell>

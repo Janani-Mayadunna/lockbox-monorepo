@@ -16,6 +16,7 @@ import DirectShareModal from '../modals/DirectShareModal';
 interface MenuParameters {
   password: string;
   username: string;
+  link?: string;
 }
 
 const StyledMenu = styled((props: MenuProps) => (
@@ -73,6 +74,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 export default function CustomizedMenus({
   password,
   username,
+  link
 }: MenuParameters) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -159,7 +161,7 @@ export default function CustomizedMenus({
       <DirectShareModal
         open={openDirectShareModal}
         setOpenModal={setOpenDirectShareModal}
-        ModalData={{ password, username } as MenuParameters}
+        ModalData={{ password, username, link } as MenuParameters}
       />
 
       <Button
