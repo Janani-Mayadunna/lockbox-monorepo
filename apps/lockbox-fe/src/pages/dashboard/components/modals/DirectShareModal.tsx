@@ -27,6 +27,7 @@ interface ShareModalProps {
   ModalData: {
     username: string;
     password: string;
+    link?: string;
   };
 }
 

@@ -103,6 +103,7 @@ export const PasswordVault = () => {
               <CustomizedMenus
                 password={row.password}
                 username={row.username}
+                link={row.link}
               />
             </Grid>
           </Grid>

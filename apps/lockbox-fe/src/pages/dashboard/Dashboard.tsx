@@ -17,7 +17,7 @@ const Dashboard = () => {
             marginBottom: '30px',
           }}
         >
-          <Typography variant="h4">Passowrd Vault</Typography>
+          <Typography variant="h4">Password Vault</Typography>
         </Box>
 
         <Box
