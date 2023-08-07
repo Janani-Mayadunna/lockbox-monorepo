@@ -7,7 +7,7 @@ import PasswordVault from '../pages/dashboard/components/vault/PasswordVault.tsx
 import PasswordAdd from '../pages/add-password/PasswordAdd.tsx';
 import SignUp from '../pages/auth/sign-up/SignUp.tsx';
 import PublicSharedVault from '../pages/public-shared/index.tsx';
-import ReceivedPasswordsVault from '../pages/users-shared/index.tsx';
+import ReceivedPasswordsVault from '../pages/vault-received/index.tsx';
 
 const routers = [
   {

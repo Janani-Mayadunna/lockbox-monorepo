@@ -283,4 +283,28 @@ export class VaultService {
 
     return computedReceivedVaults;
   }
+
+  async deleteOneReceivedVault(userId: string, deleteVaultData: IDeleteVault) {
+    const currentUser = await this.userModel.findById(userId);
+    if (!currentUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    // find a vault from currentUsers sharedVault array that matches the deleteVaultData.id
+    const vaultToDelete = currentUser.sharedVault.find(
+      (vault) => vault.vaultId.toString() === deleteVaultData.id,
+    );
+
+    if (!vaultToDelete) {
+      throw new NotFoundException(`Vault not found`);
+    }
+
+    //remove that from element from user's sharedVault array
+    await this.userModel.updateOne(
+      { _id: userId },
+      { $pull: { sharedVault: vaultToDelete } },
+    );
+
+    return vaultToDelete;
+  }
 }

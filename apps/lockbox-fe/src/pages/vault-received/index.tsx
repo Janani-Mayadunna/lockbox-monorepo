@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import ResponsiveAppBar from '../../../src/components/global/AppBar';
+import ResponsiveAppBar from '../../components/global/AppBar';
 import {
   Accordion,
   AccordionDetails,
@@ -7,19 +6,22 @@ import {
   Box,
   Button,
   Container,
+  Snackbar,
   Typography,
 } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   authorizedFetch,
   getVaultKey,
-} from '../../../src/helpers/request-interceptor';
-import { useEffect, useState } from 'react';
-import { decryptVault } from '../../../src/helpers/crypto';
-import CustomCrypto from '../../../src/helpers/custom-crypto';
+} from '../../helpers/request-interceptor';
+import React, { useEffect, useState } from 'react';
+import { decryptVault } from '../../helpers/crypto';
+import CustomCrypto from '../../helpers/custom-crypto';
 import { ICreateVault } from '../add-password/interfaces';
 
 interface VaultData {
+  vaultId: any;
   vaultUsername: string;
   vaultPassword: string;
   vaultLink: string;
@@ -29,9 +31,17 @@ interface VaultData {
   isAllowedToSave: boolean;
 }
 
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const ReceivedPasswordsVault = () => {
   const [decryptedVaults, setDecryptedVaults] = useState([
     {
+      vaultId: '',
       vaultUsername: '',
       vaultPassword: '',
       vaultLink: '',
@@ -42,6 +52,68 @@ const ReceivedPasswordsVault = () => {
     },
   ]);
   const [receivedVaults, setReceivedVaults] = useState([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  // handler of snackbar
+  const handleSnackbarClose = (
+    e?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const handleAddToVault = async (
+    vaultPassword: string,
+    vaultUsername: string,
+    vaultLink: string,
+    vaultId: any,
+  ) => {
+    const vaultKey = getVaultKey();
+
+    const encryptedVaultPW = await CustomCrypto.encrypt(
+      vaultKey,
+      vaultPassword,
+    );
+
+    const newVault: ICreateVault = {
+      link: vaultLink,
+      username: vaultUsername,
+      password: encryptedVaultPW,
+      note: '',
+    };
+
+    await createVault(newVault);
+    await handleVaultDelete(vaultId);
+    await getAllReceivedVaults();
+  };
+
+  const handleVaultDelete = async (id: string) => {
+    await authorizedFetch('http://localhost:4000/api/vault/delete-received', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    })
+      .then((res) => {
+        if (res.status !== 200) {
+          throw new Error('Failed to delete vault');
+        } else {
+          setSnackbarOpen(true);
+          return res.json();
+        }
+      })
+      .catch((err) => {
+        throw new Error('Failed to delete vault' + err.message);
+      });
+
+    await getAllReceivedVaults();
+  };
 
   const getAllReceivedVaults = async () => {
     await authorizedFetch('http://localhost:4000/api/vault/received-vaults', {
@@ -56,6 +128,26 @@ const ReceivedPasswordsVault = () => {
       })
       .catch((err: any) => {
         throw new Error(err);
+      });
+  };
+
+  const createVault = async (newVault: ICreateVault) => {
+    authorizedFetch('http://localhost:4000/api/vault', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newVault),
+    })
+      .then((res) => {
+        if (res.status !== 201) {
+          throw new Error('Failed to create vault');
+        } else {
+          return res.json();
+        }
+      })
+      .catch((err) => {
+        throw new Error('Failed to create vault' + err.message);
       });
   };
 
@@ -89,52 +181,23 @@ const ReceivedPasswordsVault = () => {
     getDecryptedVaults();
   }, [receivedVaults]);
 
-  const handleAddToVault = async (
-    vaultPassword: string,
-    vaultUsername: string,
-    vaultLink: string,
-  ) => {
-    const vaultKey = getVaultKey();
-
-    const encryptedVaultPW = await CustomCrypto.encrypt(
-      vaultKey,
-      vaultPassword,
-    );
-
-    const newVault: ICreateVault = {
-      link: vaultLink,
-      username: vaultUsername,
-      password: encryptedVaultPW,
-      note: '',
-    };
-
-    await createVault(newVault);
-  };
-
-  const createVault = async (newVault: ICreateVault) => {
-    authorizedFetch('http://localhost:4000/api/vault', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVault),
-    })
-      .then((res) => {
-        if (res.status !== 201) {
-          throw new Error('Failed to create vault');
-        } else {
-          return res.json();
-        }
-      })
-      .catch((err) => {
-        throw new Error('Failed to create vault' + err.message);
-      });
-  };
-
   return (
     <>
       <ResponsiveAppBar />
       <Container sx={{ width: 1000 }}>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={2500}
+          onClose={handleSnackbarClose}
+        >
+          <Alert
+            onClose={handleSnackbarClose}
+            severity="success"
+            sx={{ width: '100%' }}
+          >
+            Successfully Done!
+          </Alert>
+        </Snackbar>
         <div>
           <Typography
             sx={{ mt: 4, mb: 4 }}
@@ -214,6 +277,7 @@ const ReceivedPasswordsVault = () => {
                               data.vaultPassword,
                               data.vaultUsername,
                               data.vaultLink,
+                              data.vaultId,
                             )
                           }
                         >
@@ -227,6 +291,9 @@ const ReceivedPasswordsVault = () => {
                         color="secondary"
                         sx={{
                           width: 150,
+                        }}
+                        onClick={() => {
+                          handleVaultDelete(data.vaultId);
                         }}
                       >
                         Delete
