@@ -9,6 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import {
   authorizedFetch,
   getVaultKey,
@@ -157,80 +158,96 @@ export default function UserVaultTable() {
 
   return (
     <Paper sx={{ width: '90%', overflow: 'hidden', px: 4, py: 2 }}>
-      <TableContainer sx={{ maxHeight: 500 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{
-                    minWidth: column.minWidth,
-                    fontWeight: 'bold',
-                    fontSize: '1rem',
-                  }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.id === 'actions' ? (
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                                ml: 6,
-                              }}
-                            >
-                              <Grid container spacing={0} columns={12}>
-                                <Grid item xs={8}>
-                                  <Button>
-                                    <VisibilityIcon />
-                                  </Button>
-                                </Grid>
-                                <Grid item xs={4}>
-                                  <CustomizedMenus
-                                    password={row.password}
-                                    username={row.username}
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Box>
-                          ) : column.format && typeof value === 'number' ? (
-                            column.format(value)
-                          ) : (
-                            value
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {rows.length === 0 ? (
+        <Box>
+          <Typography variant="body1" align="center">
+            No Passwords Found
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          <TableContainer sx={{ maxHeight: 500 }}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align={column.align}
+                      style={{
+                        minWidth: column.minWidth,
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                      }}
+                    >
+                      {column.label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => {
+                    return (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={row.id}
+                      >
+                        {columns.map((column) => {
+                          const value = row[column.id];
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {column.id === 'actions' ? (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    ml: 6,
+                                  }}
+                                >
+                                  <Grid container spacing={0} columns={12}>
+                                    <Grid item xs={8}>
+                                      <Button>
+                                        <VisibilityIcon />
+                                      </Button>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                      <CustomizedMenus
+                                        password={row.password}
+                                        username={row.username}
+                                        link={row.link}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </Box>
+                              ) : column.format && typeof value === 'number' ? (
+                                column.format(value)
+                              ) : (
+                                value
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </>
+      )}
     </Paper>
   );
 }

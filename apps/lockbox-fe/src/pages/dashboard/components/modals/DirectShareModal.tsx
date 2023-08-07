@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { Grid, Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { FormControlLabel, Checkbox } from '@mui/material';
 import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
 import { encryptVault } from '../../../../../src/helpers/crypto';
 
@@ -39,6 +40,8 @@ export default function DirectShareModal({
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [shareEmail, setShareEmail] = React.useState('');
   const [computeSecret, setComputeSecret] = React.useState('');
+  const [isAllowedToSave, setIsAllowedToSave] = React.useState(false);
+  const [isInvalidUser, setIsInvalidUser] = React.useState(false);
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
@@ -50,7 +53,9 @@ export default function DirectShareModal({
   // handlers of the modal
   const handleClose = () => {
     setShareEmail('');
+    setIsAllowedToSave(false);
     setOpenModal(false);
+    setIsInvalidUser(false);
   };
 
   // handler of snackbar
@@ -76,7 +81,6 @@ export default function DirectShareModal({
     })
       .then((res) => res.text())
       .then((data) => {
-        console.log('data', data);
         setComputeSecret(data);
       });
 
@@ -104,7 +108,9 @@ export default function DirectShareModal({
           body: JSON.stringify({
             vaultUsername: ModalData.username,
             vaultPassword: encryptedSharePassword,
+            vaultLink: ModalData.link,
             receiverEmail: shareEmail,
+            isAllowedToSave: isAllowedToSave,
           }),
         })
           .then((res) => res.json())
@@ -114,7 +120,7 @@ export default function DirectShareModal({
               setSnackbarOpen(true);
               handleClose();
             } else {
-              console.log('error on sharing');
+              setIsInvalidUser(true);
             }
           });
       }
@@ -123,9 +129,10 @@ export default function DirectShareModal({
   };
 
   React.useEffect(() => {
-    console.log('computeSecret', computeSecret);
     handleDirectShare();
   }, [computeSecret]);
+
+  React.useEffect(() => {}, [isAllowedToSave]);
 
   return (
     <div>
@@ -179,6 +186,29 @@ export default function DirectShareModal({
               onChange={(e) => setShareEmail(e.target.value)}
             />
           </Typography>
+
+          {isInvalidUser ? (
+            <Box>
+              <Typography
+                variant="body1"
+                component="h6"
+                sx={{ color: 'red', mb: 3, ml: 4 }}
+              >
+                * User with provided email does not exist
+              </Typography>
+            </Box>
+          ) : (
+            ''
+          )}
+
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <FormControlLabel
+              control={<Checkbox />}
+              label="Allow the receiver to save this password to their vault"
+              sx={{ '& .MuiSvgIcon-root': { fontSize: 28 }, mb: 2 }}
+              onChange={() => setIsAllowedToSave((prev) => !prev)}
+            />
+          </Box>
 
           <Grid container spacing={2}>
             <Grid item xs={6}>

@@ -1,10 +1,14 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 export class SharedVaultDto {
   @IsNotEmpty()
   @IsString()
   readonly vaultId: ObjectId;
+
+  @IsOptional()
+  @IsString()
+  readonly vaultLink?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -21,4 +25,8 @@ export class SharedVaultDto {
   @IsNotEmpty()
   @IsString()
   readonly sharedUserName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly isAllowedToSave: boolean;
 }

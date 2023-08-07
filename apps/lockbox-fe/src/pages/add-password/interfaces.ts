@@ -1,5 +1,6 @@
 export interface ICreateVault {
-  link: string;
+  link?: string;
   username: string;
   password: string;
+  note?: string;
 }
