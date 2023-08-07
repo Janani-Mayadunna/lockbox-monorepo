@@ -27,10 +27,6 @@ const routers = [
     component: Dashboard,
   },
   {
-    path: ROUTE.PASSWORD_VAULT,
-    component: PasswordVault,
-  },
-  {
     path: ROUTE.PASSWORD_VAULT_ADD,
     component: PasswordAdd,
   },

@@ -182,131 +182,112 @@ const ReceivedPasswordsVault = () => {
   }, [receivedVaults]);
 
   return (
-    <>
-      <ResponsiveAppBar />
-      <Container sx={{ width: 1000 }}>
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={2500}
+    <Container sx={{ width: 1000 }}>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2500}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
           onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: '100%' }}
         >
-          <Alert
-            onClose={handleSnackbarClose}
-            severity="success"
-            sx={{ width: '100%' }}
-          >
-            Successfully Done!
-          </Alert>
-        </Snackbar>
-        <div>
-          <Typography
-            sx={{ mt: 4, mb: 4 }}
-            variant="h4"
-            component="h2"
-            gutterBottom
-          >
-            Shared Passwords
-          </Typography>
+          Successfully Done!
+        </Alert>
+      </Snackbar>
+      <div>
+        <Typography
+          sx={{ mt: 4, mb: 4 }}
+          variant="h4"
+          component="h2"
+          gutterBottom
+        >
+          Shared Passwords
+        </Typography>
 
-          <Box>
-            {/* map over vaultData array and display */}
-            {decryptedVaults.map((data: any, index: any) => (
-              <Accordion key={index} sx={{ mb: 1 }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                  sx={{ backgroundColor: '#ebeef4' }}
-                >
-                  <Typography variant="subtitle1" component="h5">
-                    Shared by : {data.sharedUserName}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box display="flex" justifyContent="space-around">
-                    <Box>
+        <Box>
+          {/* map over vaultData array and display */}
+          {decryptedVaults.map((data: any, index: any) => (
+            <Accordion key={index} sx={{ mb: 1 }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+                sx={{ backgroundColor: '#ebeef4' }}
+              >
+                <Typography variant="subtitle1" component="h5">
+                  Shared by : {data.sharedUserName}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box display="flex" justifyContent="space-around">
+                  <Box>
+                    <Typography gutterBottom sx={{ mt: 1, mb: 1 }} variant="h6">
+                      <strong>Username: </strong> {data.vaultUsername}
+                    </Typography>
+                    {data.vaultLink !== '' ? (
                       <Typography
                         gutterBottom
                         sx={{ mt: 1, mb: 1 }}
                         variant="h6"
                       >
-                        <strong>Username: </strong> {data.vaultUsername}
+                        <strong>Website: </strong> {data.vaultLink}
                       </Typography>
-                      {data.vaultLink !== '' ? (
-                        <Typography
-                          gutterBottom
-                          sx={{ mt: 1, mb: 1 }}
-                          variant="h6"
-                        >
-                          <strong>Website: </strong> {data.vaultLink}
-                        </Typography>
-                      ) : (
-                        ''
-                      )}
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Password:</strong> {data.vaultPassword}
-                      </Typography>
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Sender Name:</strong> {data.sharedUserName}
-                      </Typography>
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Sender Email:</strong> {data.sharedUserEmail}
-                      </Typography>
-                    </Box>
+                    ) : (
+                      ''
+                    )}
+                    <Typography gutterBottom sx={{ mt: 1, mb: 1 }} variant="h6">
+                      <strong>Password:</strong> {data.vaultPassword}
+                    </Typography>
+                    <Typography gutterBottom sx={{ mt: 1, mb: 1 }} variant="h6">
+                      <strong>Sender Name:</strong> {data.sharedUserName}
+                    </Typography>
+                    <Typography gutterBottom sx={{ mt: 1, mb: 1 }} variant="h6">
+                      <strong>Sender Email:</strong> {data.sharedUserEmail}
+                    </Typography>
+                  </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      {data.isAllowedToSave ? (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          sx={{ mt: 4, mb: 4 }}
-                          onClick={() =>
-                            handleAddToVault(
-                              data.vaultPassword,
-                              data.vaultUsername,
-                              data.vaultLink,
-                              data.vaultId,
-                            )
-                          }
-                        >
-                          Add to My Vault
-                        </Button>
-                      ) : (
-                        ''
-                      )}
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {data.isAllowedToSave ? (
                       <Button
                         variant="contained"
-                        color="secondary"
-                        sx={{
-                          width: 150,
-                        }}
-                        onClick={() => {
-                          handleVaultDelete(data.vaultId);
-                        }}
+                        color="primary"
+                        sx={{ mt: 4, mb: 4 }}
+                        onClick={() =>
+                          handleAddToVault(
+                            data.vaultPassword,
+                            data.vaultUsername,
+                            data.vaultLink,
+                            data.vaultId,
+                          )
+                        }
                       >
-                        Delete
+                        Add to My Vault
                       </Button>
-                    </Box>
+                    ) : (
+                      ''
+                    )}
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      sx={{
+                        width: 150,
+                      }}
+                      onClick={() => {
+                        handleVaultDelete(data.vaultId);
+                      }}
+                    >
+                      Delete
+                    </Button>
                   </Box>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </Box>
-        </div>
-      </Container>
-    </>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Box>
+      </div>
+    </Container>
   );
 };
 

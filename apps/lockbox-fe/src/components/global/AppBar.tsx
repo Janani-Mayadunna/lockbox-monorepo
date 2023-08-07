@@ -18,7 +18,7 @@ import { getLoggedIn } from '../../../src/helpers/request-interceptor';
 
 const pages = [
   { title: 'Password Vault', path: '/dashboard' },
-  { title: 'Received Vault', path: '/password_vault/received' },
+  { title: 'Received Vault', path: '/vault/received' },
 ];
 const settings = ['Profile', 'Password Vault', 'Logout'];
 
