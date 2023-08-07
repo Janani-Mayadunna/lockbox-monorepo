@@ -97,7 +97,6 @@ const PasswordAdd = () => {
 
   return (
     <div>
-      <ResponsiveAppBar />
       <GenPassModal open={openModal} setOpenModal={setOpenModal} />
       <Box
         sx={{
