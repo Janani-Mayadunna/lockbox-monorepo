@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { hashPassword } from '../utils/crypto';
 import { userLogin } from '../utils/api';
+import { chromeStorageGet } from '../utils/chrome-utils';
 
 const Login: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -15,15 +16,21 @@ const Login: React.FC<{}> = () => {
   const handleLogin = () => {
     userLogin(data.email, hashedPassword);
 
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 1500);
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'tokenUpdated') {
+        if (message.token) {
+          navigate('/dashboard');
+        }
+      }
+    });
   };
 
   React.useEffect(() => {
-    if (localStorage.getItem('jwt-lockbox')) {
-      navigate('/dashboard');
-    }
+    chrome.storage.local.get(['token']).then((result) => {
+      if (result.token) {
+        navigate('/dashboard');
+      }
+    });
   }, [navigate]);
 
   return (

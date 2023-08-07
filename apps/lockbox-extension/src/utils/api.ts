@@ -15,21 +15,24 @@ export function userLogin(email: string, hashedPassword: string) {
   })
     .then((response) => {
       response.json().then((data) => {
-        console.log('response', response);
         if (response.status === 201) {
-          console.log('data', data);
           const token = data.access_token;
-
-          localStorage.setItem('jwt-lockbox', JSON.stringify(data));
-          localStorage.setItem('isLoggedIn', JSON.stringify(true));
 
           /* Since chrome.storage.session type is not supported, I've sorted to emulate session storage 
           instead using local storage and adding listeners for browser.runtime.onStartup, 
           browser.runtime.onSuspend, browser.runtime.onInstalled that will clear 'session' storage data.*/
           //   chrome.storage.
 
-          console.log('Successfully Logged In!');
-          console.log(data);
+          chrome.runtime.sendMessage({ action: 'login' }, (response) => {
+            console.log('Background script response:', response);
+          });
+
+          chrome.runtime.sendMessage(
+            { action: 'setToken', token: token },
+            (response) => {
+              console.log('Background script response:', response);
+            }
+          );
 
           getCurrentUser(email, hashedPassword);
 
@@ -44,8 +47,8 @@ export function userLogin(email: string, hashedPassword: string) {
     });
 }
 
-export function getCurrentUser(email: string, hashedPassword: string) {
-  authorizedFetch(`${backendUrl}/auth/current-user`, {
+export async function getCurrentUser(email: string, hashedPassword: string) {
+  await authorizedFetch(`${backendUrl}/auth/current-user`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -53,23 +56,31 @@ export function getCurrentUser(email: string, hashedPassword: string) {
   })
     .then((res) => res.json())
     .then((data) => {
-        console.log('data', data);
-      localStorage.setItem('current-user', JSON.stringify(data.user));
-      //   navigate('/dashboard');
+      const currentUser = data.user;
+
+      chrome.runtime.sendMessage(
+        { action: 'setCurrentUser', currentUser: currentUser },
+        (response) => {
+          console.log('Background script response:', response);
+        }
+      );
     })
     .catch((err) => {
       console.log(err);
     });
 
-  setTimeout(() => {
-    const salt = getUserSalt();
+  const salt = await getUserSalt();
 
-    const vaultKey = generateVaultKey({
-      hashedPassword: hashedPassword,
-      email: email,
-      salt: salt,
-    });
+  const vaultKey = generateVaultKey({
+    hashedPassword: hashedPassword,
+    email: email,
+    salt: salt,
+  });
 
-    localStorage.setItem('VK', vaultKey);
-  }, 1000);
+  chrome.runtime.sendMessage(
+    { action: 'setVaultKey', vaultKey: vaultKey },
+    (response) => {
+      console.log('Background script response:', response);
+    }
+  );
 }
