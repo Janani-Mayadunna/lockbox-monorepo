@@ -121,4 +121,16 @@ export class VaultController {
   ): Promise<Vault> {
     return await this.vaultService.deleteOneUserVault(userId, deleteVaultData);
   }
+
+  @Delete('/delete-received')
+  @UseGuards(AuthGuard('jwt'))
+  async deleteOneReceivedVault(
+    @getCurrentUserId() userId: string,
+    @Body() deleteVaultData: deleteVaultDto,
+  ) {
+    return await this.vaultService.deleteOneReceivedVault(
+      userId,
+      deleteVaultData,
+    );
+  }
 }
