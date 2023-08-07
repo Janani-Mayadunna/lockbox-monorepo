@@ -84,6 +84,7 @@ export default function UserVaultTable() {
       link: '',
       username: '',
       password: '',
+      notes: '',
     },
   ]);
 
@@ -98,6 +99,16 @@ export default function UserVaultTable() {
     setPage(0);
   };
 
+  const handleCellData = async (
+    password: string,
+    username: string,
+    link: string,
+  ) => {
+    console.log('password', password);
+    console.log('username', username);
+    console.log('link', link);
+  };
+
   // get all vaults API call
   const getAllVaults = async () => {
     await authorizedFetch('http://localhost:4000/api/vault', {
@@ -109,6 +120,7 @@ export default function UserVaultTable() {
       .then((res) => res.json())
       .then((data) => {
         setVaultData(data);
+        console.log('vault data', data);
       })
       .catch((err: any) => {
         throw new Error(err);
@@ -129,7 +141,7 @@ export default function UserVaultTable() {
   }, []);
 
   React.useEffect(() => {
-    const decryptedPasswords = async (vaultData: Row[]) => {
+    const decryptedPasswords = async (vaultData:any) => {
       const vaultKey = getVaultKey();
 
       const decryptedData = await Promise.all(
@@ -150,6 +162,7 @@ export default function UserVaultTable() {
 
     async function test() {
       const decryptedData = await decryptedPasswords(vaultData);
+      console.log('decrypted data', decryptedData);
       setDecryptedVaults(decryptedData);
     }
 
@@ -199,7 +212,20 @@ export default function UserVaultTable() {
                         {columns.map((column) => {
                           const value = row[column.id];
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              onClick={() =>
+                                handleCellData(
+                                  row.password,
+                                  row.username,
+                                  row.link,
+                                )
+                              }
+                              sx={{
+                                cursor: 'pointer',
+                              }}
+                            >
                               {column.id === 'actions' ? (
                                 <Box
                                   sx={{
