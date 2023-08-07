@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import store from './store';
 import React from 'react';
 import { CssBaseline } from '@mui/material';
-import ResponsiveAppBar from './components/global/AppBar';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -16,7 +15,6 @@ root.render(
     <Provider store={store}>
       <BrowserRouter>
         <CssBaseline />
-        <ResponsiveAppBar />
         <Router />
       </BrowserRouter>
     </Provider>

@@ -3,7 +3,6 @@ import Auth from '../pages/auth/login/Auth.tsx';
 import Dashboard from '../pages/dashboard/Dashboard.tsx';
 import { Route, Routes } from 'react-router-dom';
 import Landing from '../pages/landing/Landing.tsx';
-import PasswordVault from '../pages/dashboard/components/vault/PasswordVault.tsx';
 import PasswordAdd from '../pages/add-password/PasswordAdd.tsx';
 import SignUp from '../pages/auth/sign-up/SignUp.tsx';
 import PublicSharedVault from '../pages/public-shared/index.tsx';

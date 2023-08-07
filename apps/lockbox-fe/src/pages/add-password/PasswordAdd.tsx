@@ -15,7 +15,6 @@ import {
   Typography,
 } from '@mui/material';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
-import ResponsiveAppBar from '../../components/global/AppBar';
 import GenPassModal from '../dashboard/components/modals/GenPassModal';
 import CustomCrypto from '../../../src/helpers/custom-crypto';
 
