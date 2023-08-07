@@ -4,21 +4,6 @@ export function generateSalt() {
   return crypto.randomBytes(64).toString('hex');
 }
 
-// const userECDHKeyPair: crypto.ECDH = crypto.createECDH('secp256k1');
-// userECDHKeyPair.generateKeys();
-
-// export function generateUserPublicKey(): string {
-//   const userPublicKey = userECDHKeyPair.getPublicKey().toString('base64');
-//   console.log('User Public Key: ', userPublicKey);
-//   return userPublicKey;
-// }
-
-// export function generateUserPrivateKey(): Buffer {
-//   const userPrivateKey = userECDHKeyPair.getPrivateKey();
-//   console.log('User Private Key: ', userPrivateKey);
-//   return userPrivateKey;
-// }
-
 export function generateUserKeyPair(): any {
   const userECDHKeyPair: crypto.ECDH = crypto.createECDH('secp256k1');
   userECDHKeyPair.generateKeys();

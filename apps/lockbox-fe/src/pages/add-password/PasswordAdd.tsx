@@ -24,25 +24,43 @@ const PasswordAdd = () => {
     username: '',
     password: '',
     link: '',
+    note: '',
   });
   const [openModal, setOpenModal] = useState(false);
+  const [characterCount, setCharacterCount] = useState(0);
 
   // handler of modal
   const handleModalOpen = () => {
     setOpenModal(true);
   };
 
+  const handleReset = () => {
+    setVaultData({
+      username: '',
+      password: '',
+      link: '',
+      note: '',
+    });
+
+    setCharacterCount(0);
+  };
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setVaultData({ ...vaultData, [name]: value });
+    setCharacterCount(value.length);
+  };
+
   const handleSubmit = async (e: any) => {
+    if (!vaultData.username || !vaultData.password) {
+      return;
+    }
+
     e.preventDefault();
     handleReset();
 
     const vaultKey = getVaultKey();
     const vaultPW = vaultData.password;
-
-    // const encryptedVaultPW = encryptVault({
-    //   vaultPassword: vaultPW,
-    //   vaultKey,
-    // });
 
     const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
 
@@ -50,6 +68,7 @@ const PasswordAdd = () => {
       link: vaultData.link,
       username: vaultData.username,
       password: encryptedVaultPW,
+      note: vaultData.note,
     };
 
     // console.log('newVault', newVault)
@@ -74,14 +93,6 @@ const PasswordAdd = () => {
       .catch((err) => {
         throw new Error('Failed to create vault' + err.message);
       });
-  };
-
-  const handleReset = () => {
-    setVaultData({
-      username: '',
-      password: '',
-      link: '',
-    });
   };
 
   return (
@@ -119,6 +130,7 @@ const PasswordAdd = () => {
               variant="outlined"
               value={vaultData.username}
               name="username"
+              required
               sx={{ marginBottom: '10px', padding: '5px' }}
               onChange={(e) =>
                 setVaultData({ ...vaultData, username: e.target.value })
@@ -134,6 +146,7 @@ const PasswordAdd = () => {
                   type="password"
                   value={vaultData.password}
                   name="password"
+                  required
                   sx={{ marginBottom: '10px', padding: '5px' }}
                   onChange={(e) =>
                     setVaultData({ ...vaultData, password: e.target.value })
@@ -155,7 +168,7 @@ const PasswordAdd = () => {
             </Grid>
 
             <TextField
-              label="URI"
+              label="Website link"
               variant="outlined"
               type="text"
               value={vaultData.link}
@@ -165,6 +178,34 @@ const PasswordAdd = () => {
                 setVaultData({ ...vaultData, link: e.target.value })
               }
             />
+
+            <>
+              <TextField
+                label="Note"
+                variant="outlined"
+                type="text"
+                value={vaultData.note}
+                name="note"
+                multiline
+                rows={4}
+                inputProps={{ maxLength: 200 }}
+                sx={{ padding: '5px' }}
+                onChange={handleNoteChange}
+              />
+
+              <Typography
+                variant="body2"
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  color: 'gray',
+                  marginRight: '5px',
+                  marginBottom: '25px',
+                }}
+              >
+                {characterCount} /200
+              </Typography>
+            </>
 
             <Button
               type="submit"

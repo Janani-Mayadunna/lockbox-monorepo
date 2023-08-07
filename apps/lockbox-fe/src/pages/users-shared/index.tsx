@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable react-hooks/exhaustive-deps */
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import {
   Accordion,
@@ -11,17 +10,23 @@ import {
   Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { authorizedFetch } from '../../../src/helpers/request-interceptor';
+import {
+  authorizedFetch,
+  getVaultKey,
+} from '../../../src/helpers/request-interceptor';
 import { useEffect, useState } from 'react';
 import { decryptVault } from '../../../src/helpers/crypto';
-import AddToVaultModal from './components/modals/AddToVaultModal';
+import CustomCrypto from '../../../src/helpers/custom-crypto';
+import { ICreateVault } from '../add-password/interfaces';
 
 interface VaultData {
   vaultUsername: string;
   vaultPassword: string;
+  vaultLink: string;
   sharedUserName: string;
   sharedUserEmail: string;
   sharedSecret: string;
+  isAllowedToSave: boolean;
 }
 
 const ReceivedPasswordsVault = () => {
@@ -29,21 +34,14 @@ const ReceivedPasswordsVault = () => {
     {
       vaultUsername: '',
       vaultPassword: '',
+      vaultLink: '',
       sharedUserName: '',
       sharedUserEmail: '',
       sharedSecret: '',
+      isAllowedToSave: false,
     },
   ]);
   const [receivedVaults, setReceivedVaults] = useState([]);
-  const [openAddToVaultModal, setOpenAddToVaultModal] = useState(false);
-  const [selectedVault, setSelectedVault] = useState({
-    vaultUsername: '',
-    vaultPassword: '',
-  });
-
-  const handleAddToVaultModalOpen = () => {
-    setOpenAddToVaultModal(true);
-  };
 
   const getAllReceivedVaults = async () => {
     await authorizedFetch('http://localhost:4000/api/vault/received-vaults', {
@@ -55,34 +53,10 @@ const ReceivedPasswordsVault = () => {
       .then((res) => res.json())
       .then((data) => {
         setReceivedVaults(data);
-
-        getDecryptedVaults();
       })
       .catch((err: any) => {
         throw new Error(err);
       });
-  };
-
-  const getDecryptedVaults = () => {
-    const decryptedVault = receivedVaults.map((vault: VaultData) => {
-      return decryptVault({
-        vaultPassword: vault.vaultPassword,
-        vaultKey: vault.sharedSecret,
-      });
-    });
-
-    const sanitizedDecryptedVaults = decryptedVault.map(
-      (value: string | undefined) => (value === undefined ? '' : value),
-    );
-
-    setDecryptedVaults(
-      receivedVaults.map((vault: VaultData, index: number) => {
-        return {
-          ...vault,
-          vaultPassword: sanitizedDecryptedVaults[index],
-        };
-      }),
-    );
   };
 
   useEffect(() => {
@@ -90,28 +64,76 @@ const ReceivedPasswordsVault = () => {
   }, []);
 
   useEffect(() => {
+    const getDecryptedVaults = () => {
+      const decryptedVault = receivedVaults.map((vault: VaultData) => {
+        return decryptVault({
+          vaultPassword: vault.vaultPassword,
+          vaultKey: vault.sharedSecret,
+        });
+      });
+
+      const sanitizedDecryptedVaults = decryptedVault.map(
+        (value: string | undefined) => (value === undefined ? '' : value),
+      );
+
+      setDecryptedVaults(
+        receivedVaults.map((vault: VaultData, index: number) => {
+          return {
+            ...vault,
+            vaultPassword: sanitizedDecryptedVaults[index],
+          };
+        }),
+      );
+    };
+
     getDecryptedVaults();
   }, [receivedVaults]);
 
-  useEffect(() => {
-    console.log('selected', selectedVault);
+  const handleAddToVault = async (
+    vaultPassword: string,
+    vaultUsername: string,
+    vaultLink: string,
+  ) => {
+    const vaultKey = getVaultKey();
 
-    if (
-      selectedVault.vaultPassword !== '' &&
-      selectedVault.vaultUsername !== ''
-    ) {
-      handleAddToVaultModalOpen();
-    }
-  }, [selectedVault]);
+    const encryptedVaultPW = await CustomCrypto.encrypt(
+      vaultKey,
+      vaultPassword,
+    );
+
+    const newVault: ICreateVault = {
+      link: vaultLink,
+      username: vaultUsername,
+      password: encryptedVaultPW,
+      note: '',
+    };
+
+    await createVault(newVault);
+  };
+
+  const createVault = async (newVault: ICreateVault) => {
+    authorizedFetch('http://localhost:4000/api/vault', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newVault),
+    })
+      .then((res) => {
+        if (res.status !== 201) {
+          throw new Error('Failed to create vault');
+        } else {
+          return res.json();
+        }
+      })
+      .catch((err) => {
+        throw new Error('Failed to create vault' + err.message);
+      });
+  };
 
   return (
     <>
       <ResponsiveAppBar />
-      <AddToVaultModal
-        open={openAddToVaultModal}
-        setOpenModal={setOpenAddToVaultModal}
-        ModalData={selectedVault}
-      />
       <Container sx={{ width: 1000 }}>
         <div>
           <Typography
@@ -147,6 +169,17 @@ const ReceivedPasswordsVault = () => {
                       >
                         <strong>Username: </strong> {data.vaultUsername}
                       </Typography>
+                      {data.vaultLink !== '' ? (
+                        <Typography
+                          gutterBottom
+                          sx={{ mt: 1, mb: 1 }}
+                          variant="h6"
+                        >
+                          <strong>Website: </strong> {data.vaultLink}
+                        </Typography>
+                      ) : (
+                        ''
+                      )}
                       <Typography
                         gutterBottom
                         sx={{ mt: 1, mb: 1 }}
@@ -171,21 +204,31 @@ const ReceivedPasswordsVault = () => {
                     </Box>
 
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      {data.isAllowedToSave ? (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          sx={{ mt: 4, mb: 4 }}
+                          onClick={() =>
+                            handleAddToVault(
+                              data.vaultPassword,
+                              data.vaultUsername,
+                              data.vaultLink,
+                            )
+                          }
+                        >
+                          Add to My Vault
+                        </Button>
+                      ) : (
+                        ''
+                      )}
                       <Button
                         variant="contained"
-                        color="primary"
-                        sx={{ mt: 4, mb: 4 }}
-                        onClick={() => {
-                          setSelectedVault({
-                            vaultUsername: data.vaultUsername,
-                            vaultPassword: data.vaultPassword,
-                          });
-                          // handleAddToVaultModalOpen();
+                        color="secondary"
+                        sx={{
+                          width: 150,
                         }}
                       >
-                        Add to My Vault
-                      </Button>
-                      <Button variant="contained" color="secondary">
                         Delete
                       </Button>
                     </Box>

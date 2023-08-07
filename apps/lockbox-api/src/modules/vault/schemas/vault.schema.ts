@@ -18,6 +18,9 @@ export class Vault {
   @Prop()
   password: string;
 
+  @Prop()
+  note: string;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 }

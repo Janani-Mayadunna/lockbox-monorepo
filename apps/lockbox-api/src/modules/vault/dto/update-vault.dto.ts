@@ -12,4 +12,8 @@ export class UpdateVaultDto {
   @IsOptional()
   @IsString()
   readonly password: string;
+
+  @IsOptional()
+  @IsString()
+  readonly note: string;
 }

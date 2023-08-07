@@ -74,7 +74,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 export default function CustomizedMenus({
   password,
   username,
-  link
+  link,
 }: MenuParameters) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);

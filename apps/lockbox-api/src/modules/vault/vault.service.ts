@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Vault } from './schemas/vault.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
@@ -43,6 +47,12 @@ export class VaultService {
       throw new NotFoundException(`User not found`);
     }
 
+    if (vault.note?.length > 200) {
+      throw new BadRequestException(
+        'Note length exceeds the limit of 200 characters',
+      );
+    }
+
     Object.assign(vault, { user: currentUser._id });
 
     // Create a new vault
@@ -56,6 +66,7 @@ export class VaultService {
     const vaultWithoutPassword: ICreateVaultResponse = {
       username: newVault.username,
       link: newVault.link,
+      note: newVault.note,
     };
 
     return vaultWithoutPassword;
@@ -223,23 +234,26 @@ export class VaultService {
       email: createSharedVaultData.receiverEmail,
     });
     if (!OtherUser) {
-      throw new NotFoundException(`Other user not found`);
+      return false;
+    } else {
+      const newSharedVaultData: SharedVaultDto = {
+        vaultId: new mongoose.Types.ObjectId(),
+        vaultLink: createSharedVaultData.vaultLink,
+        vaultUsername: createSharedVaultData.vaultUsername,
+        vaultPassword: createSharedVaultData.vaultPassword,
+        sharedUserEmail: senderEmail,
+        sharedUserName: senderName,
+        isAllowedToSave: createSharedVaultData.isAllowedToSave,
+      };
+
+      OtherUser.sharedVault.push(newSharedVaultData);
+      await OtherUser.save();
+      logger.info(
+        `Shared vault password with ${createSharedVaultData.receiverEmail}`,
+      );
+
+      return true;
     }
-
-    const newSharedVaultData: SharedVaultDto = {
-      vaultId: new mongoose.Types.ObjectId(),
-      vaultUsername: createSharedVaultData.vaultUsername,
-      vaultPassword: createSharedVaultData.vaultPassword,
-      sharedUserEmail: senderEmail,
-      sharedUserName: senderName,
-    };
-
-    OtherUser.sharedVault.push(newSharedVaultData);
-    await OtherUser.save();
-    logger.info(
-      `Shared vault password with ${createSharedVaultData.receiverEmail}`,
-    );
-    return true;
   }
 
   async getReceivedVaults(
