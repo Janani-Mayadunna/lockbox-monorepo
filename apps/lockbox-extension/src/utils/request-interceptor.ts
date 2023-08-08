@@ -1,4 +1,9 @@
 async function authInterceptor(request: Request): Promise<Request> {
+  chrome.runtime.sendMessage({ action: 'getToken' }, (response) => {
+    console.log('Background script response:', response);
+    // when using use response.token
+  });
+
   const token = await new Promise<string | null>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'tokenUpdated') {
@@ -22,9 +27,19 @@ export async function authorizedFetch(
   return fetch(interceptedRequest);
 }
 
-export function getVaultKey(): string {
-  const storedVaultKey = localStorage.getItem('VK');
-  const vaultKey = storedVaultKey!;
+export async function getVaultKey(): Promise<string> {
+  chrome.runtime.sendMessage({ action: 'getVaultKey' }, (response) => {
+    console.log('Background script response:', response);
+    // when using use response.token
+  });
+
+  const vaultKey = await new Promise<string | null>((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'updateVaultKey') {
+        resolve(message.vaultKey || null);
+      }
+    });
+  });
   return vaultKey;
 }
 

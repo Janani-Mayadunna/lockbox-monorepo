@@ -4,8 +4,13 @@ import './popup.css';
 import { RouterProvider, createHashRouter } from 'react-router-dom';
 import Login from '../views/login/Login';
 import Dashboard from '../views/dashboard/Dashboard';
+import Landing from '../views/landing/Landing';
 
 const router = createHashRouter([
+  {
+    path: '/landing',
+    element: <Landing />,
+  },
   {
     path: '/',
     element: <Login />,
