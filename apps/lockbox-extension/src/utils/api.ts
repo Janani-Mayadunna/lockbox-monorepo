@@ -1,5 +1,12 @@
+import { Row } from '../interfaces/common-interfaces';
 import { generateVaultKey } from './crypto';
-import { authorizedFetch, getUserSalt } from './request-interceptor';
+import CustomCrypto from './custom-crypto';
+import {
+  authorizedFetch,
+  getUserSalt,
+  getVaultKey,
+} from './request-interceptor';
+
 const backendUrl = 'http://localhost:4000/api';
 
 export function userLogin(email: string, hashedPassword: string) {
@@ -83,4 +90,113 @@ export async function getCurrentUser(email: string, hashedPassword: string) {
       console.log('Background script response:', response);
     }
   );
+}
+
+export async function getAllUserVaults() {
+  await authorizedFetch(`${backendUrl}/vault`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('just data', data);
+      chrome.runtime.sendMessage(
+        { action: 'setAllUserVaults', userVaults: data },
+        (response) => {
+          console.log('Background script response:', response);
+        }
+      );
+    })
+    .catch((err: any) => {
+      throw new Error(err);
+    });
+}
+
+async function decryptedPasswords(vaultData: any) {
+  const vaultKey = await getVaultKey();
+
+  const decryptedData = await Promise.all(
+    vaultData.map(async (row: Row) => {
+      const decryptedVaultPW = await CustomCrypto.decrypt(
+        vaultKey,
+        row.password
+      );
+
+      return {
+        ...row,
+        password: decryptedVaultPW,
+      };
+    })
+  );
+  return decryptedData;
+}
+
+export async function getDecryptedVaults() {
+  await getAllUserVaults();
+
+  const vaultData = await new Promise<string | null>((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'getAllUserVaults') {
+        resolve(message.userVaults || null);
+      }
+    });
+  });
+  const decryptedData = await decryptedPasswords(vaultData);
+  console.log('decrypted data', decryptedData);
+  return decryptedData;
+}
+
+// get all vaults api
+
+export async function getAllVaults() {
+  await authorizedFetch('http://localhost:4000/api/vault', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      chrome.runtime.sendMessage(
+        { action: 'setAllVaults', userVaults: data },
+        (response) => {
+          console.log('Background script response:', response);
+        }
+      );
+    })
+    .catch((err: any) => {
+      // throw new Error(err);
+      console.log('err', err);
+    });
+}
+
+export async function getDecryptedAllVaults() {
+  const vaultKey = await getVaultKey();
+  
+  const vaultData = await new Promise<string[] | null>((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'getAllVaults') {
+        resolve(message.userVaults || null);
+      }
+    });
+  });
+
+  //map over vaultData and decrypt each password
+  const decryptedData = await Promise.all(
+    vaultData.map(async (row: any) => {
+      const decryptedVaultPW = await CustomCrypto.decrypt(
+        vaultKey,
+        row.password
+      );
+
+      return {
+        ...row,
+        password: decryptedVaultPW,
+      };
+    })
+  );
+
+  return decryptedData;
 }
