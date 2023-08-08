@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { hashPassword } from '../utils/crypto';
-import { userLogin } from '../utils/api';
-import { chromeStorageGet } from '../utils/chrome-utils';
+import { hashPassword } from '../../utils/crypto';
+import { userLogin } from '../../utils/api';
+import { chromeStorageGet } from '../../utils/chrome-utils';
 
 const Login: React.FC<{}> = () => {
   const navigate = useNavigate();

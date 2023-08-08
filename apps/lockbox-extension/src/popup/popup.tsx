@@ -2,8 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './popup.css';
 import { RouterProvider, createHashRouter } from 'react-router-dom';
-import Login from '../components/Login';
-import Dashboard from '../components/Dashboard';
+import Login from '../views/login/Login';
+import Dashboard from '../views/dashboard/Dashboard';
 
 const router = createHashRouter([
   {
