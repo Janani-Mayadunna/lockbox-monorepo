@@ -3,11 +3,11 @@ import { CategoryTypes } from '../../../enum/vault.enum';
 import { UserFolder } from '../../../modules/user-folder/schemas/user-folder.schema';
 
 export class CreateVaultDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   category: CategoryTypes;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
 

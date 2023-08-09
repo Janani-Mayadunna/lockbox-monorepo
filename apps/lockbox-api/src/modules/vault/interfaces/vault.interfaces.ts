@@ -41,3 +41,10 @@ export interface ICreateVaultResponse {
   category: string;
   name?: string;
 }
+
+export interface IGetVaultOptions {
+  category?: string;
+  folder?: string;
+  name?: string;
+  username?: string;
+}

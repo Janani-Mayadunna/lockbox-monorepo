@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   TextField,
@@ -7,15 +7,25 @@ import {
   List,
   ListItemText,
   ListItemButton,
+  InputAdornment,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useNavigate } from 'react-router';
+import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
+import { IFolder } from '../../interfaces';
+import SearchIcon from '@mui/icons-material/Search';
 
-const FilterBar = () => {
+interface FilterBarProps {
+  onFilterSelect: (filter: string, keyword: string) => void;
+}
+
+const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
   const navigate = useNavigate();
   const [isAllVaultsOpen, setIsAllVaultsOpen] = useState(true);
   const [isFilterByCategoryOpen, setIsFilterByCategoryOpen] = useState(true);
+  const [isFilterByFolderOpen, setIsFilterByFolderOpen] = useState(true);
+  const [folders, setFolders] = useState<IFolder[]>([]);
 
   const handleAllVaultsToggle = () => {
     setIsAllVaultsOpen(!isAllVaultsOpen);
@@ -25,28 +35,64 @@ const FilterBar = () => {
     setIsFilterByCategoryOpen(!isFilterByCategoryOpen);
   };
 
+  const handleFilterByFolderToggle = () => {
+    setIsFilterByFolderOpen(!isFilterByFolderOpen);
+  };
+
+  const getAllFolders = async () => {
+    authorizedFetch('http://localhost:4000/api/user-folder', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setFolders(data);
+      })
+      .catch((err) => {
+        throw new Error('Failed to get folders' + err.message);
+      });
+  };
+
+  React.useEffect(() => {
+    getAllFolders();
+  }, []);
+
   return (
     <Box
       sx={{
-        height: '400px',
+        height: 'auto',
+        minHeight: '450px',
         position: 'initial',
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        boxShadow:
+          'rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px',
         borderRadius: '8px',
+        mt: 6,
       }}
     >
       {/* Search Bar */}
-      <Box sx={{ padding: '16px' }}>
+      <Box sx={{ p: 2, pt: 4 }}>
         <TextField
           fullWidth
           variant="outlined"
           label="Search"
-          // search functionality here
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
         />
       </Box>
 
-      {/* Filter by Category */}
       <Box sx={{ padding: '16px' }}>
-        <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+        {/* Filter by vault owner */}
+        <Typography
+          variant="body1"
+          sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}
+        >
           {isAllVaultsOpen ? (
             <ExpandLessIcon onClick={handleAllVaultsToggle} />
           ) : (
@@ -56,34 +102,82 @@ const FilterBar = () => {
         </Typography>
         <Collapse in={isAllVaultsOpen}>
           <List>
-            <ListItemButton sx={{ pt: 0, pb: 0 }}>
-              <ListItemText primary="My Vaults" onClick={() => navigate('/dashboard')}/>
+            <ListItemButton sx={{ pt: 0, pb: 0, pl: 7 }}>
+              <ListItemText
+                primary={<Typography variant="body2">My Vaults</Typography>}
+                onClick={() => onFilterSelect('', '')}
+              />
             </ListItemButton>
-            <ListItemButton sx={{ pt: 0, pb: 0 }} onClick={()=> navigate('/vault/received')}>
-              <ListItemText primary="Received Vaults" />
+            <ListItemButton
+              sx={{ pt: 0, pb: 0, pl: 7 }}
+              onClick={() => navigate('/vault/received')}
+            >
+              <ListItemText
+                primary={
+                  <Typography variant="body2">Received Vaults</Typography>
+                }
+              />
             </ListItemButton>
-            {/*  more vaults here */}
           </List>
         </Collapse>
-        <Typography variant="h6">
+
+        {/* Filter by category */}
+        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
           {isFilterByCategoryOpen ? (
             <ExpandLessIcon onClick={handleFilterByCategoryToggle} />
           ) : (
             <ExpandMoreIcon onClick={handleFilterByCategoryToggle} />
           )}
-          <span style={{ marginLeft: '8px' }}>Filter by Category</span>
+          <span style={{ marginLeft: '8px' }}>Categories</span>
         </Typography>
         <Collapse in={isFilterByCategoryOpen}>
           <List>
-            <ListItemButton sx={{ pt: 0, pb: 0 }}>
-              <ListItemText primary="Category 1" />
+            <ListItemButton
+              sx={{ pt: 0, pb: 0, pl: 7 }}
+              onClick={() => onFilterSelect('Login', 'category')}
+            >
+              <ListItemText
+                primary={<Typography variant="body2">Login</Typography>}
+              />
             </ListItemButton>
-            {/*  more categories here */}
+
+            <ListItemButton
+              sx={{ pt: 0, pb: 0, pl: 7 }}
+              onClick={() => onFilterSelect('Secret Note', 'category')}
+            >
+              <ListItemText
+                primary={<Typography variant="body2">Secret Note</Typography>}
+              />
+            </ListItemButton>
           </List>
         </Collapse>
-        <Typography variant="h6" sx={{ marginBottom: '8px' }}>
-          Filter by Folders
+
+        {/* Filter by folder */}
+        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+          {isFilterByFolderOpen ? (
+            <ExpandLessIcon onClick={handleFilterByFolderToggle} />
+          ) : (
+            <ExpandMoreIcon onClick={handleFilterByFolderToggle} />
+          )}
+          <span style={{ marginLeft: '8px' }}>Folders</span>
         </Typography>
+        <Collapse in={isFilterByFolderOpen}>
+          <List>
+            {folders.map((folder) => (
+              <ListItemButton
+                sx={{ pt: 0, pb: 0, pl: 7 }}
+                key={folder._id}
+                onClick={() => onFilterSelect(folder._id, 'folder')}
+              >
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">{folder.folderName}</Typography>
+                  }
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
       </Box>
     </Box>
   );
