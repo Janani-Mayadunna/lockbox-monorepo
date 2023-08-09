@@ -24,13 +24,13 @@ export class Vault {
   note: string;
 
   @Prop({
-    default: CategoryTypes.UNCATEGORIZED,
+    default: CategoryTypes.LOGIN,
     type: mongoose.Schema.Types.String,
     enum: CategoryTypes,
   })
   category: CategoryTypes;
 
-  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: 'UserFolder' }] })
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'UserFolder' })
   folder: UserFolder;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })

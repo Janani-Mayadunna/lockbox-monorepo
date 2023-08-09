@@ -1,3 +1,5 @@
+import { UserFolder } from 'src/modules/user-folder/schemas/user-folder.schema';
+
 export interface IVault {
   _id?: string;
   link?: string;
@@ -12,6 +14,9 @@ export interface ICreateVault {
   username: string;
   password: string;
   note?: string;
+  folder: UserFolder;
+  category?: string;
+  name: string;
 }
 
 export interface IUpdateVault {
@@ -19,6 +24,9 @@ export interface IUpdateVault {
   username?: string;
   password?: string;
   note?: string;
+  folder?: UserFolder;
+  category?: string;
+  name?: string;
 }
 
 export interface IDeleteVault {
@@ -29,4 +37,7 @@ export interface ICreateVaultResponse {
   username: string;
   link: string;
   note?: string;
+  folder?: UserFolder;
+  category: string;
+  name?: string;
 }
