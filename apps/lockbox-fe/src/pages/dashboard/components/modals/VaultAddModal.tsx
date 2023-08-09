@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 import * as React from 'react';
 import Box from '@mui/material/Box';
@@ -146,7 +145,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     if (vaultData.category === '') {
       setVaultData({ ...vaultData, category: 'login-cat' });
     }
-  }, [vaultData.category]);
+  }, [vaultData, vaultData.category]);
 
   return (
     <div>

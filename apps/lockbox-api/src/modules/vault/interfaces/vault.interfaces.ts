@@ -1,5 +1,3 @@
-import { User } from '../../../modules/user/schemas/user.schema';
-
 export interface IVault {
   _id?: string;
   link?: string;
