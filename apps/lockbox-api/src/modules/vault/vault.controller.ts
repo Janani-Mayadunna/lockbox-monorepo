@@ -16,7 +16,6 @@ import { getCurrentUserId } from '../auth/decorators/currentUserId';
 import { UpdateVaultDto } from './dto/update-vault.dto';
 import { deleteVaultDto } from './dto/delete-vault.dto';
 import { ICreateVaultResponse } from './interfaces/vault.interfaces';
-import { create } from 'domain';
 import { ICreateSharedVault } from '../user/user.interfaces';
 
 @Controller('vault')

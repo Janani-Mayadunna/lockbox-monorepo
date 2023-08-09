@@ -86,6 +86,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       salt: user.salt ? user.salt : '',
+      folders: user.folders,
     };
     logger.info('Current user fetched');
     return { user: filteredUser };

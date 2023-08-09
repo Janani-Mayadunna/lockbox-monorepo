@@ -7,11 +7,15 @@ import { AuthModule } from '../auth/auth.module';
 import { UserSchema } from '../user/schemas/user.schema';
 import { JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { UserFolderSchema } from '../user-folder/schemas/user-folder.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Vault', schema: VaultSchema }]),
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'UserFolder', schema: UserFolderSchema },
+    ]),
   ],
   controllers: [VaultController],
   providers: [VaultService, JwtService],
