@@ -10,11 +10,11 @@ import {
   authorizedFetch,
   getVaultKey,
 } from '../../../../../src/helpers/request-interceptor';
-import { ICreateVault } from '../../../../../src/pages/add-password/interfaces';
 import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 import GenPassModal from './GenPassModal';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import '../../styles/VaultAddModal.css';
+import { ICreateVault, IFolder } from '../../interfaces';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -46,6 +46,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
   });
   const [characterCount, setCharacterCount] = React.useState(0);
   const [openGeneratorModal, setOpenGeneratorModal] = React.useState(false);
+  const [folders, setFolders] = React.useState<IFolder[]>([]);
   const maxCharacters = 300;
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -63,6 +64,17 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
 
   const handleGeneratorModalOpen = () => {
     setOpenGeneratorModal(true);
+  };
+
+  // handler of snackbar
+  const handleSnackbarClose = (
+    e?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   const handleReset = () => {
@@ -85,6 +97,22 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     setCharacterCount(value.length);
   };
 
+  const getAllFolders = async () => {
+    authorizedFetch('http://localhost:4000/api/user-folder', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setFolders(data);
+      })
+      .catch((err) => {
+        throw new Error('Failed to get folders' + err.message);
+      });
+  };
+
   const handleSubmit = async (e: any) => {
     if (!vaultData.username || !vaultData.password) {
       return;
@@ -99,13 +127,16 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
 
     const newVault: ICreateVault = {
+      category: vaultData.category,
+      name: vaultData.name,
+      folder: vaultData.folder,
       link: vaultData.link,
       username: vaultData.username,
       password: encryptedVaultPW,
       note: vaultData.note,
     };
 
-    // console.log('newVault', newVault)
+    console.log('newVault', newVault)
 
     // const decryptedDataj = await CustomCrypto.decrypt(vaultKey, encryptedVaultPW);
     //   console.log('decrypted data', decryptedDataj);
@@ -129,23 +160,16 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
       });
   };
 
-  // handler of snackbar
-  const handleSnackbarClose = (
-    e?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   // update category state
   React.useEffect(() => {
     if (vaultData.category === '') {
-      setVaultData({ ...vaultData, category: 'login-cat' });
+      setVaultData({ ...vaultData, category: 'Login' });
     }
   }, [vaultData, vaultData.category]);
+
+  React.useEffect(() => {
+    getAllFolders();
+  }, []);
 
   return (
     <div>
@@ -206,7 +230,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                     <select
                       name="category"
                       id="category"
-                      defaultValue="login-cat"
+                      defaultValue="Login"
                       value={vaultData.category}
                       className="input-field"
                       style={{ marginBottom: '10px', padding: '5px' }}
@@ -214,10 +238,10 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                         setVaultData({ ...vaultData, category: e.target.value })
                       }
                     >
-                      <option value="login-cat" selected>
+                      <option value="Login" selected>
                         Login
                       </option>
-                      <option value="note-cat">Note</option>
+                      <option value="Secret Note">Note</option>
                     </select>
                   </Grid>
                   <Grid item xs={6}>
@@ -264,12 +288,14 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                         }
                       >
                         <option value="value" selected></option>
-                        <option value="volvo">Volvo</option>
+                        {folders.map((folder: IFolder) => (
+                          <option value={folder._id}>{folder.folderName}</option>
+                        ))}
                       </select>
                     </Grid>
                   </Grid>
 
-                  {vaultData.category === 'login-cat' ? (
+                  {vaultData.category === 'Login' ? (
                     <>
                       {/* 3. Grid item containing username input and password input */}
                       <Grid container item xs={12} spacing={4}>
@@ -337,7 +363,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                           type="text"
                           value={vaultData.link}
                           name="link"
-                          placeholder='https://example.com'
+                          placeholder="https://example.com"
                           className="input-field"
                           style={{ marginBottom: '10px', padding: '5px' }}
                           onChange={(e) =>

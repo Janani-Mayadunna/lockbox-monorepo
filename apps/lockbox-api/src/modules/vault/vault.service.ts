@@ -24,6 +24,7 @@ import {
   ICreateSharedVault,
   IGetReceivedVaultResponse,
 } from '../user/user.interfaces';
+import { UserFolder } from '../user-folder/schemas/user-folder.schema';
 
 @Injectable()
 export class VaultService {
@@ -32,6 +33,8 @@ export class VaultService {
     private vaultModel: Model<Vault>,
     @InjectModel(User.name)
     private userModel: Model<User>,
+    @InjectModel(UserFolder.name)
+    private folderModel: Model<UserFolder>,
     private jwtService: JwtService,
   ) {}
 
@@ -39,34 +42,48 @@ export class VaultService {
     vault: ICreateVault,
     userId: string,
   ): Promise<ICreateVaultResponse> {
-    // Retrieve the user document
     const currentUser = await this.userModel.findById(userId);
+
     if (!currentUser) {
-      // Handle user not found
       logger.error(`User not found with id: ${userId}`);
       throw new NotFoundException(`User not found`);
     }
 
-    if (vault.note?.length > 200) {
+    if (vault.note?.length > 300) {
       throw new BadRequestException(
-        'Note length exceeds the limit of 200 characters',
+        'Note length exceeds the limit of 300 characters',
       );
     }
 
     Object.assign(vault, { user: currentUser._id });
 
-    // Create a new vault
     const newVault: Vault = await this.vaultModel.create(vault);
-    // Add the newly created vault to the user's vaults array
+
     currentUser.vaults.push(newVault);
 
-    // Save the updated user document
     await currentUser.save();
+
+    if (vault.folder) {
+      const selectedFolder = await this.folderModel.findById(vault.folder);
+      console.log('vault folder', vault.folder);
+
+      if (!selectedFolder) {
+        logger.error(`Folder not found with id: ${vault.folder}`);
+        throw new NotFoundException(`Folder not found`);
+      }
+
+      Object.assign(vault, { folder: vault.folder });
+      selectedFolder.vaults.push(newVault);
+      await selectedFolder.save();
+    }
 
     const vaultWithoutPassword: ICreateVaultResponse = {
       username: newVault.username,
       link: newVault.link,
       note: newVault.note,
+      folder: newVault.folder,
+      category: newVault.category,
+      name: newVault.name,
     };
 
     return vaultWithoutPassword;
