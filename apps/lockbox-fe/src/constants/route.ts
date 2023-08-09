@@ -3,9 +3,9 @@ const ROUTE = {
   AUTH: '/auth/',
   SIGNUP: '/signup',
   DASHBOARD: '/dashboard',
-  PASSWORD_VAULT: '/password-vault',
   PASSWORD_VAULT_ADD: '/password-vault/add',
-  SHARED: '/vault/shared/:sharedToken',
+  PUBLIC_SHARED: '/vault/shared/:sharedToken',
+  USERS_SHARED: '/vault/received'
 };
 
 export default ROUTE;

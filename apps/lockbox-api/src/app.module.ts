@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { VaultModule } from './modules/vault/vault.module';
+import { UserFolderModule } from './modules/user-folder/user-folder.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { VaultModule } from './modules/vault/vault.module';
     AuthModule,
     UserModule,
     VaultModule,
+    UserFolderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

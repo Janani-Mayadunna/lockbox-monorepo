@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Vault } from './schemas/vault.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
@@ -11,7 +15,15 @@ import {
   IUpdateVault,
 } from './interfaces/vault.interfaces';
 import { JwtService } from '@nestjs/jwt';
-import { generateSalt } from '../../utils/helper-functions';
+import {
+  computeSharedSecret,
+  generateSalt,
+} from '../../utils/helper-functions';
+import { SharedVaultDto } from '../user/dto/shared-vault.dto';
+import {
+  ICreateSharedVault,
+  IGetReceivedVaultResponse,
+} from '../user/user.interfaces';
 
 @Injectable()
 export class VaultService {
@@ -35,6 +47,12 @@ export class VaultService {
       throw new NotFoundException(`User not found`);
     }
 
+    if (vault.note?.length > 200) {
+      throw new BadRequestException(
+        'Note length exceeds the limit of 200 characters',
+      );
+    }
+
     Object.assign(vault, { user: currentUser._id });
 
     // Create a new vault
@@ -48,6 +66,7 @@ export class VaultService {
     const vaultWithoutPassword: ICreateVaultResponse = {
       username: newVault.username,
       link: newVault.link,
+      note: newVault.note,
     };
 
     return vaultWithoutPassword;
@@ -149,7 +168,7 @@ export class VaultService {
       encryptedSharedPassword,
     };
 
-    const shareToken = this.jwtService.sign(payload, {
+    const shareToken = await this.jwtService.sign(payload, {
       expiresIn: '1m',
       secret: process.env.JWT_SHARED_SECRET,
     });
@@ -160,7 +179,7 @@ export class VaultService {
 
   async verifyShareLink(shareToken: any): Promise<any> {
     try {
-      const decoded = this.jwtService.verify(shareToken, {
+      const decoded = await this.jwtService.verify(shareToken, {
         secret: process.env.JWT_SHARED_SECRET,
       });
 
@@ -171,5 +190,121 @@ export class VaultService {
     } catch (error) {
       throw new NotFoundException('Could not verify share link');
     }
+  }
+
+  async getOtherUserPublicKey(email: string): Promise<string> {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException(`Other user not found`);
+    }
+    const otherUserPublicKey = user.publicKey;
+    return otherUserPublicKey;
+  }
+
+  async getUserPrivateKey(userId: string): Promise<Buffer> {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException(`User not found to fetch private key`);
+    }
+    const userPrivateKey = user.privateKey;
+    return userPrivateKey;
+  }
+
+  async computeSecret(email: string, userId: string): Promise<string> {
+    const userPrivateKey = await this.getUserPrivateKey(userId);
+    const otherPublicKey = await this.getOtherUserPublicKey(email);
+
+    const sharedSecret = computeSharedSecret(userPrivateKey, otherPublicKey);
+    return sharedSecret;
+  }
+
+  async directShareVaultPassword(
+    createSharedVaultData: ICreateSharedVault,
+    userId: string,
+  ): Promise<boolean> {
+    const currentUser = await this.userModel.findById(userId);
+    if (!currentUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    const senderName = currentUser.name;
+    const senderEmail = currentUser.email;
+
+    const OtherUser = await this.userModel.findOne({
+      email: createSharedVaultData.receiverEmail,
+    });
+    if (!OtherUser) {
+      return false;
+    } else {
+      const newSharedVaultData: SharedVaultDto = {
+        vaultId: new mongoose.Types.ObjectId(),
+        vaultLink: createSharedVaultData.vaultLink,
+        vaultUsername: createSharedVaultData.vaultUsername,
+        vaultPassword: createSharedVaultData.vaultPassword,
+        sharedUserEmail: senderEmail,
+        sharedUserName: senderName,
+        isAllowedToSave: createSharedVaultData.isAllowedToSave,
+      };
+
+      OtherUser.sharedVault.push(newSharedVaultData);
+      await OtherUser.save();
+      logger.info(
+        `Shared vault password with ${createSharedVaultData.receiverEmail}`,
+      );
+
+      return true;
+    }
+  }
+
+  async getReceivedVaults(
+    userId: string,
+  ): Promise<IGetReceivedVaultResponse[]> {
+    const currentUser = await this.userModel.findById(userId);
+    if (!currentUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    const receivedVaults: SharedVaultDto[] = currentUser.sharedVault;
+
+    //map through each received vault and compute their secret
+    const computedReceivedVaults: IGetReceivedVaultResponse[] =
+      await Promise.all(
+        receivedVaults.map(async (receivedVault) => {
+          const sharedSecret = await this.computeSecret(
+            receivedVault.sharedUserEmail,
+            userId,
+          );
+          return {
+            ...receivedVault,
+            sharedSecret,
+          };
+        }),
+      );
+
+    return computedReceivedVaults;
+  }
+
+  async deleteOneReceivedVault(userId: string, deleteVaultData: IDeleteVault) {
+    const currentUser = await this.userModel.findById(userId);
+    if (!currentUser) {
+      throw new NotFoundException(`User not found`);
+    }
+
+    // find a vault from currentUsers sharedVault array that matches the deleteVaultData.id
+    const vaultToDelete = currentUser.sharedVault.find(
+      (vault) => vault.vaultId.toString() === deleteVaultData.id,
+    );
+
+    if (!vaultToDelete) {
+      throw new NotFoundException(`Vault not found`);
+    }
+
+    //remove that from element from user's sharedVault array
+    await this.userModel.updateOne(
+      { _id: userId },
+      { $pull: { sharedVault: vaultToDelete } },
+    );
+
+    return vaultToDelete;
   }
 }

@@ -1,23 +1,24 @@
-import { User } from '../../../modules/user/schemas/user.schema';
-
 export interface IVault {
   _id?: string;
-  link: string;
+  link?: string;
   username: string;
   password: string;
   user: string;
+  note?: string;
 }
 
 export interface ICreateVault {
-  link: string;
+  link?: string;
   username: string;
   password: string;
+  note?: string;
 }
 
 export interface IUpdateVault {
   link?: string;
   username?: string;
   password?: string;
+  note?: string;
 }
 
 export interface IDeleteVault {
@@ -27,4 +28,5 @@ export interface IDeleteVault {
 export interface ICreateVaultResponse {
   username: string;
   link: string;
+  note?: string;
 }

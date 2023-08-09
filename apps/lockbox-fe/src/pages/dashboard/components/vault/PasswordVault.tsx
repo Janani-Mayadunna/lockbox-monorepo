@@ -10,6 +10,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { decryptVault } from '../../../../helpers/crypto';
 import CustomizedMenus from '../options-menu/OptionsMenu';
 
+//type of row
+interface Row {
+  id: number;
+  link: string;
+  username: string;
+  password: string;
+}
+
 export const PasswordVault = () => {
   const [vaultData, setVaultData] = useState([]);
 
@@ -34,11 +42,11 @@ export const PasswordVault = () => {
   }, []);
 
   //loop through vaultData array and decrypt each password
-  const decryptedVaults = vaultData.map((row: any) => {
+  const decryptedVaults = vaultData.map((row: Row) => {
     const vaultKey = getVaultKey();
 
     const decryptedVaultPW = decryptVault({
-      vault: row.password,
+      vaultPassword: row.password,
       vaultKey: vaultKey,
     });
 
@@ -48,7 +56,7 @@ export const PasswordVault = () => {
     };
   });
 
-  const vaults = decryptedVaults.map((row: any, index: any) => ({
+  const vaults = decryptedVaults.map((row: any, index: number) => ({
     ...row,
     id: index + 1,
   }));
@@ -56,32 +64,32 @@ export const PasswordVault = () => {
   const columns: any = [
     {
       name: '#',
-      selector: (row: any) => row.id,
+      selector: (row: Row) => row.id,
       sortable: true,
       width: '100px',
     },
     {
       name: 'Link',
-      selector: (row: any) => row.link,
+      selector: (row: Row) => row.link,
       sortable: true,
       width: '200px',
     },
     {
       name: 'Username',
-      selector: (row: any) => row.username,
+      selector: (row: Row) => row.username,
       sortable: true,
       width: '200px',
     },
     {
       name: 'Password',
-      selector: (row: any) => row.password,
+      selector: (row: Row) => row.password,
       sortable: true,
       width: '200px',
     },
 
     {
       name: 'Actions',
-      selector: (row: any) => (
+      selector: (row: Row) => (
         <>
           {/* visibility */}
 
@@ -92,7 +100,11 @@ export const PasswordVault = () => {
               </Button>
             </Grid>
             <Grid item xs={8}>
-              <CustomizedMenus password={row.password} />
+              <CustomizedMenus
+                password={row.password}
+                username={row.username}
+                link={row.link}
+              />
             </Grid>
           </Grid>
         </>

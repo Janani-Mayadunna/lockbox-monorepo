@@ -5,7 +5,6 @@ import {
   authorizedFetch,
   getVaultKey,
 } from '../../helpers/request-interceptor';
-import { encryptVault } from '../../helpers/crypto';
 import {
   Box,
   Button,
@@ -16,39 +15,65 @@ import {
   Typography,
 } from '@mui/material';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
-import ResponsiveAppBar from '../../components/global/AppBar';
 import GenPassModal from '../dashboard/components/modals/GenPassModal';
+import CustomCrypto from '../../../src/helpers/custom-crypto';
 
 const PasswordAdd = () => {
   const [vaultData, setVaultData] = useState({
     username: '',
     password: '',
     link: '',
+    note: '',
   });
   const [openModal, setOpenModal] = useState(false);
+  const [characterCount, setCharacterCount] = useState(0);
 
   // handler of modal
   const handleModalOpen = () => {
     setOpenModal(true);
   };
 
-  const handleSubmit = (e: any) => {
+  const handleReset = () => {
+    setVaultData({
+      username: '',
+      password: '',
+      link: '',
+      note: '',
+    });
+
+    setCharacterCount(0);
+  };
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setVaultData({ ...vaultData, [name]: value });
+    setCharacterCount(value.length);
+  };
+
+  const handleSubmit = async (e: any) => {
+    if (!vaultData.username || !vaultData.password) {
+      return;
+    }
+
     e.preventDefault();
     handleReset();
 
     const vaultKey = getVaultKey();
     const vaultPW = vaultData.password;
 
-    const encryptedVaultPW = encryptVault({
-      vault: vaultPW,
-      vaultKey,
-    });
+    const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
 
     const newVault: ICreateVault = {
       link: vaultData.link,
       username: vaultData.username,
       password: encryptedVaultPW,
+      note: vaultData.note,
     };
+
+    // console.log('newVault', newVault)
+
+    // const decryptedDataj = await CustomCrypto.decrypt(vaultKey, encryptedVaultPW);
+    //   console.log('decrypted data', decryptedDataj);
 
     authorizedFetch('http://localhost:4000/api/vault', {
       method: 'POST',
@@ -69,17 +94,8 @@ const PasswordAdd = () => {
       });
   };
 
-  const handleReset = () => {
-    setVaultData({
-      username: '',
-      password: '',
-      link: '',
-    });
-  };
-
   return (
     <div>
-      <ResponsiveAppBar />
       <GenPassModal open={openModal} setOpenModal={setOpenModal} />
       <Box
         sx={{
@@ -112,6 +128,7 @@ const PasswordAdd = () => {
               variant="outlined"
               value={vaultData.username}
               name="username"
+              required
               sx={{ marginBottom: '10px', padding: '5px' }}
               onChange={(e) =>
                 setVaultData({ ...vaultData, username: e.target.value })
@@ -127,6 +144,7 @@ const PasswordAdd = () => {
                   type="password"
                   value={vaultData.password}
                   name="password"
+                  required
                   sx={{ marginBottom: '10px', padding: '5px' }}
                   onChange={(e) =>
                     setVaultData({ ...vaultData, password: e.target.value })
@@ -148,7 +166,7 @@ const PasswordAdd = () => {
             </Grid>
 
             <TextField
-              label="URI"
+              label="Website link"
               variant="outlined"
               type="text"
               value={vaultData.link}
@@ -158,6 +176,34 @@ const PasswordAdd = () => {
                 setVaultData({ ...vaultData, link: e.target.value })
               }
             />
+
+            <>
+              <TextField
+                label="Note"
+                variant="outlined"
+                type="text"
+                value={vaultData.note}
+                name="note"
+                multiline
+                rows={4}
+                inputProps={{ maxLength: 200 }}
+                sx={{ padding: '5px' }}
+                onChange={handleNoteChange}
+              />
+
+              <Typography
+                variant="body2"
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  color: 'gray',
+                  marginRight: '5px',
+                  marginBottom: '25px',
+                }}
+              >
+                {characterCount} /200
+              </Typography>
+            </>
 
             <Button
               type="submit"

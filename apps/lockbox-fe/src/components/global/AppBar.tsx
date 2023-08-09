@@ -17,8 +17,8 @@ import { logoutRequest } from '../../../src/pages/auth/redux/actions';
 import { getLoggedIn } from '../../../src/helpers/request-interceptor';
 
 const pages = [
-  { title: 'Home', path: '/' },
   { title: 'Password Vault', path: '/dashboard' },
+  { title: 'Received Vault', path: '/vault/received' },
 ];
 const settings = ['Profile', 'Password Vault', 'Logout'];
 
