@@ -1,13 +1,33 @@
-import { Link } from 'react-router-dom';
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Tooltip, Typography } from '@mui/material';
 import UserVaultTable from './components/vault/UserVault';
 import FilterBar from './components/filters-bar/FiltersSidebar';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
+import React from 'react';
+import FolderAddModal from './components/modals/FolderAddModal';
+import VaultAddModal from './components/modals/VaultAddModal';
 
 const Dashboard = () => {
+  const [folderModalOpen, setFolderModalOpen] = React.useState(false);
+  const [vaultModalOpen, setVaultModalOpen] = React.useState(false);
+
+  const handleNewFolderModalOpen = () => {
+    setFolderModalOpen(true);
+  };
+
+  const handleNewVaultModalOpen = () => {
+    setVaultModalOpen(true);
+  };
+
   return (
     <>
       <ResponsiveAppBar />
+      <FolderAddModal
+        open={folderModalOpen}
+        setOpenModal={setFolderModalOpen}
+      />
+      <VaultAddModal open={vaultModalOpen} setOpenModal={setVaultModalOpen} />
       <Container>
         <Grid container spacing={1}>
           <Grid item xs={3}>
@@ -50,14 +70,30 @@ const Dashboard = () => {
                     <Typography variant="h5">Password Vault</Typography>
                   </Box>
 
-                  <Link to="/password-vault/add">
+                  <Box>
+                    <Tooltip title="Add new folder">
+                      <Button
+                        variant="text"
+                        sx={{ marginRight: '10px' }}
+                        onClick={handleNewFolderModalOpen}
+                      >
+                        <CreateNewFolderIcon
+                          sx={{ fontSize: '2.5rem', color: 'black' }}
+                        />
+                      </Button>
+                    </Tooltip>
+
+                    {/* <Link to="/password-vault/add"> */}
                     <Button
                       variant="contained"
                       sx={{ backgroundColor: 'green' }}
+                      onClick={handleNewVaultModalOpen}
                     >
-                      Add new Password
+                      New Vault
+                      <EnhancedEncryptionIcon sx={{ marginLeft: '10px' }} />
                     </Button>
-                  </Link>
+                    {/* </Link> */}
+                  </Box>
                 </Box>
 
                 <Box
