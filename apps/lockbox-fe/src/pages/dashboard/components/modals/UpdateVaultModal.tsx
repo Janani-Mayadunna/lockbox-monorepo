@@ -31,9 +31,14 @@ const style = {
 interface ShareModalProps {
   open: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  data: any;
 }
 
-export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
+export default function VaultUpdateModal({
+  open,
+  setOpenModal,
+  data,
+}: ShareModalProps) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [vaultData, setVaultData] = React.useState({
     category: '',
@@ -172,6 +177,10 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
   React.useEffect(() => {
     getAllFolders();
   }, []);
+
+  React.useEffect(() => {
+    console.log('data', data);
+  }, [data]);
 
   return (
     <div>

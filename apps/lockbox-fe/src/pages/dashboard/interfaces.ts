@@ -3,8 +3,19 @@ export interface IFolder {
   folderName: string;
 }
 
+export interface IVault {
+  _id: string;
+  category?: string;
+  name: string;
+  folder?: string;
+  link?: string;
+  username: string;
+  password: string;
+  note?: string;
+}
+
 export interface ICreateVault {
-  category: string;
+  category?: string;
   name: string;
   folder?: string;
   link?: string;

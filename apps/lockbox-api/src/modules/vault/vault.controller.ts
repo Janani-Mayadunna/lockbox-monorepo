@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { VaultService } from './vault.service';
@@ -22,11 +23,24 @@ import { ICreateSharedVault } from '../user/user.interfaces';
 export class VaultController {
   constructor(private vaultService: VaultService) {}
 
-  //retrieve all vaults in the array and display
+  //retrieve all vaults in the vaults array of user and display
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getAllUserVaults(@getCurrentUserId() userId: string): Promise<Vault[]> {
-    return await this.vaultService.getAllUserVaults(userId);
+  async getAllUserVaults(
+    @Query('category') category: string,
+    @Query('folder') folder: string,
+    @Query('name') name: string,
+    @Query('username') username: string,
+    @getCurrentUserId() userId: string,
+  ): Promise<Vault[]> {
+    const where: any = {};
+    if (category) where.category = new RegExp(category.toString(), 'i');
+    if (folder) where.folder = new RegExp(folder.toString(), 'i');
+    if (name) where.name = new RegExp(name.toString(), 'i');
+    if (username) where.username = new RegExp(username.toString(), 'i');
+
+    const options = where;
+    return await this.vaultService.getAllUserVaults(userId, options);
   }
 
   //verify password share link validity and expiration

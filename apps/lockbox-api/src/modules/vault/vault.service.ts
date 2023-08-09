@@ -12,6 +12,7 @@ import {
   ICreateVault,
   ICreateVaultResponse,
   IDeleteVault,
+  IGetVaultOptions,
   IUpdateVault,
 } from './interfaces/vault.interfaces';
 import { JwtService } from '@nestjs/jwt';
@@ -56,11 +57,8 @@ export class VaultService {
     }
 
     Object.assign(vault, { user: currentUser._id });
-
     const newVault: Vault = await this.vaultModel.create(vault);
-
     currentUser.vaults.push(newVault);
-
     await currentUser.save();
 
     if (vault.folder) {
@@ -89,16 +87,32 @@ export class VaultService {
     return vaultWithoutPassword;
   }
 
-  async getAllUserVaults(userId: string): Promise<Vault[]> {
+  async getAllUserVaults(
+    userId: string,
+    options: IGetVaultOptions,
+  ): Promise<Vault[]> {
     const user = await this.userModel.findById(userId);
 
     if (!user) {
       throw new NotFoundException(`User not found`);
     }
 
-    // Retrieve all vaults for the user
-    const vaults = await this.vaultModel.find({ user: user._id });
+    const query: any = { user: userId };
 
+    if (options.category) {
+      query.category = options.category;
+    }
+    if (options.folder) {
+      query.folder = options.folder;
+    }
+    if (options.name) {
+      query.name = options.name;
+    }
+    if (options.username) {
+      query.username = options.username;
+    }
+
+    const vaults = await this.vaultModel.find(query);
     return vaults;
   }
 
