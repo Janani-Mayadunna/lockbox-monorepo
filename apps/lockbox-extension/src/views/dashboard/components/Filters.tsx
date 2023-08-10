@@ -23,8 +23,14 @@ const Vaults: React.FC<{}> = () => {
   const navigate = useNavigate();
   const [vaults, setVaults] = React.useState([]);
   const [folders, setFolders] = React.useState([]);
-  const [loginCount, setLoginCount] = React.useState(0);
-  const [secretNoteCount, setSecretNoteCount] = React.useState(0);
+  const [logins, setLogins] = React.useState({
+    vaultsArray: [],
+    count: 0,
+  });
+  const [secretNotes, setSecretNotes] = React.useState({
+    vaultsArray: [],
+    count: 0,
+  });
 
   const getVaults = async () => {
     await getAllVaults();
@@ -38,18 +44,36 @@ const Vaults: React.FC<{}> = () => {
     setFolders(userFolder);
   };
 
+  const getAllLogins = () => {
+    const logins = vaults.filter((vault: any) => vault.category === 'Login');
+    setLogins({
+      vaultsArray: logins,
+      count: logins.length,
+    });
+  };
+
+  const getAllSecretNotes = () => {
+    const secretNotes = vaults.filter(
+      (vault: any) => vault.category === 'Secret Note'
+    );
+    setSecretNotes({
+      vaultsArray: secretNotes,
+      count: secretNotes.length,
+    });
+  };
+
   const getByCategories = (keyword: string) => {
     if (keyword === 'Login') {
-      const logins = vaults.filter((vault: any) => vault.category === 'Login');
-      setLoginCount(logins.length);
-      return logins;
+      return logins.vaultsArray;
     } else if (keyword === 'Secret Note') {
-      const secretNotes = vaults.filter(
-        (vault: any) => vault.category === 'Secret Note'
-      );
-      setSecretNoteCount(secretNotes.length);
-      return secretNotes;
+      return secretNotes.vaultsArray;
     }
+  };
+
+  const handleAllVaultsClick = (title: string) => {
+    navigate('/vaults/filtered', {
+      state: { vault: vaults, title: title },
+    });
   };
 
   const handleCategoryClick = (keyword: string) => {
@@ -73,6 +97,11 @@ const Vaults: React.FC<{}> = () => {
     getAllFolders();
   }, []);
 
+  React.useEffect(() => {
+    getAllLogins();
+    getAllSecretNotes();
+  }, [vaults]);
+
   return (
     <div>
       <Box sx={{ mb: 3 }}>
@@ -93,6 +122,44 @@ const Vaults: React.FC<{}> = () => {
           }}
         />
       </Box>
+
+      {/* All vaults */}
+      <Card
+        onClick={() => handleAllVaultsClick('All Vaults')}
+        variant='outlined'
+        sx={{
+          backgroundColor: '#91b9ce',
+          p: 0,
+          mt: 1,
+          ml: 1,
+          mr: 1,
+          cursor: 'pointer',
+        }}
+      >
+        <CardContent
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingBottom: '0px',
+            paddingTop: '0px',
+          }}
+        >
+          <Box sx={{ padding: 1 }}>
+            <Typography sx={{ fontSize: '1rem' }}>All Vaults</Typography>
+          </Box>
+          <Box style={{ display: 'flex', alignItems: 'center' }}>
+            <Typography variant='body1' style={{ marginRight: '10px' }}>
+              {vaults.length}
+            </Typography>
+            <Typography>
+              <ArrowForwardIosIcon sx={{ fontSize: '1rem', display: 'flex' }} />
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Divider sx={{ mt: 2, mb: 2 }} />
 
       {/* Categories  */}
       <Box>
@@ -126,7 +193,7 @@ const Vaults: React.FC<{}> = () => {
               </Box>
               <Box style={{ display: 'flex', alignItems: 'center' }}>
                 <Typography variant='body1' style={{ marginRight: '10px' }}>
-                  {loginCount}
+                  {logins.count}
                 </Typography>
                 <Typography>
                   <ArrowForwardIosIcon
@@ -140,7 +207,14 @@ const Vaults: React.FC<{}> = () => {
           <Card
             onClick={() => handleCategoryClick('Secret Note')}
             variant='outlined'
-            sx={{ backgroundColor: '#91b9ce', p: 0, mt: 1, ml: 1, mr: 1 }}
+            sx={{
+              backgroundColor: '#91b9ce',
+              p: 0,
+              mt: 1,
+              ml: 1,
+              mr: 1,
+              cursor: 'pointer',
+            }}
           >
             <CardContent
               style={{
@@ -156,7 +230,7 @@ const Vaults: React.FC<{}> = () => {
               </Box>
               <Box style={{ display: 'flex', alignItems: 'center' }}>
                 <Typography variant='body1' style={{ marginRight: '10px' }}>
-                  {secretNoteCount}
+                  {secretNotes.count}
                 </Typography>
                 <Typography>
                   <ArrowForwardIosIcon
