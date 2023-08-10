@@ -17,8 +17,8 @@ import {
 import React, { useEffect, useState } from 'react';
 import { decryptVault } from '../../helpers/crypto';
 import CustomCrypto from '../../helpers/custom-crypto';
-import { ICreateVault } from '../add-password/interfaces';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
+import { ICreateVault } from '../dashboard/interfaces';
 
 interface VaultData {
   vaultId: any;
@@ -83,6 +83,8 @@ const ReceivedPasswordsVault = () => {
       username: vaultUsername,
       password: encryptedVaultPW,
       note: '',
+      folder: '',
+      name: '',
     };
 
     await createVault(newVault);

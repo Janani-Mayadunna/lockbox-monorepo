@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserFolderService } from './user-folder.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ICreateFolderResponse } from './interfaces/user-folder.interfaces';
@@ -14,6 +14,16 @@ export class UserFolderController {
   @UseGuards(AuthGuard('jwt'))
   async getAllUserFolders(@getCurrentUserId() userId: string): Promise<any> {
     return await this.folderService.getAllUserFolders(userId);
+  }
+
+  // get folder by id
+  @Get('/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async getFolderById(
+    @getCurrentUserId() userId: string,
+    @Param('id') folderId: string,
+  ): Promise<any> {
+    return await this.folderService.getFolderById(folderId);
   }
 
   // create a folder

@@ -31,9 +31,14 @@ const style = {
 interface ShareModalProps {
   open: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  data: any;
 }
 
-export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
+export default function VaultUpdateModal({
+  open,
+  setOpenModal,
+  data,
+}: ShareModalProps) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [vaultData, setVaultData] = React.useState({
     category: '',
@@ -172,6 +177,10 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
   React.useEffect(() => {
     getAllFolders();
   }, []);
+
+  React.useEffect(() => {
+    console.log('data', data);
+  }, [data]);
 
   return (
     <div>
@@ -342,19 +351,16 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                               }
                             />
                           </Grid>
-                          <Grid item xs={2} 
-                                sx={{display: 'flex', alignItems: 'center' }}
-                          
-                          >
+                          <Grid item xs={2}>
                             <Tooltip title="Generate safe password" arrow>
                               <Button
                                 onClick={handleGeneratorModalOpen}
                                 type="button"
                                 variant="text"
-                                sx={{ color: 'green'}}
+                                sx={{ color: 'green' }}
                               >
                                 <AutoAwesomeTwoToneIcon
-                                  sx={{ fontSize: '2rem', mt: 1 }}
+                                  sx={{ fontSize: '2rem' }}
                                 />
                               </Button>
                             </Tooltip>

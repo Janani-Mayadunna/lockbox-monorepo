@@ -1,5 +1,9 @@
 body {
   background-color: #f4efef;
-  height: 350px;
-  width: 300px;
+  max-height: 400px;
+  min-width: 300px;
+  overflow-y: scroll;
+  margin: 0;
+  padding: 0;
+  padding-top: 10px;
 }

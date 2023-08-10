@@ -1,10 +1,8 @@
-import { Typography } from '@mui/material';
-import React, { useEffect } from 'react';
+import { Container } from '@mui/material';
+import React from 'react';
 import BottomNav from './components/BottomNav';
-import Vaults from './components/Vaults';
+import Vaults from './components/Filters';
 import AddVault from './components/AddVault';
-import { authorizedFetch } from '../../utils/request-interceptor';
-import { getAllVaults } from '../../utils/api';
 
 const Dashboard = () => {
   const [selectedValue, setSelectedValue] =
@@ -15,23 +13,38 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 350 }}>
-      <div style={{ flex: '1', marginBottom: 'auto' }}>
-        {selectedValue === 'all_vaults' ? (
-          <Vaults />
-        ) : selectedValue === 'add_vault' ? (
-          <AddVault />
-        ) : selectedValue === 'generator' ? (
-          <div>Generator</div>
-        ) : (
-          ''
-        )}
-      </div>
+    <>
+      <Container
+        sx={{ height: '400px', minWidth: '300px', overflowY: 'scroll', pb: 8 }}
+      >
+        <div
+          style={{ display: 'flex', flexDirection: 'column', minHeight: 350 }}
+        >
+          <div style={{ flex: '1', marginBottom: 'auto' }}>
+            {selectedValue === 'all_vaults' ? (
+              <Vaults />
+            ) : selectedValue === 'add_vault' ? (
+              <AddVault />
+            ) : selectedValue === 'generator' ? (
+              <div>Generator</div>
+            ) : (
+              ''
+            )}
+          </div>
+        </div>
+      </Container>
 
-      <div style={{ flexShrink: 0 }}>
+      <div
+        style={{
+          flexShrink: 0,
+          position: 'absolute',
+          bottom: 0,
+          width: '-webkit-fill-available',
+        }}
+      >
         <BottomNav onNavChange={handleNavChange} />
       </div>
-    </div>
+    </>
   );
 };
 

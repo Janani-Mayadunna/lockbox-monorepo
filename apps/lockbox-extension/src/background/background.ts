@@ -42,8 +42,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         sendResponse({ message: 'Current User stored successfully' });
         chrome.runtime.sendMessage({
-          action: 'getCurrentUser',
+          action: 'updateCurrentUser',
           currentUser: message.currentUser,
+        });
+      });
+      break;
+    case 'getCurrentUser':
+      chrome.storage.local.get(['currentUser'], (result) => {
+        console.log(
+          'Current User retrieved from chrome.storage.local:',
+          result.currentUser
+        );
+        sendResponse({ currentUser: result.currentUser });
+
+        chrome.runtime.sendMessage({
+          action: 'updateCurrentUser',
+          currentUser: result.currentUser,
         });
       });
       break;
@@ -86,6 +100,48 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.runtime.sendMessage({
           action: 'getAllVaults',
           userVaults: message.userVaults,
+        });
+      });
+      break;
+    case 'getAllVaults':
+      chrome.storage.local.get(['userVaults'], (result) => {
+        console.log(
+          'All User Vaults retrieved from chrome.storage.local:',
+          result.userVaults
+        );
+
+        sendResponse({ userVaults: result.userVaults });
+        chrome.runtime.sendMessage({
+          action: 'updateAllVaults',
+          userVaults: result.userVaults,
+        });
+      });
+      break;
+    case 'setUserFolders':
+      chrome.storage.local.set({ userFolders: message.userFolders }, () => {
+        console.log(
+          'All User Folders stored in chrome.storage.local:',
+          message.userFolders
+        );
+
+        sendResponse({ message: 'All User Folders stored successfully' });
+        chrome.runtime.sendMessage({
+          action: 'updateUserFolders',
+          userFolders: message.userFolders,
+        });
+      });
+      break;
+    case 'getUserFolders':
+      chrome.storage.local.get(['userFolders'], (result) => {
+        console.log(
+          'All User Folders retrieved from chrome.storage.local:',
+          result.userFolders
+        );
+
+        sendResponse({ userFolders: result.userFolders });
+        chrome.runtime.sendMessage({
+          action: 'updateUserFolders',
+          userFolders: result.userFolders,
         });
       });
       break;

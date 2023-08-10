@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Tooltip } from '@mui/material';
 import UserVaultTable from './components/vault/UserVault';
 import FilterBar from './components/filters-bar/FiltersSidebar';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
@@ -8,10 +8,20 @@ import React from 'react';
 import FolderAddModal from './components/modals/FolderAddModal';
 import VaultAddModal from './components/modals/VaultAddModal';
 
-const Dashboard = () => {
+const Dashboard: React.FC = () => {
   const [folderModalOpen, setFolderModalOpen] = React.useState(false);
   const [vaultModalOpen, setVaultModalOpen] = React.useState(false);
+  const [selectedFilter, setSelectedFilter] = React.useState({
+    filter: '',
+    keyword: '',
+  });
 
+  const handleFilterSelect = (filter: string, keyword: string) => {
+    setSelectedFilter({
+      filter,
+      keyword,
+    }); // Update the parent component's state with the selected filter
+  };
   const handleNewFolderModalOpen = () => {
     setFolderModalOpen(true);
   };
@@ -29,10 +39,10 @@ const Dashboard = () => {
       />
       <VaultAddModal open={vaultModalOpen} setOpenModal={setVaultModalOpen} />
       <Container>
-        <Grid container spacing={1}>
+        <Grid container spacing={4}>
           <Grid item xs={3}>
             <Box sx={{ mt: 5 }}>
-              <FilterBar />
+              <FilterBar onFilterSelect={handleFilterSelect} />
             </Box>
           </Grid>
           <Grid item xs={8}>
@@ -67,7 +77,7 @@ const Dashboard = () => {
                       justifyContent: 'left',
                     }}
                   >
-                    <Typography variant="h5">Password Vault</Typography>
+                    {/* <Typography variant="h5">Password Vault</Typography> */}
                   </Box>
 
                   <Box>
@@ -102,7 +112,7 @@ const Dashboard = () => {
                     justifyContent: 'center',
                   }}
                 >
-                  <UserVaultTable />
+                  <UserVaultTable selectedFilter={selectedFilter} />
                 </Box>
               </Box>
             </Box>

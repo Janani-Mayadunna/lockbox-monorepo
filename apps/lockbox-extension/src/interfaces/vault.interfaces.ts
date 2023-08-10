@@ -10,3 +10,8 @@ export interface ICreateVault {
   password: string;
   note?: string;
 }
+
+export interface IFolder {
+  _id: string;
+  folderName: string;
+}

@@ -63,6 +63,17 @@ export class UserFolderService {
     return userFolders;
   }
 
+  async getFolderById(folderId: string): Promise<UserFolder> {
+    const folder = await this.folderModel.findById(folderId);
+
+    if (!folder) {
+      logger.error(`Folder not found with id: ${folderId}`);
+      throw new NotFoundException(`Folder not found`);
+    }
+
+    return folder;
+  }
+
   //   async getAllVaultsInFolder(userId: string): Promise<any> {
   //     const currentUser = await this.userModel.findById(userId);
 

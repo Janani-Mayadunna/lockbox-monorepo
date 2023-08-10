@@ -5,6 +5,8 @@ import { RouterProvider, createHashRouter } from 'react-router-dom';
 import Login from '../views/login/Login';
 import Dashboard from '../views/dashboard/Dashboard';
 import Landing from '../views/landing/Landing';
+import VaultsFiltered from '../views/vaults/VaultsFiltered';
+import VaultsUpdate from '../views/vaults/vaults-update/VaultsUpdate';
 
 const router = createHashRouter([
   {
@@ -13,11 +15,21 @@ const router = createHashRouter([
   },
   {
     path: '/',
+    // path: '/test',
     element: <Login />,
   },
   {
     path: '/dashboard',
     element: <Dashboard />,
+  },
+  {
+    path: '/vaults/filtered',
+    element: <VaultsFiltered />,
+  },
+  {
+    path: '/vaults/update',
+    // path: '/',
+    element: <VaultsUpdate />,
   }
 ]);
 
