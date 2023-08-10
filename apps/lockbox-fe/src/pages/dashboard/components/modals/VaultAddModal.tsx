@@ -342,16 +342,19 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                               }
                             />
                           </Grid>
-                          <Grid item xs={2}>
+                          <Grid item xs={2} 
+                                sx={{display: 'flex', alignItems: 'center' }}
+                          
+                          >
                             <Tooltip title="Generate safe password" arrow>
                               <Button
                                 onClick={handleGeneratorModalOpen}
                                 type="button"
                                 variant="text"
-                                sx={{ color: 'green' }}
+                                sx={{ color: 'green'}}
                               >
                                 <AutoAwesomeTwoToneIcon
-                                  sx={{ fontSize: '2rem' }}
+                                  sx={{ fontSize: '2rem', mt: 1 }}
                                 />
                               </Button>
                             </Tooltip>

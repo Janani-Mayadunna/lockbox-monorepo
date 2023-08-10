@@ -1,4 +1,4 @@
-import { Row } from '../interfaces/common-interfaces';
+import { Row } from '../interfaces/vault.interfaces';
 import { generateVaultKey } from './crypto';
 import CustomCrypto from './custom-crypto';
 import {
@@ -174,7 +174,7 @@ export async function getAllVaults() {
 
 export async function getDecryptedAllVaults() {
   const vaultKey = await getVaultKey();
-  
+
   const vaultData = await new Promise<string[] | null>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'getAllVaults') {
@@ -199,4 +199,67 @@ export async function getDecryptedAllVaults() {
   );
 
   return decryptedData;
+}
+
+export async function setFoldersToStorage() {
+  //map over userFolders and get each folder
+  await authorizedFetch(`http://localhost:4000/api/user-folder`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      // set user folders in chrome storage local
+      chrome.runtime.sendMessage(
+        { action: 'setUserFolders', userFolders: data },
+        (response) => {
+          console.log('Background script response:', response);
+        }
+      );
+    })
+    .catch((err) => {
+      throw new Error('Failed to get folders' + err.message);
+    });
+}
+
+export async function getFolders() {
+  chrome.runtime.sendMessage({ action: 'getUserFolders' }, (response) => {
+    console.log('Background script response:', response);
+  });
+
+  const userFolders = await new Promise<string[] | []>((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'updateUserFolders') {
+        resolve(message.userFolders || []);
+      }
+    });
+  });
+
+  return userFolders;
+}
+
+export async function getByCategories(keyword: string[]) {
+  //get all vaults
+  chrome.runtime.sendMessage({ action: 'getAllVaults' })
+
+  const userVaults = await new Promise<string[] | []>((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'updateAllVaults') {
+        resolve(message.userVaults || []);
+      }
+    });
+  });
+
+  console.log('all vaults for categories', userVaults)
+
+  // get all vaults which have category = keyword
+  const vaultsByCategories = userVaults.filter((vault: any) => {
+    return vault.category === keyword
+  })
+
+  console.log('vaults by categories', vaultsByCategories)
+
+  return vaultsByCategories;
 }
