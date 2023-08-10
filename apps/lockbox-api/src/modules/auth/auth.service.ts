@@ -62,12 +62,18 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.jwtService.sign({ id: user._id });
+    const token = this.jwtService.sign({ id: user._id }, { expiresIn: '1d' });
     logger.info('Logged in');
     return {
       access_token: token,
       userId: user._id,
     };
+
+    //check if token is expired
+    // const isExpired = this.jwtService.verify(token, { ignoreExpiration: false });
+    // if (isExpired) {
+    //   throw new UnauthorizedException('Token expired');
+    // }
   }
 
   //get current user

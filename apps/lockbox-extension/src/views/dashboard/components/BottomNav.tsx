@@ -20,7 +20,9 @@ export default function BottomNav({ onNavChange }: BottomNavProps) {
 
   return (
     <Box>
-      <BottomNavigation showLabels value={value} onChange={handleChange}>
+      <BottomNavigation 
+      // sx={{backgroundColor: '#b6c9d6'}}
+       showLabels value={value} onChange={handleChange}>
         <BottomNavigationAction
           label='Vaults'
           value='all_vaults'

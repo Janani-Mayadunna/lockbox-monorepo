@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
-import { ICreateVault } from '../../../interfaces/common-interfaces';
+import { ICreateVault } from '../../../interfaces/vault.interfaces';
 import CustomCrypto from '../../../utils/custom-crypto';
 import {
   authorizedFetch,

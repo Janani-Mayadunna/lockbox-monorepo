@@ -21,7 +21,7 @@ import { IVault } from '../../interfaces';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
 
 interface Column {
-  id: 'image' | 'name' | 'folder' | 'actions';
+  id: 'image' | 'name' | 'username' | 'actions';
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
@@ -37,8 +37,8 @@ const columns: readonly Column[] = [
     align: 'left',
   },
   {
-    id: 'folder',
-    label: 'Folder',
+    id: 'username',
+    label: 'Username',
     minWidth: 150,
     align: 'left',
   },

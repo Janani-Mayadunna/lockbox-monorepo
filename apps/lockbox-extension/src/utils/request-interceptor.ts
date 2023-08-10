@@ -44,9 +44,14 @@ export async function getVaultKey(): Promise<string> {
 }
 
 export async function getUserSalt() {
+  chrome.runtime.sendMessage({ action: 'getCurrentUser' }, (response) => {
+    console.log('Background script response:', response);
+    // when using use response.token
+  });
+  
   const salt = await new Promise((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === 'getCurrentUser') {
+      if (message.action === 'updateCurrentUser') {
         resolve(message.currentUser.salt || null);
       }
     });
