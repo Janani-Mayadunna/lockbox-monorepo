@@ -3,6 +3,7 @@ import React from 'react';
 import BottomNav from './components/BottomNav';
 import Vaults from './components/Filters';
 import AddVault from './components/AddVault';
+import CurrentTabVaults from './components/CurrentTabVaults';
 
 const Dashboard = () => {
   const [selectedValue, setSelectedValue] =
@@ -27,6 +28,8 @@ const Dashboard = () => {
               <AddVault />
             ) : selectedValue === 'generator' ? (
               <div>Generator</div>
+            ) : selectedValue === 'current_tab_vaults' ? (
+              <CurrentTabVaults />
             ) : (
               ''
             )}

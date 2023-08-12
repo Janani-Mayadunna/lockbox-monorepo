@@ -13,9 +13,12 @@
     "default_title": "LockBox Extension",
     "default_icon": "icon.png"
   },
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "activeTab", "webNavigation", "scripting"],
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "host_permissions": [
+      "https://*/*"
+  ]
 }
