@@ -77,10 +77,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getVaultKey':
       chrome.storage.local.get(['vaultKey'], (result) => {
-        console.log(
-          'Vault Key retrieved from chrome.storage.local:',
-          result.vaultKey
-        );
+        // console.log(
+        //   'Vault Key retrieved from chrome.storage.local:',
+        //   result.vaultKey
+        // );
         sendResponse({ vaultKey: result.vaultKey });
 
         chrome.runtime.sendMessage({
@@ -91,14 +91,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'setAllVaults':
       chrome.storage.local.set({ userVaults: message.userVaults }, () => {
-        console.log(
-          'All User Vaults stored in chrome.storage.local:',
-          message.userVaults
-        );
+        // console.log(
+        //   'All User Vaults stored in chrome.storage.local:',
+        //   message.userVaults
+        // );
 
         sendResponse({ message: 'All User Vaults stored successfully' });
         chrome.runtime.sendMessage({
-          action: 'getAllVaults',
+          action: 'updateAllVaults',
           userVaults: message.userVaults,
         });
       });
@@ -119,10 +119,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'setUserFolders':
       chrome.storage.local.set({ userFolders: message.userFolders }, () => {
-        console.log(
-          'All User Folders stored in chrome.storage.local:',
-          message.userFolders
-        );
+        // console.log(
+        //   'All User Folders stored in chrome.storage.local:',
+        //   message.userFolders
+        // );
 
         sendResponse({ message: 'All User Folders stored successfully' });
         chrome.runtime.sendMessage({
@@ -133,10 +133,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getUserFolders':
       chrome.storage.local.get(['userFolders'], (result) => {
-        console.log(
-          'All User Folders retrieved from chrome.storage.local:',
-          result.userFolders
-        );
+        // console.log(
+        //   'All User Folders retrieved from chrome.storage.local:',
+        //   result.userFolders
+        // );
 
         sendResponse({ userFolders: result.userFolders });
         chrome.runtime.sendMessage({
@@ -145,6 +145,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
       });
       break;
+    case 'getTabVaults':
+      chrome.storage.local.get(['tabVaults'], (result) => {
+        sendResponse({ tabVaults: result.tabVaults });
+        chrome.runtime.sendMessage({
+          action: 'updateTabVaults',
+          tabVaults: result.tabVaults,
+        });
+      });
+      break;
+    case 'autoFill':
+      const sendData = {
+        type: 'autoFill',
+        data: {
+          username: message.username,
+          password: message.password,
+        },
+      };
+
+      console.log('data', sendData);
+
+      // send message to content script
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        var tab = tabs[0];
+        chrome.tabs.sendMessage(tab.id, sendData, (response) => {
+          console.log('autofill', response);
+        });
+      });
     default:
       break;
   }
@@ -153,4 +180,79 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-console.log('Background script loaded');
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.active) {
+    if (tab.url?.startsWith('chrome://')) {
+      console.log('chrome://');
+    } else {
+      chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        files: ['contentScript.js'],
+      });
+
+      chrome.storage.local.get(['userVaults'], (result) => {
+        const vaults = result.userVaults;
+        const tabVaults = vaults.filter(
+          (vault: { link: string }) =>
+            vault.link && tab.url.includes(vault.link)
+        );
+
+        chrome.storage.local.set({ tabVaults: tabVaults });
+      });
+
+      const sendData = {
+        type: 'connectionEstablished',
+        data: tab.url,
+      };
+
+      setTimeout(() => {
+        chrome.tabs.sendMessage(tabId, sendData, (response) => {
+          console.log('tab updated', response);
+        });
+      }, 2000);
+    }
+  }
+});
+
+/*
+  Using tabs onActivated (doesn't work wwhen navigating from scratch. 
+  only listenes when an already exisitng tab gets activated) 
+*/
+
+// chrome.tabs.onActivated.addListener((tab) => {
+//   chrome.tabs.get(tab.tabId, (currentTabData) => {
+//     console.log('currentTabData', currentTabData);
+
+//     if (currentTabData.url?.startsWith('chrome://')) {
+//       console.log('chrome://');
+//     } else {
+//       chrome.scripting.executeScript({
+//         target: { tabId: currentTabData.id },
+//         files: ['contentScript.js'],
+//       });
+
+//       chrome.storage.local.get(['userVaults'], (result) => {
+//         const vaults = result.userVaults;
+//         const tabVaults = vaults.filter(
+//           (vault: { link: string }) =>
+//             vault.link && currentTabData.url.includes(vault.link)
+//         );
+//         console.log('vault', tabVaults);
+
+//         // save the current vaults in chrome storage local
+//         chrome.storage.local.set({ tabVaults: tabVaults });
+//       });
+
+//       const sendData = {
+//         type: 'connectionEstablished',
+//         data: currentTabData.url,
+//       };
+
+//       setTimeout(() => {
+//         chrome.tabs.sendMessage(tab.tabId, sendData, (response) => {
+//           console.log('tab activated', response);
+//         });
+//       }, 2000);
+//     }
+//   });
+// });
