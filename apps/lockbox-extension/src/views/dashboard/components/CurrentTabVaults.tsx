@@ -51,7 +51,14 @@ const CurrentTabVaults: React.FC<{}> = () => {
             }
             key={vault._id}
             variant='outlined'
-            sx={{ backgroundColor: '#91b9ce', p: 0, mt: 1, ml: 1, mr: 1 }}
+            sx={{
+              backgroundColor: '#91b9ce',
+              p: 0,
+              mt: 1,
+              ml: 1,
+              mr: 1,
+              cursor: 'pointer',
+            }}
           >
             <CardContent
               style={{

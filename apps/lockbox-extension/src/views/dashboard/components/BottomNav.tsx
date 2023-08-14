@@ -26,7 +26,7 @@ export default function BottomNav({ onNavChange }: BottomNavProps) {
         showLabels
         value={value}
         onChange={handleChange}
-        sx={{ pr: 1 }}
+        sx={{ pr: 1, WebkitTextStrokeWidth: 'medium' }}
       >
         <BottomNavigationAction
           label='Fill'
