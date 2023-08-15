@@ -62,7 +62,9 @@ function* logoutSaga() {
   }
 }
 
-export function* authSaga() {
+function* authSaga() {
   yield all([takeLatest(LOGIN_REQUEST, loginSaga)]);
   yield all([takeLatest(LOGOUT_REQUEST, logoutSaga)]);
 }
+
+export default authSaga;
