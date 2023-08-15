@@ -6,15 +6,14 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { Grid, Snackbar, Tooltip } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import {
-  authorizedFetch,
-  getVaultKey,
-} from '../../../../../src/helpers/request-interceptor';
+import { getVaultKey } from '../../../../../src/helpers/request-interceptor';
 import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 import GenPassModal from './GenPassModal';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import '../../styles/VaultAddModal.css';
 import { ICreateVault, IFolder } from '../../interfaces';
+import { useAppDispatch, useAppSelector } from '../../../../../src/store';
+import { createVaultRequest, getAllFoldersRequest } from '../../redux/actions';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -34,6 +33,9 @@ interface ShareModalProps {
 }
 
 export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
+  const dispatch = useAppDispatch();
+  const { folders } = useAppSelector((state) => state.vaults);
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [vaultData, setVaultData] = React.useState({
     category: '',
@@ -46,7 +48,6 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
   });
   const [characterCount, setCharacterCount] = React.useState(0);
   const [openGeneratorModal, setOpenGeneratorModal] = React.useState(false);
-  const [folders, setFolders] = React.useState<IFolder[]>([]);
   const maxCharacters = 300;
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -97,22 +98,6 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     setCharacterCount(value.length);
   };
 
-  const getAllFolders = async () => {
-    authorizedFetch('http://localhost:4000/api/user-folder', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setFolders(data);
-      })
-      .catch((err) => {
-        throw new Error('Failed to get folders' + err.message);
-      });
-  };
-
   const handleSubmit = async (e: any) => {
     if (!vaultData.username || !vaultData.password) {
       return;
@@ -140,26 +125,8 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
 
     console.log('newVault', newVault);
 
-    // const decryptedDataj = await CustomCrypto.decrypt(vaultKey, encryptedVaultPW);
-    //   console.log('decrypted data', decryptedDataj);
-
-    authorizedFetch('http://localhost:4000/api/vault', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVault),
-    })
-      .then((res) => {
-        if (res.status !== 201) {
-          throw new Error('Failed to create vault');
-        } else {
-          return res.json();
-        }
-      })
-      .catch((err) => {
-        throw new Error('Failed to create vault' + err.message);
-      });
+    dispatch(createVaultRequest(newVault));
+    handleClose();
   };
 
   // update category state
@@ -170,8 +137,8 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
   }, [vaultData, vaultData.category]);
 
   React.useEffect(() => {
-    getAllFolders();
-  }, []);
+    dispatch(getAllFoldersRequest());
+  }, [dispatch]);
 
   return (
     <div>
@@ -342,16 +309,17 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                               }
                             />
                           </Grid>
-                          <Grid item xs={2} 
-                                sx={{display: 'flex', alignItems: 'center' }}
-                          
+                          <Grid
+                            item
+                            xs={2}
+                            sx={{ display: 'flex', alignItems: 'center' }}
                           >
                             <Tooltip title="Generate safe password" arrow>
                               <Button
                                 onClick={handleGeneratorModalOpen}
                                 type="button"
                                 variant="text"
-                                sx={{ color: 'green'}}
+                                sx={{ color: 'green' }}
                               >
                                 <AutoAwesomeTwoToneIcon
                                   sx={{ fontSize: '2rem', mt: 1 }}

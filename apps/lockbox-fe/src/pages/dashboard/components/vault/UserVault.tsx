@@ -10,15 +10,14 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {
-  authorizedFetch,
-  getVaultKey,
-} from '../../../../../src/helpers/request-interceptor';
+import { getVaultKey } from '../../../../../src/helpers/request-interceptor';
 import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
 import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 import { IVault } from '../../interfaces';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
+import { useAppDispatch, useAppSelector } from '../../../../../src/store';
+import { getVaultRequest } from '../../redux/actions';
 
 interface Column {
   id: 'image' | 'name' | 'username' | 'actions';
@@ -60,9 +59,11 @@ interface UserVaultTableProps {
 export default function UserVaultTable({
   selectedFilter,
 }: UserVaultTableProps) {
+  const dispatch = useAppDispatch();
+  const { vaults } = useAppSelector((state) => state.vaults);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [vaultData, setVaultData] = React.useState([]);
+  const [vaultData, setVaultData] = React.useState<IVault[]>([]);
   const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<IVault>({
     _id: '',
@@ -72,7 +73,6 @@ export default function UserVaultTable({
     password: '',
     note: '',
     folder: '',
-
   });
   const [decryptedVaults, setDecryptedVaults] = React.useState<IVault[]>([
     {
@@ -85,7 +85,6 @@ export default function UserVaultTable({
       folder: '',
     },
   ]);
-  const backendUrl = 'http://localhost:4000/api/vault';
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -104,29 +103,21 @@ export default function UserVaultTable({
   };
 
   // get all vaults API call
+  React.useEffect(() => {
+    dispatch(getVaultRequest(selectedFilter.keyword, selectedFilter.filter));
+  }, [dispatch, selectedFilter.filter, selectedFilter.keyword]);
 
   React.useEffect(() => {
-    const getAllVaults = async () => {
-      await authorizedFetch(
-        `${backendUrl}/?${selectedFilter.keyword}=${selectedFilter.filter}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          setVaultData(data);
-        })
-        .catch((err: any) => {
-          throw new Error(err);
-        });
-    };
+    if (selectedFilter.filter === '') {
+      dispatch(getVaultRequest('', ''));
+    }
+  }, [dispatch, selectedFilter]);
 
-    getAllVaults();
-  }, [selectedFilter.filter, selectedFilter.keyword]);
+  React.useEffect(() => {
+    if (vaults) {
+      setVaultData(vaults);
+    }
+  }, [vaults]);
 
   React.useEffect(() => {
     const decryptedPasswords = async (vaultData: any) => {
@@ -148,12 +139,12 @@ export default function UserVaultTable({
       return decryptedData;
     };
 
-    async function test() {
+    async function getDecryptedData() {
       const decryptedData = await decryptedPasswords(vaultData);
       setDecryptedVaults(decryptedData);
     }
 
-    test();
+    getDecryptedData();
   }, [vaultData]);
 
   return (
@@ -208,7 +199,6 @@ export default function UserVaultTable({
                           '&:last-child td, &:last-child th': { border: 0 },
                           cursor: 'pointer',
                         }}
-                        onClick={() => handleUpdateModalOpen(row)}
                       >
                         <TableCell align="left">
                           {row.link?.split('//') && row.link.split('//')[1] ? (
@@ -231,7 +221,12 @@ export default function UserVaultTable({
                             />
                           )}
                         </TableCell>
-                        <TableCell align="left">{row.name}</TableCell>
+                        <TableCell
+                          align="left"
+                          onClick={() => handleUpdateModalOpen(row)}
+                        >
+                          {row.name}
+                        </TableCell>
                         <TableCell align="left">{row.username}</TableCell>
                         <TableCell align="center">
                           <Box
