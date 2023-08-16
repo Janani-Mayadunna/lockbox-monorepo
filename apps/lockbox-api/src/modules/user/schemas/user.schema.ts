@@ -24,7 +24,7 @@ export class User extends Document {
   publicKey: string;
 
   @Prop()
-  privateKey: Buffer;
+  privateKey: string;
 
   @Prop()
   sharedVault: Array<SharedVaultDto>;

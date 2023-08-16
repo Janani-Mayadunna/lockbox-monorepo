@@ -1,10 +1,11 @@
-/* eslint-disable no-console */
 import CryptoJS from 'crypto-js';
 
 export function hashPassword(password: string) {
   // (`${email}:${password}`)
   let hashedPassword = CryptoJS.SHA256(password);
 
+  // stetching the password
+  // the advatage of this is, that it will take a long time to brute force and it will be hard to guess the password
   for (let i = 0; i < 10000; i++) {
     hashedPassword = CryptoJS.SHA256(hashedPassword.toString());
   }
@@ -67,11 +68,9 @@ export function decryptVault({
         return str;
       }
     } catch (error: any) {
-      console.log('unable to decrypt', error.message);
-      // throw new Error('Unable to decrypt', error.message);
+      throw new Error('Unable to decrypt', error.message);
     }
   } else {
-    console.log('unable to decrypt');
     throw new Error('Unable to decrypt vault');
   }
 }

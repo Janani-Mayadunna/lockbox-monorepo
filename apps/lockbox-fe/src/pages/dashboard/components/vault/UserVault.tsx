@@ -119,44 +119,47 @@ export default function UserVaultTable({
     }
   }, [vaults]);
 
+  const decryptedPasswords = async (vaultData: any) => {
+    const vaultKey = getVaultKey();
+    let decryptedNote = '';
+
+    const decryptedData = await Promise.all(
+      vaultData.map(async (row: IVault) => {
+        const decryptedVaultPW = await CustomCrypto.decrypt(
+          vaultKey,
+          row.password,
+        );
+
+        const decryptedVaultUsername = await CustomCrypto.decrypt(
+          vaultKey,
+          row.username,
+        );
+
+        if (row.note) {
+          decryptedNote = await CustomCrypto.decrypt(vaultKey, row.note);
+        }
+
+        return {
+          ...row,
+          password: decryptedVaultPW,
+          username: decryptedVaultUsername,
+          note: decryptedNote,
+        };
+      }),
+    );
+    return decryptedData;
+  };
+
   React.useEffect(() => {
-    const decryptedPasswords = async (vaultData: any) => {
-      const vaultKey = getVaultKey();
-      let decryptedNote = '';
-
-      const decryptedData = await Promise.all(
-        vaultData.map(async (row: IVault) => {
-          const decryptedVaultPW = await CustomCrypto.decrypt(
-            vaultKey,
-            row.password,
-          );
-
-          const decryptedVaultUsername = await CustomCrypto.decrypt(
-            vaultKey,
-            row.username,
-          );
-
-          if (row.note) {
-            decryptedNote = await CustomCrypto.decrypt(vaultKey, row.note);
-          }
-
-          return {
-            ...row,
-            password: decryptedVaultPW,
-            username: decryptedVaultUsername,
-            note: decryptedNote,
-          };
-        }),
-      );
-      return decryptedData;
-    };
-
     async function getDecryptedData() {
       const decryptedData = await decryptedPasswords(vaultData);
       setDecryptedVaults(decryptedData);
+      console.log('decryptedData', decryptedData);
     }
 
-    getDecryptedData();
+    setTimeout(() => {
+      getDecryptedData();
+    }, 2000);
   }, [vaultData]);
 
   React.useEffect(() => {
