@@ -114,7 +114,6 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
       vaultKey,
       vaultData.username,
     );
-    const encryptedLink = await CustomCrypto.encrypt(vaultKey, vaultData.link);
     const encryptedNote = await CustomCrypto.encrypt(vaultKey, vaultData.note);
 
     console.log('encryptedUsername', encryptedUsername);
@@ -123,7 +122,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
       category: vaultData.category,
       name: vaultData.name,
       folder: vaultData.folder,
-      link: encryptedLink,
+      link: vaultData.link,
       username: encryptedUsername,
       password: encryptedVaultPW,
       note: encryptedNote,
