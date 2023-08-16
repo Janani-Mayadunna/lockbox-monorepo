@@ -15,7 +15,6 @@ import {
   getVaultKey,
 } from '../../helpers/request-interceptor';
 import React, { useEffect, useState } from 'react';
-import { decryptVault } from '../../helpers/crypto';
 import CustomCrypto from '../../helpers/custom-crypto';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import { ICreateVault } from '../dashboard/interfaces';
@@ -81,10 +80,8 @@ const ReceivedPasswordsVault = () => {
 
     const encryptedUsername = await CustomCrypto.encrypt(vaultKey, vaultUsername);
 
-    const encryptedLink = await CustomCrypto.encrypt(vaultKey, vaultLink);
-
     const newVault: ICreateVault = {
-      link: encryptedLink,
+      link: vaultLink,
       username: encryptedUsername,
       password: encryptedVaultPW,
       note: '',

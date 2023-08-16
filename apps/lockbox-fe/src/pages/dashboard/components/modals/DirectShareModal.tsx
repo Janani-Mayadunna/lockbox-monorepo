@@ -9,7 +9,6 @@ import { Grid, Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { FormControlLabel, Checkbox } from '@mui/material';
 import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
-import { encryptVault } from '../../../../../src/helpers/crypto';
 import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 
 const style = {
@@ -94,14 +93,10 @@ export default function DirectShareModal({
     if (shareEmail) {
       computeAgreedSecret();
 
-      // const encryptedSharePassword = encryptVault({
-      //   vaultPassword: ModalData.password,
-      //   vaultKey: computeSecret,
-      // });
       const encryptedSharePassword = await CustomCrypto.encrypt(
         computeSecret,
         ModalData.password,
-      )
+      );
 
       if (computeSecret === '') {
         console.log('computeSecret is empty');
