@@ -8,6 +8,9 @@ import {
   LOGOUT_FAILURE,
   LOGOUT_REQUEST,
   LOGOUT_SUCCESS,
+  SIGNUP_FAILURE,
+  SIGNUP_REQUEST,
+  SIGNUP_SUCCESS,
 } from './actionTypes';
 
 export interface IAuth {
@@ -17,8 +20,9 @@ export interface IAuth {
 export interface AuthState {
   pending: boolean;
   error: string | null;
-  token: string;
+  token: string | null;
   isLoggedIn: boolean;
+  message: string | null;
 }
 
 /* LOGIN */
@@ -101,6 +105,32 @@ export type GetCurrentuserFailure = {
   payload: { error: string };
 };
 
+export type SignupRequest = {
+  type: typeof SIGNUP_REQUEST;
+  payload: SignupRequestPayload;
+};
+
+export interface SignupRequestPayload {
+  name: string;
+  email: string;
+  password: string;
+  salt?: string;
+}
+
+export type SignupSuccess = {
+  type: typeof SIGNUP_SUCCESS;
+  payload: SignupSuccessPayload;
+};
+
+export interface SignupSuccessPayload {
+  message: string;
+}
+
+export type SignupFailure = {
+  type: typeof SIGNUP_FAILURE;
+  payload: any;
+};
+
 export type AuthAction =
   | LoginRequest
   | LoginSuccess
@@ -110,4 +140,7 @@ export type AuthAction =
   | LogoutFailure
   | GetCurrentuser
   | GetCurrentuserSuccess
-  | GetCurrentuserFailure;
+  | GetCurrentuserFailure
+  | SignupRequest
+  | SignupSuccess
+  | SignupFailure;

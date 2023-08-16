@@ -1,5 +1,6 @@
 export interface IUserSignIn {
-    name: string;
-    email: string;
-    password: string;
+  name: string;
+  email: string;
+  password: string;
+  salt?: string;
 }

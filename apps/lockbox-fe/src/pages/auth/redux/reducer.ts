@@ -5,6 +5,9 @@ import {
     GET_CURRENT_USER,
     GET_CURRENT_USER_SUCCESS,
     GET_CURRENT_USER_FAILURE,
+    SIGNUP_REQUEST,
+    SIGNUP_SUCCESS,
+    SIGNUP_FAILURE,
   } from "./actionTypes";
   
 import { AuthAction, AuthState } from "./types";
@@ -12,8 +15,9 @@ import { AuthAction, AuthState } from "./types";
 const initialState: AuthState = {
     pending: false,
     error: null,
-    token: "",
+    token: null,
     isLoggedIn: false,
+    message: null,
   };
   
   const reducers = (state = initialState, action: AuthAction) => {
@@ -56,7 +60,25 @@ const initialState: AuthState = {
           loading: false,
           error: action.payload,
         };
-  
+        case SIGNUP_REQUEST:
+          return {
+            ...state,
+            pending: true,
+          };
+          case SIGNUP_SUCCESS:
+            return {
+              ...state,
+              message: action.payload.message,
+              pending: false,
+              error: null,
+            };
+          case SIGNUP_FAILURE:
+            return {
+              ...state,
+              // success: false,
+              pending: false,
+              error: action.payload.error,
+            };
       default:
         return { ...state };
     }
