@@ -199,14 +199,14 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                     <select
                       name="category"
                       id="category"
-                      value={vaultData.category}
+                      defaultValue={vaultData.category}
                       className="input-field"
                       style={{ marginBottom: '10px', padding: '5px' }}
                       onChange={(e) =>
                         setVaultData({ ...vaultData, category: e.target.value })
                       }
                     >
-                      <option value="Login" selected>
+                      <option value="Login">
                         Login
                       </option>
                       <option value="Secret Note">Note</option>
@@ -245,7 +245,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                       <select
                         name="folder"
                         id="folder"
-                        value={vaultData.folder}
+                        defaultValue={vaultData.folder}
                         className="input-field"
                         style={{ marginBottom: '10px', padding: '5px' }}
                         onChange={(e) =>
@@ -255,7 +255,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                           })
                         }
                       >
-                        <option value="value" selected></option>
+                        <option value="value"></option>
                         {folders.map((folder: IFolder) => (
                           <option key={folder._id} value={folder._id}>
                             {folder.folderName}

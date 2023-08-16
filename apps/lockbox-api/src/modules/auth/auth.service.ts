@@ -21,15 +21,23 @@ export class AuthService {
   ) {}
 
   //sign up user
-  async signUp(signUpDto: SignUpDto): Promise<{ token: string }> {
-    const { name, email, password } = signUpDto;
+  async signUp(signUpDto: SignUpDto): Promise<{ message: string }> {
+    let userSalt = '';
 
-    const userSalt = generateSalt();
+    const { name, email, password, salt } = signUpDto;
+
+    if (salt !== '') {
+      userSalt = salt;
+    } else {
+      userSalt = generateSalt();
+    }
+    console.log('salt', userSalt);
+    // const userSalt = generateSalt();
     const userECDHKeyPair = generateUserKeyPair();
 
     const hashedPassword = await argon2.hash(`${email}:${password}`);
 
-    const user = await this.userModel.create({
+    await this.userModel.create({
       name,
       email,
       password: hashedPassword,
@@ -38,8 +46,10 @@ export class AuthService {
       salt: userSalt,
     });
 
-    const token = this.jwtService.sign({ id: user._id });
-    return { token };
+    // const token = this.jwtService.sign({ id: user._id });
+    return {
+      message: 'signup successful',
+    };
   }
 
   //login user
