@@ -260,6 +260,7 @@ export default function UserVaultTable({
                                   password={row.password}
                                   username={row.username}
                                   link={row.link}
+                                  alias={row.name}
                                 />
                               </Grid>
                             </Grid>

@@ -3,7 +3,13 @@ import CryptoJS from 'crypto-js';
 
 export function hashPassword(password: string) {
   // (`${email}:${password}`)
-  return CryptoJS.SHA256(password).toString();
+  let hashedPassword = CryptoJS.SHA256(password);
+
+  for (let i = 0; i < 10000; i++) {
+    hashedPassword = CryptoJS.SHA256(hashedPassword.toString());
+  }
+
+  return hashedPassword.toString();
 }
 
 //to generate the vault key original passowrd, email and the randomly generated salt stored on server is needed

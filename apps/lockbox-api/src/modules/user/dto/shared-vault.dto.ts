@@ -20,6 +20,10 @@ export class SharedVaultDto {
 
   @IsNotEmpty()
   @IsString()
+  readonly vaultAlias: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly sharedUserEmail: string;
 
   @IsNotEmpty()

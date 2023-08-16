@@ -70,6 +70,7 @@ const ReceivedPasswordsVault = () => {
     vaultUsername: string,
     vaultLink: string,
     vaultId: any,
+    vaultAlias: string,
   ) => {
     const vaultKey = getVaultKey();
 
@@ -78,13 +79,17 @@ const ReceivedPasswordsVault = () => {
       vaultPassword,
     );
 
+    const encryptedUsername = await CustomCrypto.encrypt(vaultKey, vaultUsername);
+
+    const encryptedLink = await CustomCrypto.encrypt(vaultKey, vaultLink);
+
     const newVault: ICreateVault = {
-      link: vaultLink,
-      username: vaultUsername,
+      link: encryptedLink,
+      username: encryptedUsername,
       password: encryptedVaultPW,
       note: '',
       folder: '',
-      name: '',
+      name: vaultAlias,
     };
 
     await createVault(newVault);
@@ -158,15 +163,18 @@ const ReceivedPasswordsVault = () => {
   }, []);
 
   useEffect(() => {
-    const getDecryptedVaults = () => {
-      const decryptedVault = receivedVaults.map((vault: VaultData) => {
-        return decryptVault({
-          vaultPassword: vault.vaultPassword,
-          vaultKey: vault.sharedSecret,
-        });
+    const getDecryptedVaults = async () => {
+      const decryptedVault = receivedVaults.map(async (vault: VaultData) => {
+        return await CustomCrypto.decrypt(
+          vault.sharedSecret,
+          vault.vaultPassword,
+        );
+
       });
 
-      const sanitizedDecryptedVaults = decryptedVault.map(
+      const decx = await Promise.all(decryptedVault);
+
+      const sanitizedDecryptedVaults = decx.map(
         (value: string | undefined) => (value === undefined ? '' : value),
       );
 
@@ -280,6 +288,7 @@ const ReceivedPasswordsVault = () => {
                               data.vaultUsername,
                               data.vaultLink,
                               data.vaultId,
+                              data.vaultAlias,
                             )
                           }
                         >
