@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 export interface ICreateSharedVault {
   vaultUsername: string;
   vaultPassword: string;
+  vaultAlias: string;
   vaultLink?: string;
   receiverEmail: string;
   isAllowedToSave: boolean;
@@ -17,6 +18,7 @@ export interface IGetReceivedVaultResponse {
   vaultId: ObjectId;
   vaultUsername: string;
   vaultPassword: string;
+  vaultAlias: string;
   vaultLink?: string;
   sharedUserEmail: string;
   sharedUserName: string;

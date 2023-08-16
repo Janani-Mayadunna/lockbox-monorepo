@@ -266,6 +266,7 @@ export class VaultService {
         vaultLink: createSharedVaultData.vaultLink,
         vaultUsername: createSharedVaultData.vaultUsername,
         vaultPassword: createSharedVaultData.vaultPassword,
+        vaultAlias: createSharedVaultData.vaultAlias,
         sharedUserEmail: senderEmail,
         sharedUserName: senderName,
         isAllowedToSave: createSharedVaultData.isAllowedToSave,
