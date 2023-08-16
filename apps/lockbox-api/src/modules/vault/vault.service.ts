@@ -50,12 +50,6 @@ export class VaultService {
       throw new NotFoundException(`User not found`);
     }
 
-    if (vault.note?.length > 300) {
-      throw new BadRequestException(
-        'Note length exceeds the limit of 300 characters',
-      );
-    }
-
     Object.assign(vault, { user: currentUser._id });
     const newVault: Vault = await this.vaultModel.create(vault);
     currentUser.vaults.push(newVault);

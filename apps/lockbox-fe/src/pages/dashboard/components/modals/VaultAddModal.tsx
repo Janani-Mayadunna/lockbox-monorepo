@@ -110,17 +110,23 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     const vaultPW = vaultData.password;
 
     const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
+    const encryptedUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      vaultData.username,
+    );
+    const encryptedLink = await CustomCrypto.encrypt(vaultKey, vaultData.link);
+    const encryptedNote = await CustomCrypto.encrypt(vaultKey, vaultData.note);
 
-    console.log('encryptedVaultPW', encryptedVaultPW);
+    console.log('encryptedUsername', encryptedUsername);
 
     const newVault: ICreateVault = {
       category: vaultData.category,
       name: vaultData.name,
       folder: vaultData.folder,
-      link: vaultData.link,
-      username: vaultData.username,
+      link: encryptedLink,
+      username: encryptedUsername,
       password: encryptedVaultPW,
-      note: vaultData.note,
+      note: encryptedNote,
     };
 
     console.log('newVault', newVault);
@@ -206,9 +212,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                         setVaultData({ ...vaultData, category: e.target.value })
                       }
                     >
-                      <option value="Login">
-                        Login
-                      </option>
+                      <option value="Login">Login</option>
                       <option value="Secret Note">Note</option>
                     </select>
                   </Grid>
@@ -363,6 +367,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                       onChange={handleNoteChange}
                       rows={3}
                       cols={50}
+                      maxLength={maxCharacters}
                       style={{
                         resize: 'vertical',
                         maxWidth: '100%',

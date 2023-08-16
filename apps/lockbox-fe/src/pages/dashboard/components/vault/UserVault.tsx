@@ -122,6 +122,8 @@ export default function UserVaultTable({
   React.useEffect(() => {
     const decryptedPasswords = async (vaultData: any) => {
       const vaultKey = getVaultKey();
+      let decryptedLink = '';
+      let decryptedNote = '';
 
       const decryptedData = await Promise.all(
         vaultData.map(async (row: IVault) => {
@@ -130,9 +132,25 @@ export default function UserVaultTable({
             row.password,
           );
 
+          const decryptedVaultUsername = await CustomCrypto.decrypt(
+            vaultKey,
+            row.username,
+          );
+
+          if (row.link) {
+            decryptedLink = await CustomCrypto.decrypt(vaultKey, row.link);
+          }
+
+          if (row.note) {
+            decryptedNote = await CustomCrypto.decrypt(vaultKey, row.note);
+          }
+
           return {
             ...row,
             password: decryptedVaultPW,
+            username: decryptedVaultUsername,
+            link: decryptedLink,
+            note: decryptedNote,
           };
         }),
       );
