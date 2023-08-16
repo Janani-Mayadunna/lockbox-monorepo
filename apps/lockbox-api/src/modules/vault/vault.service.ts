@@ -226,11 +226,12 @@ export class VaultService {
     return otherUserPublicKey;
   }
 
-  async getUserPrivateKey(userId: string): Promise<Buffer> {
+  async getUserPrivateKey(userId: string): Promise<string> {
     const user = await this.userModel.findById(userId);
     if (!user) {
       throw new NotFoundException(`User not found to fetch private key`);
     }
+
     const userPrivateKey = user.privateKey;
     return userPrivateKey;
   }

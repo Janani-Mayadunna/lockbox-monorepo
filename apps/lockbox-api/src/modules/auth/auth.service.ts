@@ -26,16 +26,15 @@ export class AuthService {
 
     const { name, email, password, salt } = signUpDto;
 
+    const hashedPassword = await argon2.hash(`${email}:${password}`);
+
     if (salt !== '') {
       userSalt = salt;
     } else {
       userSalt = generateSalt();
     }
-    console.log('salt', userSalt);
-    // const userSalt = generateSalt();
-    const userECDHKeyPair = generateUserKeyPair();
 
-    const hashedPassword = await argon2.hash(`${email}:${password}`);
+    const userECDHKeyPair = generateUserKeyPair();
 
     await this.userModel.create({
       name,
