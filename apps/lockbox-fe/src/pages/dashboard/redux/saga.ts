@@ -1,4 +1,4 @@
-import { authorizedFetch } from '../../../../src/helpers/request-interceptor';
+import { authorizedFetch, getVaultKey } from '../../../../src/helpers/request-interceptor';
 import { ICreateVault, IFolder, IVault } from '../interfaces';
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { CreateVaultRequest, GetVaults } from './types';
@@ -17,6 +17,7 @@ import {
   GET_VAULTS_REQUEST,
 } from './actionTypes';
 import API from '../constants';
+import CustomCrypto from '../../../../src/helpers/custom-crypto';
 
 /* Get all */
 const fetchVaults = async (keyword: string, filter: string) => {
@@ -31,7 +32,37 @@ const fetchVaults = async (keyword: string, filter: string) => {
   );
 
   const data = await response.json();
-  return data;
+
+  const vaultKey = getVaultKey();
+  let decryptedNote = '';
+
+  const decryptedData = await Promise.all(
+    data.map(async (row: IVault) => {
+      const decryptedVaultPW = await CustomCrypto.decrypt(
+        vaultKey,
+        row.password,
+      );
+
+      const decryptedVaultUsername = await CustomCrypto.decrypt(
+        vaultKey,
+        row.username,
+      );
+
+      if (row.note) {
+        decryptedNote = await CustomCrypto.decrypt(vaultKey, row.note);
+      }
+
+      return {
+        ...row,
+        password: decryptedVaultPW,
+        username: decryptedVaultUsername,
+        note: decryptedNote,
+      };
+    }),
+  );
+
+
+  return decryptedData;
 };
 
 export function* fetchVaultsSaga({ payload }: GetVaults): any {

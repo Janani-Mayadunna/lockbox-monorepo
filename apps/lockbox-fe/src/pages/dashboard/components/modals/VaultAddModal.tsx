@@ -13,7 +13,7 @@ import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import '../../styles/VaultAddModal.css';
 import { ICreateVault, IFolder } from '../../interfaces';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
-import { createVaultRequest, getAllFoldersRequest } from '../../redux/actions';
+import { createVaultRequest } from '../../redux/actions';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -141,9 +141,9 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     }
   }, [vaultData, vaultData.category]);
 
-  React.useEffect(() => {
-    dispatch(getAllFoldersRequest());
-  }, [dispatch]);
+  // React.useEffect(() => {
+  //   dispatch(getAllFoldersRequest());
+  // }, [dispatch]);
 
   return (
     <div>
