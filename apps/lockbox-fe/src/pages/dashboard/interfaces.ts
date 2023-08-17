@@ -25,7 +25,6 @@ export interface ICreateVault {
 }
 
 export enum CategoryTypes {
-    LOGIN = 'Login',
-    SECRET_NOTE = 'Secret Note',
-  }
-  
+  LOGIN = 'Login',
+  SECRET_NOTE = 'Secret Note',
+}

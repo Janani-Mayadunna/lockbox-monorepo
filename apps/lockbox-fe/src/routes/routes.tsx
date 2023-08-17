@@ -36,7 +36,7 @@ const routers = [
   {
     path: ROUTE.USERS_SHARED,
     component: ReceivedPasswordsVault,
-  }
+  },
 ];
 
 const Router = () => (

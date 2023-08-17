@@ -83,7 +83,9 @@ export const signupRequest = (
   payload,
 });
 
-export const signupSuccess = (payload: SignupSuccessPayload): SignupSuccess => ({
+export const signupSuccess = (
+  payload: SignupSuccessPayload,
+): SignupSuccess => ({
   type: SIGNUP_SUCCESS,
   payload,
 });

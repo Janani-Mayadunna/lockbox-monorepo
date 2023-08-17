@@ -99,7 +99,7 @@ export function* signUpSaga(action: SignupRequest) {
       password: action.payload.password,
       salt: action.payload.salt,
     });
-    if(message.message === 'signup successful') {
+    if (message.message === 'signup successful') {
       yield put(signupSuccess(message));
     } else {
       yield put(signupFailure({ error: message.message }));

@@ -105,7 +105,7 @@ const PasswordAdd = () => {
           marginBottom: '30px',
         }}
       >
-        <Typography variant="h5">Add Passwords</Typography>
+        <Typography variant='h5'>Add Passwords</Typography>
       </Box>
       <Box
         sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
@@ -124,10 +124,10 @@ const PasswordAdd = () => {
             }}
           >
             <TextField
-              label="Username"
-              variant="outlined"
+              label='Username'
+              variant='outlined'
               value={vaultData.username}
-              name="username"
+              name='username'
               required
               sx={{ marginBottom: '10px', padding: '5px' }}
               onChange={(e) =>
@@ -135,15 +135,15 @@ const PasswordAdd = () => {
               }
             />
 
-            <Grid container spacing={1} alignItems="center">
+            <Grid container spacing={1} alignItems='center'>
               <Grid item>
                 <TextField
-                  id="password"
-                  label="Password"
-                  variant="outlined"
-                  type="password"
+                  id='password'
+                  label='Password'
+                  variant='outlined'
+                  type='password'
                   value={vaultData.password}
-                  name="password"
+                  name='password'
                   required
                   sx={{ marginBottom: '10px', padding: '5px' }}
                   onChange={(e) =>
@@ -152,11 +152,11 @@ const PasswordAdd = () => {
                 />
               </Grid>
               <Grid item>
-                <Tooltip title="Generate safe password" arrow>
+                <Tooltip title='Generate safe password' arrow>
                   <Button
                     onClick={handleModalOpen}
-                    type="button"
-                    variant="text"
+                    type='button'
+                    variant='text'
                     sx={{ color: 'green' }}
                   >
                     <AutoAwesomeTwoToneIcon sx={{ fontSize: '2rem' }} />
@@ -166,11 +166,11 @@ const PasswordAdd = () => {
             </Grid>
 
             <TextField
-              label="Website link"
-              variant="outlined"
-              type="text"
+              label='Website link'
+              variant='outlined'
+              type='text'
               value={vaultData.link}
-              name="link"
+              name='link'
               sx={{ marginBottom: '10px', padding: '5px' }}
               onChange={(e) =>
                 setVaultData({ ...vaultData, link: e.target.value })
@@ -179,11 +179,11 @@ const PasswordAdd = () => {
 
             <>
               <TextField
-                label="Note"
-                variant="outlined"
-                type="text"
+                label='Note'
+                variant='outlined'
+                type='text'
                 value={vaultData.note}
-                name="note"
+                name='note'
                 multiline
                 rows={4}
                 inputProps={{ maxLength: 200 }}
@@ -192,7 +192,7 @@ const PasswordAdd = () => {
               />
 
               <Typography
-                variant="body2"
+                variant='body2'
                 sx={{
                   display: 'flex',
                   justifyContent: 'flex-end',
@@ -206,9 +206,9 @@ const PasswordAdd = () => {
             </>
 
             <Button
-              type="submit"
+              type='submit'
               onClick={handleSubmit}
-              variant="contained"
+              variant='contained'
               sx={{
                 marginBottom: '10px',
                 backgroundColor: '#007bff',
@@ -219,9 +219,9 @@ const PasswordAdd = () => {
             </Button>
 
             <Button
-              type="reset"
+              type='reset'
               onClick={() => handleReset()}
-              variant="contained"
+              variant='contained'
               sx={{
                 marginBottom: '10px',
                 backgroundColor: '#6c757d',
@@ -232,15 +232,15 @@ const PasswordAdd = () => {
             </Button>
 
             <Button
-              type="button"
-              variant="contained"
+              type='button'
+              variant='contained'
               sx={{
                 marginBottom: '10px',
                 backgroundColor: '#dc3545',
                 color: 'black',
               }}
               component={Link}
-              to="/dashboard"
+              to='/dashboard'
             >
               View All
             </Button>

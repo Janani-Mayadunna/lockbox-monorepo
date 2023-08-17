@@ -5,7 +5,7 @@ const ROUTE = {
   DASHBOARD: '/dashboard',
   PASSWORD_VAULT_ADD: '/password-vault/add',
   PUBLIC_SHARED: '/vault/shared/:sharedToken',
-  USERS_SHARED: '/vault/received'
+  USERS_SHARED: '/vault/received',
 };
 
 export default ROUTE;

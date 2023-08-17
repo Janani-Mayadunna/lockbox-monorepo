@@ -47,7 +47,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
     props,
     ref,
   ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   // handlers of the modal
@@ -149,7 +149,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
+          severity='success'
           sx={{ width: '100%' }}
         >
           Link Copied to Clipboard
@@ -159,14 +159,14 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography id='modal-modal-title' variant='h6' component='h2'>
             Generate Strong Password
           </Typography>
-          <div className="generator">
+          <div className='generator'>
             <Box
               sx={{
                 display: 'flex',
@@ -184,7 +184,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               }}
             >
               <Typography
-                variant="h6"
+                variant='h6'
                 sx={{
                   width: '50%',
                   fontWeight: 'bold',
@@ -197,69 +197,69 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               </Typography>
             </Box>
             <Container>
-              <div className="generator__form-controls">
+              <div className='generator__form-controls'>
                 <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isUppercase}
                     onChange={(e) => setIsUppercase(e.target.checked)}
-                    type="checkbox"
-                    id="uppercase"
-                    name="uppercase"
+                    type='checkbox'
+                    id='uppercase'
+                    name='uppercase'
                     style={{
                       marginRight: '1rem',
                       width: '1.2rem',
                       height: '1.2rem',
                     }}
                   />
-                  <label htmlFor="uppercase">Uppercase</label>
+                  <label htmlFor='uppercase'>Uppercase</label>
                 </Box>
 
                 <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isLowercase}
                     onChange={(e) => setIsLowercase(e.target.checked)}
-                    type="checkbox"
-                    id="lowercase"
-                    name="lowercase"
+                    type='checkbox'
+                    id='lowercase'
+                    name='lowercase'
                     style={{
                       marginRight: '1rem',
                       width: '1.2rem',
                       height: '1.2rem',
                     }}
                   />
-                  <label htmlFor="lowercase">Lowercase</label>
+                  <label htmlFor='lowercase'>Lowercase</label>
                 </Box>
 
                 <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isNumber}
                     onChange={(e) => setIsNumber(e.target.checked)}
-                    type="checkbox"
-                    id="numbers"
-                    name="numbers"
+                    type='checkbox'
+                    id='numbers'
+                    name='numbers'
                     style={{
                       marginRight: '1rem',
                       width: '1.2rem',
                       height: '1.2rem',
                     }}
                   />
-                  <label htmlFor="numbers">Numbers</label>
+                  <label htmlFor='numbers'>Numbers</label>
                 </Box>
 
                 <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isSymbol}
                     onChange={(e) => setIsSymbol(e.target.checked)}
-                    type="checkbox"
-                    id="symbols"
-                    name="symbols"
+                    type='checkbox'
+                    id='symbols'
+                    name='symbols'
                     style={{
                       marginRight: '1rem',
                       width: '1.2rem',
                       height: '1.2rem',
                     }}
                   />
-                  <label htmlFor="symbols">Symbols</label>
+                  <label htmlFor='symbols'>Symbols</label>
                 </Box>
 
                 <Box
@@ -273,7 +273,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
                   <Typography sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
                     Select Password Length
                   </Typography>
-                  <Box className="generator__length-counter">
+                  <Box className='generator__length-counter'>
                     <Button onClick={decreaseCounter}>
                       <RemoveIcon />
                     </Button>
@@ -304,7 +304,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
             <Grid container spacing={2}>
               <Grid item xs={4}>
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   onClick={generatePassword}
                   sx={{ color: 'green', borderColor: 'green' }}
                 >
@@ -315,7 +315,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               <Grid item xs={3}></Grid>
               <Grid item xs={4}>
                 <Button
-                  variant="outlined"
+                  variant='outlined'
                   onClick={copyPasswordHandler}
                   sx={{ color: 'black', width: '120px', borderColor: 'black' }}
                 >

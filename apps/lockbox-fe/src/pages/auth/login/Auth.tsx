@@ -101,12 +101,12 @@ const Auth = () => {
         open={backdropOpen}
         onClick={handleClose}
       >
-        <CircularProgress color="inherit" />
+        <CircularProgress color='inherit' />
       </Backdrop>
 
       <ResponsiveAppBar />
       {/* <h1 className="title">{'Hello again!'}</h1> */}
-      <br/>
+      <br />
 
       <form>
         <Box
@@ -123,44 +123,44 @@ const Auth = () => {
             borderRadius: '2ch',
           }}
         >
-          <Typography variant="h4" paddingBottom={3} textAlign="center">
+          <Typography variant='h4' paddingBottom={3} textAlign='center'>
             {'Login'}
           </Typography>
 
           <TextField
-            name="email"
+            name='email'
             value={user.email}
-            margin="normal"
-            type="text"
-            label="Email"
-            variant="outlined"
+            margin='normal'
+            type='text'
+            label='Email'
+            variant='outlined'
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
-              width: '90%'
+              width: '90%',
             }}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
 
           <TextField
-            name="password"
+            name='password'
             value={user.password}
-            margin="normal"
-            type="password"
-            label="Password"
-            variant="outlined"
+            margin='normal'
+            type='password'
+            label='Password'
+            variant='outlined'
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
-              width: '90%'
+              width: '90%',
             }}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
             <Button
               onClick={handleSubmit}
-              type="submit"
+              type='submit'
               sx={{
                 borderRadius: '4px',
                 marginTop: '20px',
@@ -171,7 +171,7 @@ const Auth = () => {
                   backgroundColor: '#0056b3',
                 },
               }}
-              variant="contained"
+              variant='contained'
             >
               Login
             </Button>
@@ -188,7 +188,7 @@ const Auth = () => {
               },
             }}
           >
-            <Link to="/signup"> New here? Sign Up</Link>
+            <Link to='/signup'> New here? Sign Up</Link>
           </Button>
         </Box>
       </form>

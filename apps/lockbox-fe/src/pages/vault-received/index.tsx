@@ -86,7 +86,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
   ref,
 ) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
 const ReceivedPasswordsVault = () => {
@@ -267,7 +267,7 @@ const ReceivedPasswordsVault = () => {
         >
           <Alert
             onClose={handleSnackbarClose}
-            severity="success"
+            severity='success'
             sx={{ width: '100%' }}
           >
             Successfully Done!
@@ -276,8 +276,8 @@ const ReceivedPasswordsVault = () => {
         <div>
           <Typography
             sx={{ mt: 4, mb: 4 }}
-            variant="h4"
-            component="h2"
+            variant='h4'
+            component='h2'
             gutterBottom
           >
             Shared Passwords
@@ -382,7 +382,7 @@ const ReceivedPasswordsVault = () => {
 
             {decryptedVaults.length === 0 ? (
               <Box>
-                <Typography variant="body1" align="center">
+                <Typography variant='body1' align='center'>
                   No Vaults Found
                 </Typography>
               </Box>
@@ -391,7 +391,7 @@ const ReceivedPasswordsVault = () => {
                 <TableContainer sx={{ maxHeight: 500, maxWidth: 1000 }}>
                   <Table
                     stickyHeader
-                    aria-label="sticky table"
+                    aria-label='sticky table'
                     sx={{ minWidth: 650 }}
                   >
                     <TableHead>
@@ -421,7 +421,7 @@ const ReceivedPasswordsVault = () => {
                           return (
                             <TableRow
                               hover
-                              role="checkbox"
+                              role='checkbox'
                               tabIndex={-1}
                               key={row.vaultId}
                               sx={{
@@ -430,14 +430,14 @@ const ReceivedPasswordsVault = () => {
                                 },
                               }}
                             >
-                              <TableCell align="left">
+                              <TableCell align='left'>
                                 {row.vaultLink?.split('//') &&
                                 row.vaultLink.split('//')[1] ? (
                                   <img
                                     src={`https://icons.bitwarden.net/${
                                       row.vaultLink.split('//')[1]
                                     }/icon.png`}
-                                    alt="logo"
+                                    alt='logo'
                                     style={{
                                       width: '30px',
                                       height: '30px',
@@ -446,28 +446,28 @@ const ReceivedPasswordsVault = () => {
                                   />
                                 ) : (
                                   <img
-                                    src="https://cdn-icons-png.flaticon.com/512/3170/3170748.png"
-                                    alt="logo"
+                                    src='https://cdn-icons-png.flaticon.com/512/3170/3170748.png'
+                                    alt='logo'
                                     style={{ width: '30px', height: '30px' }}
                                   />
                                 )}
                               </TableCell>
                               <TableCell
-                                align="left"
+                                align='left'
                                 // onClick={() => handleUpdateModalOpen(row)}
                               >
                                 {row.sharedUserName}
                               </TableCell>
-                              <TableCell align="left">
+                              <TableCell align='left'>
                                 {row.sharedUserEmail}
                               </TableCell>
-                              <TableCell align="left">
+                              <TableCell align='left'>
                                 {row.vaultLink}
                               </TableCell>
-                              <TableCell align="left">
+                              <TableCell align='left'>
                                 {row.vaultUsername}
                               </TableCell>
-                              <TableCell align="center">
+                              <TableCell align='center'>
                                 <Box
                                   sx={{
                                     display: 'flex',
@@ -477,27 +477,34 @@ const ReceivedPasswordsVault = () => {
                                 >
                                   <Grid container spacing={2} columns={12}>
                                     {row.isAllowedToSave ? (
-                                      <Grid item xs={4} sx={{ display: 'flex' }}>
-                                      <Tooltip title="Save to your vault">
-                                        <Box
-                                          onClick={() =>
-                                            handleAddToVault(
-                                              row.vaultPassword,
-                                              row.vaultUsername,
-                                              row.vaultLink,
-                                              row.vaultId,
-                                              row.vaultAlias,
-                                            )
-                                          }
-                                          sx={{ cursor: 'pointer' }}
-                                        >
-                                          <AddCircleOutlineIcon />
-                                        </Box>
-                                      </Tooltip>
-                                    </Grid>
+                                      <Grid
+                                        item
+                                        xs={4}
+                                        sx={{ display: 'flex' }}
+                                      >
+                                        <Tooltip title='Save to your vault'>
+                                          <Box
+                                            onClick={() =>
+                                              handleAddToVault(
+                                                row.vaultPassword,
+                                                row.vaultUsername,
+                                                row.vaultLink,
+                                                row.vaultId,
+                                                row.vaultAlias,
+                                              )
+                                            }
+                                            sx={{ cursor: 'pointer' }}
+                                          >
+                                            <AddCircleOutlineIcon />
+                                          </Box>
+                                        </Tooltip>
+                                      </Grid>
                                     ) : (
-                                      <Grid item xs={4} sx={{ display: 'flex' }}>
-                                        </Grid>
+                                      <Grid
+                                        item
+                                        xs={4}
+                                        sx={{ display: 'flex' }}
+                                      ></Grid>
                                     )}
 
                                     <Grid item xs={4} sx={{ display: 'flex' }}>
@@ -535,7 +542,7 @@ const ReceivedPasswordsVault = () => {
                 </TableContainer>
                 <TablePagination
                   rowsPerPageOptions={[10, 25, 100]}
-                  component="div"
+                  component='div'
                   count={decryptedVaults.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
