@@ -176,7 +176,7 @@ export default function UserVaultTable({
       {decryptedVaults.length === 0 ? (
         <Box>
           <Typography variant="body1" align="center">
-            No Passwords Found
+            No Vaults Found
           </Typography>
         </Box>
       ) : (

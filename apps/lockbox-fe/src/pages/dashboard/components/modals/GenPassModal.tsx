@@ -3,11 +3,13 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import { Container, Snackbar } from '@mui/material';
+import { Container, Grid, Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { useState } from 'react';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
+import LoopIcon from '@mui/icons-material/Loop';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -16,7 +18,8 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'background.paper',
-  border: '2px solid #000',
+  // border: '2px solid #000',
+  borderRadius: '10px',
   boxShadow: 24,
   p: 4,
 };
@@ -29,7 +32,7 @@ interface ShareModalProps {
 export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [password, setPassword] = useState('');
-  const [counter, setCounter] = useState(6);
+  const [counter, setCounter] = useState(8);
   const [isUppercase, setIsUppercase] = useState(false);
   const [isLowercase, setIsLowercase] = useState(false);
   const [isNumber, setIsNumber] = useState(false);
@@ -38,7 +41,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
   const numbers = '0123456789';
   const upperCaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const lowerCaseLetters = 'abcdefghijklmnopqrstuvwxyz';
-  const special = "!'^+%&/()=?_#$½§{[]}|;:>÷`<.*-@é";
+  const special = '!^+%&/()=?_#$-{[]}|;:>`<.*@';
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
@@ -73,7 +76,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
 
   const decreaseCounter = (e: any) => {
     e.preventDefault();
-    if (counter > 6) {
+    if (counter > 8) {
       setCounter((prevCounter) => prevCounter - 1);
     }
   };
@@ -161,7 +164,7 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Generate Your Password
+            Generate Strong Password
           </Typography>
           <div className="generator">
             <Box
@@ -169,20 +172,24 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
                 display: 'flex',
                 justifyContent: 'space-around',
                 alignItems: 'center',
-                marginTop: '20px',
-                marginRight: '30px',
+                pt: 2,
+                pb: 2,
+                mb: 3,
+                mt: 3,
+                height: '3rem',
+                width: '100%',
+                border: '1px solid',
+                borderColor: '#d3d3df',
+                borderRadius: '5px',
               }}
             >
               <Typography
                 variant="h6"
                 sx={{
                   width: '50%',
-                  color: 'black',
                   fontWeight: 'bold',
-                  marginBottom: '1.5rem',
-                  border: '2px solid black',
-                  borderColor: 'navy',
-                  padding: '1rem',
+                  marginBottom: '0rem',
+                  padding: '0.5rem',
                   borderRadius: '5px',
                 }}
               >
@@ -191,72 +198,99 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
             </Box>
             <Container>
               <div className="generator__form-controls">
-                <Box>
-                  <label htmlFor="uppercase">Uppercase</label>
+                <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isUppercase}
                     onChange={(e) => setIsUppercase(e.target.checked)}
                     type="checkbox"
                     id="uppercase"
                     name="uppercase"
+                    style={{
+                      marginRight: '1rem',
+                      width: '1.2rem',
+                      height: '1.2rem',
+                    }}
                   />
+                  <label htmlFor="uppercase">Uppercase</label>
                 </Box>
 
-                <Box>
-                  <label htmlFor="lowercase">Lowercase</label>
+                <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isLowercase}
                     onChange={(e) => setIsLowercase(e.target.checked)}
                     type="checkbox"
                     id="lowercase"
                     name="lowercase"
+                    style={{
+                      marginRight: '1rem',
+                      width: '1.2rem',
+                      height: '1.2rem',
+                    }}
                   />
+                  <label htmlFor="lowercase">Lowercase</label>
                 </Box>
 
-                <Box>
-                  <label htmlFor="numbers">Numbers</label>
+                <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isNumber}
                     onChange={(e) => setIsNumber(e.target.checked)}
                     type="checkbox"
                     id="numbers"
                     name="numbers"
+                    style={{
+                      marginRight: '1rem',
+                      width: '1.2rem',
+                      height: '1.2rem',
+                    }}
                   />
+                  <label htmlFor="numbers">Numbers</label>
                 </Box>
 
-                <Box>
-                  <label htmlFor="symbols">Symbols</label>
+                <Box sx={{ display: 'flex' }}>
                   <input
                     checked={isSymbol}
                     onChange={(e) => setIsSymbol(e.target.checked)}
                     type="checkbox"
                     id="symbols"
                     name="symbols"
+                    style={{
+                      marginRight: '1rem',
+                      width: '1.2rem',
+                      height: '1.2rem',
+                    }}
                   />
+                  <label htmlFor="symbols">Symbols</label>
                 </Box>
 
-                <br />
+                <Box
+                  sx={{
+                    mt: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
+                    Select Password Length
+                  </Typography>
+                  <Box className="generator__length-counter">
+                    <Button onClick={decreaseCounter}>
+                      <RemoveIcon />
+                    </Button>
+                    <span>{counter}</span>
+                    <Button onClick={increaseCounter}>
+                      <AddIcon />
+                    </Button>
+                  </Box>
+                </Box>
 
-                <Typography sx={{ fontSize: '1rem', fontWeight: 'bold' }}>
-                  Select Password Length
-                </Typography>
-                <div className="generator__length-counter">
-                  <Button onClick={decreaseCounter}>
-                    <RemoveIcon />
-                  </Button>
-                  <span>{counter}</span>
-                  <Button onClick={increaseCounter}>
-                    <AddIcon />
-                  </Button>
-                </div>
-
-                <button
+                {/* <button
                   style={{ marginRight: '5rem' }}
                   onClick={generatePassword}
                 >
                   Generate Password
                 </button>
-                <button onClick={copyPasswordHandler}>Copy Password</button>
+                <button onClick={copyPasswordHandler}>Copy Password</button> */}
               </div>
             </Container>
           </div>
@@ -267,9 +301,34 @@ export default function GenPassModal({ open, setOpenModal }: ShareModalProps) {
               marginTop: '30px',
             }}
           >
-            <Button variant="contained" onClick={handleClose}>
-              Close
-            </Button>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <Button
+                  variant="outlined"
+                  onClick={generatePassword}
+                  sx={{ color: 'green', borderColor: 'green' }}
+                >
+                  <LoopIcon sx={{ color: 'green', fontSize: '2rem' }} />
+                  Generate{' '}
+                </Button>
+              </Grid>
+              <Grid item xs={3}></Grid>
+              <Grid item xs={4}>
+                <Button
+                  variant="outlined"
+                  onClick={copyPasswordHandler}
+                  sx={{ color: 'black', width: '120px', borderColor: 'black' }}
+                >
+                  <ContentCopyIcon sx={{ color: 'black', fontSize: '2rem' }} />
+                  Copy{' '}
+                </Button>
+              </Grid>
+              <Grid item xs={4}>
+                {/* <Button variant="contained" onClick={handleClose}>
+                  Close
+                </Button> */}
+              </Grid>
+            </Grid>
           </Box>
         </Box>
       </Modal>

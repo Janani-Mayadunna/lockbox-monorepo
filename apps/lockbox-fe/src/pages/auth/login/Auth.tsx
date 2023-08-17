@@ -137,6 +137,7 @@ const Auth = () => {
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
+              width: '90%'
             }}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
@@ -151,6 +152,7 @@ const Auth = () => {
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
+              width: '90%'
             }}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />

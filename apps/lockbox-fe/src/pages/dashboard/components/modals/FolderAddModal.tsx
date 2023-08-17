@@ -17,6 +17,7 @@ const style = {
   width: 500,
   bgcolor: 'background.paper',
   boxShadow: 24,
+  borderRadius: '10px',
   p: 5,
 };
 
@@ -103,7 +104,12 @@ export default function FolderAddModal({
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ display: 'flex', justifyContent: 'center', fontSize: '1.4rem' }}
+          >
             Name your folder
           </Typography>
 
@@ -115,7 +121,7 @@ export default function FolderAddModal({
               type="text"
               name="folderName"
               placeholder="Enter folder name"
-              style={{ width: '80%', padding: '15px' }}
+              style={{ width: '95%', padding: '15px' }}
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
             />
@@ -126,7 +132,7 @@ export default function FolderAddModal({
               <Box display="flex" justifyContent="flex-start">
                 <Button
                   variant="contained"
-                  sx={{ backgroundColor: 'green' }}
+                  sx={{ backgroundColor: 'green', pr: 4, pl: 4 }}
                   onClick={handleFolderCreate}
                 >
                   Save
@@ -138,7 +144,7 @@ export default function FolderAddModal({
                 <Button
                   variant="contained"
                   onClick={handleClose}
-                  sx={{ backgroundColor: 'black' }}
+                  sx={{ backgroundColor: 'black', pr: 4, pl: 4 }}
                 >
                   Close
                 </Button>
