@@ -12,20 +12,21 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useNavigate } from 'react-router';
-import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
 import { IFolder } from '../../interfaces';
 import SearchIcon from '@mui/icons-material/Search';
+import { useAppSelector } from '../../../../../src/store';
 
 interface FilterBarProps {
   onFilterSelect: (filter: string, keyword: string) => void;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
+  const { folders } = useAppSelector((state) => state.vaults);
+
   const navigate = useNavigate();
   const [isAllVaultsOpen, setIsAllVaultsOpen] = useState(true);
   const [isFilterByCategoryOpen, setIsFilterByCategoryOpen] = useState(true);
   const [isFilterByFolderOpen, setIsFilterByFolderOpen] = useState(true);
-  const [folders, setFolders] = useState<IFolder[]>([]);
 
   const handleAllVaultsToggle = () => {
     setIsAllVaultsOpen(!isAllVaultsOpen);
@@ -38,26 +39,6 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
   const handleFilterByFolderToggle = () => {
     setIsFilterByFolderOpen(!isFilterByFolderOpen);
   };
-
-  const getAllFolders = async () => {
-    authorizedFetch('http://localhost:4000/api/user-folder', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setFolders(data);
-      })
-      .catch((err) => {
-        throw new Error('Failed to get folders' + err.message);
-      });
-  };
-
-  React.useEffect(() => {
-    getAllFolders();
-  }, []);
 
   return (
     <Box
@@ -163,19 +144,22 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
         </Typography>
         <Collapse in={isFilterByFolderOpen}>
           <List>
-            {folders.map((folder) => (
-              <ListItemButton
-                sx={{ pt: 0, pb: 0, pl: 7 }}
-                key={folder._id}
-                onClick={() => onFilterSelect(folder._id, 'folder')}
-              >
-                <ListItemText
-                  primary={
-                    <Typography variant='body2'>{folder.folderName}</Typography>
-                  }
-                />
-              </ListItemButton>
-            ))}
+            {folders &&
+              folders.map((folder: IFolder) => (
+                <ListItemButton
+                  sx={{ pt: 0, pb: 0, pl: 7 }}
+                  key={folder._id}
+                  onClick={() => onFilterSelect(folder._id, 'folder')}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography variant='body2'>
+                        {folder.folderName}
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              ))}
           </List>
         </Collapse>
       </Box>
