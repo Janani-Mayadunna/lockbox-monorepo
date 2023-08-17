@@ -81,9 +81,9 @@ const Dashboard: React.FC = () => {
                   </Box>
 
                   <Box>
-                    <Tooltip title="Add new folder">
+                    <Tooltip title='Add new folder'>
                       <Button
-                        variant="text"
+                        variant='text'
                         sx={{ marginRight: '10px' }}
                         onClick={handleNewFolderModalOpen}
                       >
@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
 
                     {/* <Link to="/password-vault/add"> */}
                     <Button
-                      variant="contained"
+                      variant='contained'
                       sx={{ backgroundColor: 'green' }}
                       onClick={handleNewVaultModalOpen}
                     >

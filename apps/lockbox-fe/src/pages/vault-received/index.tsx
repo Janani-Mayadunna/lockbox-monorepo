@@ -1,15 +1,19 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
-  Button,
   Container,
+  Grid,
   Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   authorizedFetch,
   getVaultKey,
@@ -18,23 +22,71 @@ import React, { useEffect, useState } from 'react';
 import CustomCrypto from '../../helpers/custom-crypto';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import { ICreateVault } from '../dashboard/interfaces';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 interface VaultData {
   vaultId: any;
   vaultUsername: string;
   vaultPassword: string;
   vaultLink: string;
+  vaultAlias: string;
   sharedUserName: string;
   sharedUserEmail: string;
   sharedSecret: string;
   isAllowedToSave: boolean;
 }
 
+/* new */
+interface Column {
+  id: 'image' | 'sender' | 'sender_email' | 'link' | 'username' | 'actions';
+  label: string;
+  minWidth?: number;
+  align?: 'right' | 'center' | 'left';
+  format?: (value: number) => string;
+}
+
+const columns: readonly Column[] = [
+  { id: 'image', label: '', minWidth: 50 },
+  {
+    id: 'sender',
+    label: 'Sender',
+    minWidth: 100,
+    align: 'left',
+  },
+  {
+    id: 'sender_email',
+    label: 'Sender Email',
+    minWidth: 100,
+    align: 'left',
+  },
+  {
+    id: 'link',
+    label: 'URI',
+    minWidth: 100,
+    align: 'center',
+  },
+  {
+    id: 'username',
+    label: 'Username',
+    minWidth: 80,
+    align: 'left',
+  },
+  {
+    id: 'actions',
+    label: 'Actions',
+    minWidth: 150,
+    align: 'center',
+  },
+];
+
+/* new */
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
   ref,
 ) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
 const ReceivedPasswordsVault = () => {
@@ -44,6 +96,7 @@ const ReceivedPasswordsVault = () => {
       vaultUsername: '',
       vaultPassword: '',
       vaultLink: '',
+      vaultAlias: '',
       sharedUserName: '',
       sharedUserEmail: '',
       sharedSecret: '',
@@ -52,6 +105,8 @@ const ReceivedPasswordsVault = () => {
   ]);
   const [receivedVaults, setReceivedVaults] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   // handler of snackbar
   const handleSnackbarClose = (
@@ -62,6 +117,17 @@ const ReceivedPasswordsVault = () => {
       return;
     }
     setSnackbarOpen(false);
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
   };
 
   const handleAddToVault = async (
@@ -78,7 +144,10 @@ const ReceivedPasswordsVault = () => {
       vaultPassword,
     );
 
-    const encryptedUsername = await CustomCrypto.encrypt(vaultKey, vaultUsername);
+    const encryptedUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      vaultUsername,
+    );
 
     const newVault: ICreateVault = {
       link: vaultLink,
@@ -166,13 +235,12 @@ const ReceivedPasswordsVault = () => {
           vault.sharedSecret,
           vault.vaultPassword,
         );
-
       });
 
       const decx = await Promise.all(decryptedVault);
 
-      const sanitizedDecryptedVaults = decx.map(
-        (value: string | undefined) => (value === undefined ? '' : value),
+      const sanitizedDecryptedVaults = decx.map((value: string | undefined) =>
+        value === undefined ? '' : value,
       );
 
       setDecryptedVaults(
@@ -199,7 +267,7 @@ const ReceivedPasswordsVault = () => {
         >
           <Alert
             onClose={handleSnackbarClose}
-            severity="success"
+            severity='success'
             sx={{ width: '100%' }}
           >
             Successfully Done!
@@ -208,8 +276,8 @@ const ReceivedPasswordsVault = () => {
         <div>
           <Typography
             sx={{ mt: 4, mb: 4 }}
-            variant="h4"
-            component="h2"
+            variant='h4'
+            component='h2'
             gutterBottom
           >
             Shared Passwords
@@ -217,7 +285,7 @@ const ReceivedPasswordsVault = () => {
 
           <Box>
             {/* map over vaultData array and display */}
-            {decryptedVaults.map((data: any, index: any) => (
+            {/* {decryptedVaults.map((data: any, index: any) => (
               <Accordion key={index} sx={{ mb: 1 }}>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
@@ -310,7 +378,179 @@ const ReceivedPasswordsVault = () => {
                   </Box>
                 </AccordionDetails>
               </Accordion>
-            ))}
+            ))} */}
+
+            {decryptedVaults.length === 0 ? (
+              <Box>
+                <Typography variant='body1' align='center'>
+                  No Vaults Found
+                </Typography>
+              </Box>
+            ) : (
+              <>
+                <TableContainer sx={{ maxHeight: 500, maxWidth: 1000 }}>
+                  <Table
+                    stickyHeader
+                    aria-label='sticky table'
+                    sx={{ minWidth: 650 }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        {columns.map((column) => (
+                          <TableCell
+                            key={column.id}
+                            align={column.align}
+                            style={{
+                              minWidth: column.minWidth,
+                              fontWeight: 'bold',
+                              fontSize: '1rem',
+                            }}
+                          >
+                            {column.label}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {decryptedVaults
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage,
+                        )
+                        .map((row) => {
+                          return (
+                            <TableRow
+                              hover
+                              role='checkbox'
+                              tabIndex={-1}
+                              key={row.vaultId}
+                              sx={{
+                                '&:last-child td, &:last-child th': {
+                                  border: 0,
+                                },
+                              }}
+                            >
+                              <TableCell align='left'>
+                                {row.vaultLink?.split('//') &&
+                                row.vaultLink.split('//')[1] ? (
+                                  <img
+                                    src={`https://icons.bitwarden.net/${
+                                      row.vaultLink.split('//')[1]
+                                    }/icon.png`}
+                                    alt='logo'
+                                    style={{
+                                      width: '30px',
+                                      height: '30px',
+                                      borderRadius: '30%',
+                                    }}
+                                  />
+                                ) : (
+                                  <img
+                                    src='https://cdn-icons-png.flaticon.com/512/3170/3170748.png'
+                                    alt='logo'
+                                    style={{ width: '30px', height: '30px' }}
+                                  />
+                                )}
+                              </TableCell>
+                              <TableCell
+                                align='left'
+                                // onClick={() => handleUpdateModalOpen(row)}
+                              >
+                                {row.sharedUserName}
+                              </TableCell>
+                              <TableCell align='left'>
+                                {row.sharedUserEmail}
+                              </TableCell>
+                              <TableCell align='left'>
+                                {row.vaultLink}
+                              </TableCell>
+                              <TableCell align='left'>
+                                {row.vaultUsername}
+                              </TableCell>
+                              <TableCell align='center'>
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    ml: 6,
+                                  }}
+                                >
+                                  <Grid container spacing={2} columns={12}>
+                                    {row.isAllowedToSave ? (
+                                      <Grid
+                                        item
+                                        xs={4}
+                                        sx={{ display: 'flex' }}
+                                      >
+                                        <Tooltip title='Save to your vault'>
+                                          <Box
+                                            onClick={() =>
+                                              handleAddToVault(
+                                                row.vaultPassword,
+                                                row.vaultUsername,
+                                                row.vaultLink,
+                                                row.vaultId,
+                                                row.vaultAlias,
+                                              )
+                                            }
+                                            sx={{ cursor: 'pointer' }}
+                                          >
+                                            <AddCircleOutlineIcon />
+                                          </Box>
+                                        </Tooltip>
+                                      </Grid>
+                                    ) : (
+                                      <Grid
+                                        item
+                                        xs={4}
+                                        sx={{ display: 'flex' }}
+                                      ></Grid>
+                                    )}
+
+                                    <Grid item xs={4} sx={{ display: 'flex' }}>
+                                      <ContentCopyIcon />
+                                      {/* <Typography
+                                        variant="caption"
+                                        sx={{
+                                          ml: 1,
+                                          display: 'flex',
+                                          alignItems: 'flex-end',
+                                        }}
+                                      >
+                                        Copy
+                                      </Typography> */}
+                                    </Grid>
+
+                                    <Grid item xs={4} sx={{ display: 'flex' }}>
+                                      <Box
+                                        onClick={() => {
+                                          handleVaultDelete(row.vaultId);
+                                        }}
+                                        sx={{ cursor: 'pointer' }}
+                                      >
+                                        <DeleteIcon />
+                                      </Box>
+                                    </Grid>
+                                  </Grid>
+                                </Box>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[10, 25, 100]}
+                  component='div'
+                  count={decryptedVaults.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </>
+            )}
           </Box>
         </div>
       </Container>

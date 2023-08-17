@@ -68,8 +68,8 @@ function ResponsiveAppBar() {
   };
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
+    <AppBar position='static'>
+      <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <img
             style={{
@@ -78,14 +78,14 @@ function ResponsiveAppBar() {
               marginRight: '1rem',
               marginLeft: '1rem',
             }}
-            src="https://clipart.coolclips.com/480/vectors/tf05191/CoolClips_vc017972.png"
-            alt="logo"
+            src='https://clipart.coolclips.com/480/vectors/tf05191/CoolClips_vc017972.png'
+            alt='logo'
           />
           <Typography
-            variant="h5"
+            variant='h5'
             noWrap
-            component="a"
-            href="/"
+            component='a'
+            href='/'
             sx={{
               mr: 10,
               display: { xs: 'none', md: 'flex' },
@@ -102,17 +102,17 @@ function ResponsiveAppBar() {
           {isLogged ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
+                size='large'
+                aria-label='account of current user'
+                aria-controls='menu-appbar'
+                aria-haspopup='true'
                 onClick={handleOpenNavMenu}
-                color="inherit"
+                color='inherit'
               >
                 <MenuIcon />
               </IconButton>
               <Menu
-                id="menu-appbar"
+                id='menu-appbar'
                 anchorEl={anchorElNav}
                 anchorOrigin={{
                   vertical: 'bottom',
@@ -132,7 +132,7 @@ function ResponsiveAppBar() {
                 {pages.map((page) => (
                   <MenuItem key={page.title} onClick={handleCloseNavMenu}>
                     <Typography
-                      textAlign="center"
+                      textAlign='center'
                       component={Link}
                       to={page.path}
                     >
@@ -146,10 +146,10 @@ function ResponsiveAppBar() {
             ''
           )}
           <Typography
-            variant="h5"
+            variant='h5'
             noWrap
-            component="a"
-            href=""
+            component='a'
+            href=''
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -186,9 +186,9 @@ function ResponsiveAppBar() {
 
           <Box sx={{ flexGrow: 0 }}>
             {isLogged ? (
-              <Tooltip title="Open settings">
+              <Tooltip title='Open settings'>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
                 </IconButton>
               </Tooltip>
             ) : (
@@ -197,7 +197,7 @@ function ResponsiveAppBar() {
 
             <Menu
               sx={{ mt: '45px' }}
-              id="menu-appbar"
+              id='menu-appbar'
               anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: 'top',
@@ -216,7 +216,7 @@ function ResponsiveAppBar() {
                   key={setting}
                   onClick={() => handleSettingsItemClick(setting)}
                 >
-                  <Typography textAlign="center">{setting}</Typography>
+                  <Typography textAlign='center'>{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

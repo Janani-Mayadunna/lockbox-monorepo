@@ -35,7 +35,7 @@ export default function LinkShareModal({
     props,
     ref,
   ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   // handlers of the modal
@@ -73,7 +73,7 @@ export default function LinkShareModal({
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
+          severity='success'
           sx={{ width: '100%' }}
         >
           Link Copied to Clipboard
@@ -83,11 +83,11 @@ export default function LinkShareModal({
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography id='modal-modal-title' variant='h6' component='h2'>
             Your password share link will expire in 1 minute
           </Typography>
           <Button onClick={handleCopyToClipboard}>Copy link</Button>

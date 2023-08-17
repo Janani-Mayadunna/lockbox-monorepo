@@ -54,14 +54,14 @@ const PublicSharedVault = () => {
       {linkExpired ? (
         // Show this box if token is expired
         <Box>
-          <h1 className="title">Shared Page</h1>
+          <h1 className='title'>Shared Page</h1>
           <h2>Oppss... </h2>
           <h3>Seems like the link has expired or invalid</h3>
         </Box>
       ) : (
         // Show this box if token is not expired
         <Box>
-          <h1 className="title">Shared Page</h1>
+          <h1 className='title'>Shared Page</h1>
           <h3>Shared password is : {decryptedSharedPW}</h3>
 
           <p>This link expires after 1 minute and cannot be viewed again</p>

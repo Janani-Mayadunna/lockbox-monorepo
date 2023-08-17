@@ -175,8 +175,8 @@ export default function UserVaultTable({
       />
       {decryptedVaults.length === 0 ? (
         <Box>
-          <Typography variant="body1" align="center">
-            No Passwords Found
+          <Typography variant='body1' align='center'>
+            No Vaults Found
           </Typography>
         </Box>
       ) : (
@@ -184,7 +184,7 @@ export default function UserVaultTable({
           <TableContainer sx={{ maxHeight: 500, maxWidth: 800 }}>
             <Table
               stickyHeader
-              aria-label="sticky table"
+              aria-label='sticky table'
               sx={{ minWidth: 650 }}
             >
               <TableHead>
@@ -211,7 +211,7 @@ export default function UserVaultTable({
                     return (
                       <TableRow
                         hover
-                        role="checkbox"
+                        role='checkbox'
                         tabIndex={-1}
                         key={row._id}
                         sx={{
@@ -219,13 +219,13 @@ export default function UserVaultTable({
                           cursor: 'pointer',
                         }}
                       >
-                        <TableCell align="left">
+                        <TableCell align='left'>
                           {row.link?.split('//') && row.link.split('//')[1] ? (
                             <img
                               src={`https://icons.bitwarden.net/${
                                 row.link.split('//')[1]
                               }/icon.png`}
-                              alt="logo"
+                              alt='logo'
                               style={{
                                 width: '30px',
                                 height: '30px',
@@ -234,20 +234,20 @@ export default function UserVaultTable({
                             />
                           ) : (
                             <img
-                              src="https://cdn-icons-png.flaticon.com/512/3170/3170748.png"
-                              alt="logo"
+                              src='https://cdn-icons-png.flaticon.com/512/3170/3170748.png'
+                              alt='logo'
                               style={{ width: '30px', height: '30px' }}
                             />
                           )}
                         </TableCell>
                         <TableCell
-                          align="left"
+                          align='left'
                           onClick={() => handleUpdateModalOpen(row)}
                         >
                           {row.name}
                         </TableCell>
-                        <TableCell align="left">{row.username}</TableCell>
-                        <TableCell align="center">
+                        <TableCell align='left'>{row.username}</TableCell>
+                        <TableCell align='center'>
                           <Box
                             sx={{
                               display: 'flex',
@@ -275,7 +275,7 @@ export default function UserVaultTable({
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
-            component="div"
+            component='div'
             count={decryptedVaults.length}
             rowsPerPage={rowsPerPage}
             page={page}

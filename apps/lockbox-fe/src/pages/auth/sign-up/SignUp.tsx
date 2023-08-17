@@ -69,18 +69,18 @@ const SignUp = () => {
             borderRadius: '2ch',
           }}
         >
-          <Typography variant="h4" paddingBottom={3} textAlign="center">
+          <Typography variant='h4' paddingBottom={3} textAlign='center'>
             {'Sign Up'}
           </Typography>
 
           <TextField
-            name="name"
+            name='name'
             value={user.name}
-            margin="normal"
-            type="text"
+            margin='normal'
+            type='text'
             required
-            label="Name"
-            variant="outlined"
+            label='Name'
+            variant='outlined'
             sx={{
               backgroundColor: 'white',
               borderRadius: '4px',
@@ -90,13 +90,13 @@ const SignUp = () => {
           />
 
           <TextField
-            name="email"
+            name='email'
             value={user.email}
-            margin="normal"
+            margin='normal'
             required
-            type="text"
-            label="Email"
-            variant="outlined"
+            type='text'
+            label='Email'
+            variant='outlined'
             sx={{
               backgroundColor: 'white',
               width: '90%',
@@ -106,13 +106,13 @@ const SignUp = () => {
           />
 
           <TextField
-            name="password"
+            name='password'
             value={user.password}
             required
-            margin="normal"
-            type="password"
-            label="Password"
-            variant="outlined"
+            margin='normal'
+            type='password'
+            label='Password'
+            variant='outlined'
             sx={{
               backgroundColor: 'white',
               width: '90%',
@@ -122,12 +122,12 @@ const SignUp = () => {
           />
 
           <TextField
-            name="salt"
+            name='salt'
             value={user.salt}
-            margin="normal"
-            type="text"
-            label="Cutom Salt"
-            variant="outlined"
+            margin='normal'
+            type='text'
+            label='Cutom Salt'
+            variant='outlined'
             sx={{
               backgroundColor: 'white',
               width: '90%',
@@ -136,8 +136,8 @@ const SignUp = () => {
             onChange={(e) => setUser({ ...user, salt: e.target.value })}
             InputProps={{
               endAdornment: (
-                <Tooltip title="Provide your own salt to encrypt data, else a custom salt would be automatically generated">
-                  <InputAdornment position="start">
+                <Tooltip title='Provide your own salt to encrypt data, else a custom salt would be automatically generated'>
+                  <InputAdornment position='start'>
                     <QuestionMarkIcon />
                   </InputAdornment>
                 </Tooltip>
@@ -147,7 +147,7 @@ const SignUp = () => {
 
           <Button
             onClick={handleSubmit}
-            type="submit"
+            type='submit'
             sx={{
               borderRadius: '4px',
               marginTop: '20px',
@@ -158,7 +158,7 @@ const SignUp = () => {
                 backgroundColor: '#f57c00',
               },
             }}
-            variant="contained"
+            variant='contained'
           >
             Sign Up
           </Button>
@@ -174,7 +174,7 @@ const SignUp = () => {
               },
             }}
           >
-            <Link to="/auth"> Already have an account? Login</Link>
+            <Link to='/auth'> Already have an account? Login</Link>
           </Button>
         </Box>
       </form>

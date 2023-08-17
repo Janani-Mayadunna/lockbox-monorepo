@@ -8,6 +8,6 @@ const API = {
   SIGNUP: {
     path: `${baseUrl}/signup`,
     method: 'POST',
-  }
+  },
 };
 export default API;

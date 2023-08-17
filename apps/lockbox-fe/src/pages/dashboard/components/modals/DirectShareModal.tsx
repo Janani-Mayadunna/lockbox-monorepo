@@ -48,7 +48,7 @@ export default function DirectShareModal({
     props,
     ref,
   ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   // handlers of the modal
@@ -145,7 +145,7 @@ export default function DirectShareModal({
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
+          severity='success'
           sx={{ width: '100%' }}
         >
           Password Shared Securely!
@@ -155,11 +155,11 @@ export default function DirectShareModal({
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography id='modal-modal-title' variant='h6' component='h2'>
             Enter the email of the person you want to share this password with
           </Typography>
 
@@ -176,13 +176,13 @@ export default function DirectShareModal({
           )} */}
 
           <Typography
-            id="modal-modal-description"
+            id='modal-modal-description'
             sx={{ mt: 2, mb: 4, justifyContent: 'center', display: 'flex' }}
           >
             <input
-              type="text"
-              name="email"
-              placeholder="Email"
+              type='text'
+              name='email'
+              placeholder='Email'
               style={{ width: '80%', padding: '15px' }}
               value={shareEmail}
               onChange={(e) => setShareEmail(e.target.value)}
@@ -192,8 +192,8 @@ export default function DirectShareModal({
           {isInvalidUser ? (
             <Box>
               <Typography
-                variant="body1"
-                component="h6"
+                variant='body1'
+                component='h6'
                 sx={{ color: 'red', mb: 3, ml: 4 }}
               >
                 * User with provided email does not exist
@@ -206,7 +206,7 @@ export default function DirectShareModal({
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <FormControlLabel
               control={<Checkbox />}
-              label="Allow the receiver to save this password to their vault"
+              label='Allow the receiver to save this password to their vault'
               sx={{ '& .MuiSvgIcon-root': { fontSize: 28 }, mb: 2 }}
               onChange={() => setIsAllowedToSave((prev) => !prev)}
             />
@@ -214,9 +214,9 @@ export default function DirectShareModal({
 
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Box display="flex" justifyContent="flex-start">
+              <Box display='flex' justifyContent='flex-start'>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   sx={{ backgroundColor: 'green' }}
                   onClick={handleDirectShare}
                 >
@@ -225,9 +225,9 @@ export default function DirectShareModal({
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <Box display="flex" justifyContent="flex-end">
+              <Box display='flex' justifyContent='flex-end'>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   onClick={handleClose}
                   sx={{ backgroundColor: 'black' }}
                 >

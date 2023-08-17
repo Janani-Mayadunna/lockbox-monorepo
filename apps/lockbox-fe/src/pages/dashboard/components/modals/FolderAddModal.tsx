@@ -17,6 +17,7 @@ const style = {
   width: 500,
   bgcolor: 'background.paper',
   boxShadow: 24,
+  borderRadius: '10px',
   p: 5,
 };
 
@@ -36,7 +37,7 @@ export default function FolderAddModal({
     props,
     ref,
   ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   // handlers of the modal
@@ -89,7 +90,7 @@ export default function FolderAddModal({
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
+          severity='success'
           sx={{ width: '100%' }}
         >
           Folder Created
@@ -99,23 +100,32 @@ export default function FolderAddModal({
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography
+            id='modal-modal-title'
+            variant='h6'
+            component='h2'
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              fontSize: '1.4rem',
+            }}
+          >
             Name your folder
           </Typography>
 
           <Typography
-            id="modal-modal-description"
+            id='modal-modal-description'
             sx={{ mt: 2, mb: 4, justifyContent: 'center', display: 'flex' }}
           >
             <input
-              type="text"
-              name="folderName"
-              placeholder="Enter folder name"
-              style={{ width: '80%', padding: '15px' }}
+              type='text'
+              name='folderName'
+              placeholder='Enter folder name'
+              style={{ width: '95%', padding: '15px' }}
               value={folderName}
               onChange={(e) => setFolderName(e.target.value)}
             />
@@ -123,10 +133,10 @@ export default function FolderAddModal({
 
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <Box display="flex" justifyContent="flex-start">
+              <Box display='flex' justifyContent='flex-start'>
                 <Button
-                  variant="contained"
-                  sx={{ backgroundColor: 'green' }}
+                  variant='contained'
+                  sx={{ backgroundColor: 'green', pr: 4, pl: 4 }}
                   onClick={handleFolderCreate}
                 >
                   Save
@@ -134,11 +144,11 @@ export default function FolderAddModal({
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <Box display="flex" justifyContent="flex-end">
+              <Box display='flex' justifyContent='flex-end'>
                 <Button
-                  variant="contained"
+                  variant='contained'
                   onClick={handleClose}
-                  sx={{ backgroundColor: 'black' }}
+                  sx={{ backgroundColor: 'black', pr: 4, pl: 4 }}
                 >
                   Close
                 </Button>
