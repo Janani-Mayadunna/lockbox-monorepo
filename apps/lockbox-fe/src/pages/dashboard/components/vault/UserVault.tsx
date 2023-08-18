@@ -12,10 +12,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
-import { IVault } from '../../interfaces';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
-import { getAllFoldersRequest, getVaultByIdRequest, getVaultRequest } from '../../redux/actions';
+import { getAllFoldersRequest, getVaultRequest } from '../../redux/actions';
 
 interface Column {
   id: 'image' | 'name' | 'username' | 'actions';

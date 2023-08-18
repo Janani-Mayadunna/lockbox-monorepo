@@ -169,7 +169,6 @@ const getVaultById = async (id: string): Promise<IVault> => {
   });
 
   const data = await response.json();
-  console.log('single vault', data);
 
   const vaultKey = getVaultKey();
   let decryptedNote = '';
