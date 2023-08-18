@@ -10,15 +10,11 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {
-  authorizedFetch,
-  getVaultKey,
-} from '../../../../../src/helpers/request-interceptor';
 import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
-import CustomCrypto from '../../../../../src/helpers/custom-crypto';
-import { IVault } from '../../interfaces';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
+import { useAppDispatch, useAppSelector } from '../../../../../src/store';
+import { getAllFoldersRequest, getVaultRequest } from '../../redux/actions';
 
 interface Column {
   id: 'image' | 'name' | 'username' | 'actions';
@@ -60,32 +56,12 @@ interface UserVaultTableProps {
 export default function UserVaultTable({
   selectedFilter,
 }: UserVaultTableProps) {
+  const dispatch = useAppDispatch();
+  const { vaults } = useAppSelector((state) => state.vaults);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [vaultData, setVaultData] = React.useState([]);
   const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState<IVault>({
-    _id: '',
-    name: '',
-    link: '',
-    username: '',
-    password: '',
-    note: '',
-    folder: '',
-
-  });
-  const [decryptedVaults, setDecryptedVaults] = React.useState<IVault[]>([
-    {
-      _id: '',
-      name: '',
-      link: '',
-      username: '',
-      password: '',
-      note: '',
-      folder: '',
-    },
-  ]);
-  const backendUrl = 'http://localhost:4000/api/vault';
+  const [selectedRow, setSelectedRow] = React.useState('');
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -98,63 +74,33 @@ export default function UserVaultTable({
     setPage(0);
   };
 
-  const handleUpdateModalOpen = async (data: any) => {
+  const handleUpdateModalOpen = async (data: string) => {
+    // dispatch(getVaultByIdRequest(data));
+
     setSelectedRow(data);
-    setOpenUpdateModal(true);
+      // setTimeout(() => {
+        setOpenUpdateModal(true);
+      // }, 1500);
   };
 
   // get all vaults API call
+  React.useEffect(() => {
+    dispatch(getVaultRequest(selectedFilter.keyword, selectedFilter.filter));
+  }, [dispatch, selectedFilter.filter, selectedFilter.keyword]);
 
   React.useEffect(() => {
-    const getAllVaults = async () => {
-      await authorizedFetch(
-        `${backendUrl}/?${selectedFilter.keyword}=${selectedFilter.filter}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          setVaultData(data);
-        })
-        .catch((err: any) => {
-          throw new Error(err);
-        });
-    };
-
-    getAllVaults();
-  }, [selectedFilter.filter, selectedFilter.keyword]);
-
-  React.useEffect(() => {
-    const decryptedPasswords = async (vaultData: any) => {
-      const vaultKey = getVaultKey();
-
-      const decryptedData = await Promise.all(
-        vaultData.map(async (row: IVault) => {
-          const decryptedVaultPW = await CustomCrypto.decrypt(
-            vaultKey,
-            row.password,
-          );
-
-          return {
-            ...row,
-            password: decryptedVaultPW,
-          };
-        }),
-      );
-      return decryptedData;
-    };
-
-    async function test() {
-      const decryptedData = await decryptedPasswords(vaultData);
-      setDecryptedVaults(decryptedData);
+    if (selectedFilter.filter === '') {
+      dispatch(getVaultRequest('', ''));
     }
+  }, [dispatch, selectedFilter]);
 
-    test();
-  }, [vaultData]);
+  React.useEffect(() => {
+    dispatch(getAllFoldersRequest());
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    console.log('selected row', selectedRow);
+  }, [selectedRow]);
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', px: 4, py: 2 }}>
@@ -163,10 +109,10 @@ export default function UserVaultTable({
         setOpenModal={setOpenUpdateModal}
         data={selectedRow}
       />
-      {decryptedVaults.length === 0 ? (
+      {vaults && vaults.length === 0 ? (
         <Box>
-          <Typography variant="body1" align="center">
-            No Passwords Found
+          <Typography variant='body1' align='center'>
+            No Vaults Found
           </Typography>
         </Box>
       ) : (
@@ -174,7 +120,7 @@ export default function UserVaultTable({
           <TableContainer sx={{ maxHeight: 500, maxWidth: 800 }}>
             <Table
               stickyHeader
-              aria-label="sticky table"
+              aria-label='sticky table'
               sx={{ minWidth: 650 }}
             >
               <TableHead>
@@ -195,73 +141,80 @@ export default function UserVaultTable({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {decryptedVaults
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row._id}
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => handleUpdateModalOpen(row)}
-                      >
-                        <TableCell align="left">
-                          {row.link?.split('//') && row.link.split('//')[1] ? (
-                            <img
-                              src={`https://icons.bitwarden.net/${
-                                row.link.split('//')[1]
-                              }/icon.png`}
-                              alt="logo"
-                              style={{
-                                width: '30px',
-                                height: '30px',
-                                borderRadius: '30%',
-                              }}
-                            />
-                          ) : (
-                            <img
-                              src="https://cdn-icons-png.flaticon.com/512/3170/3170748.png"
-                              alt="logo"
-                              style={{ width: '30px', height: '30px' }}
-                            />
-                          )}
-                        </TableCell>
-                        <TableCell align="left">{row.name}</TableCell>
-                        <TableCell align="left">{row.username}</TableCell>
-                        <TableCell align="center">
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'flex-end',
-                              ml: 6,
-                            }}
+                {vaults &&
+                  vaults
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => {
+                      return (
+                        <TableRow
+                          hover
+                          role='checkbox'
+                          tabIndex={-1}
+                          key={row._id}
+                          sx={{
+                            '&:last-child td, &:last-child th': { border: 0 },
+                          }}
+                        >
+                          <TableCell align='left'>
+                            {row.link?.split('//') &&
+                            row.link.split('//')[1] ? (
+                              <img
+                                src={`https://icons.bitwarden.net/${
+                                  row.link.split('//')[1]
+                                }/icon.png`}
+                                alt='logo'
+                                style={{
+                                  width: '30px',
+                                  height: '30px',
+                                  borderRadius: '30%',
+                                }}
+                              />
+                            ) : (
+                              <img
+                                src='https://cdn-icons-png.flaticon.com/512/3170/3170748.png'
+                                alt='logo'
+                                style={{ width: '30px', height: '30px' }}
+                              />
+                            )}
+                          </TableCell>
+                          <TableCell
+                            align='left'
+                            sx={{ cursor: 'pointer' }}
+                            onClick={() => handleUpdateModalOpen(row._id)}
                           >
-                            <Grid container spacing={0} columns={12}>
-                              <Grid item xs={4}>
-                                <CustomizedMenus
-                                  password={row.password}
-                                  username={row.username}
-                                  link={row.link}
-                                />
+                            {row.name}
+                          </TableCell>
+                          <TableCell align='left'>{row.username}</TableCell>
+                          <TableCell align='center'>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                ml: 6,
+                              }}
+                            >
+                              <Grid container spacing={0} columns={12}>
+                                <Grid item xs={4}>
+                                  <CustomizedMenus
+                                    password={row.password}
+                                    username={row.username}
+                                    link={row.link}
+                                    alias={row.name}
+                                  />
+                                </Grid>
                               </Grid>
-                            </Grid>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
               </TableBody>
             </Table>
           </TableContainer>
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={decryptedVaults.length}
+            component='div'
+            count={vaults!.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

@@ -111,7 +111,7 @@ export class VaultController {
   }
 
   //update a single vault in the array and display
-  @Put(':id')
+  @Put('/:id')
   @UseGuards(AuthGuard('jwt'))
   async updateOneUserVault(
     @getCurrentUserId() userId: string,

@@ -5,7 +5,7 @@ export interface IFolder {
 
 export interface IVault {
   _id: string;
-  category?: string;
+  category: string;
   name: string;
   folder?: string;
   link?: string;
@@ -24,8 +24,17 @@ export interface ICreateVault {
   note?: string;
 }
 
+export interface IUpdateVault {
+  category?: string;
+  name: string;
+  folder?: string;
+  link?: string;
+  username: string;
+  password: string;
+  note?: string;
+}
+
 export enum CategoryTypes {
-    LOGIN = 'Login',
-    SECRET_NOTE = 'Secret Note',
-  }
-  
+  LOGIN = 'Login',
+  SECRET_NOTE = 'Secret Note',
+}

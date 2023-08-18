@@ -6,15 +6,14 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { Grid, Snackbar, Tooltip } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import {
-  authorizedFetch,
-  getVaultKey,
-} from '../../../../../src/helpers/request-interceptor';
+import { getVaultKey } from '../../../../../src/helpers/request-interceptor';
 import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 import GenPassModal from './GenPassModal';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import '../../styles/VaultAddModal.css';
 import { ICreateVault, IFolder } from '../../interfaces';
+import { useAppDispatch, useAppSelector } from '../../../../../src/store';
+import { createVaultRequest } from '../../redux/actions';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -34,6 +33,9 @@ interface ShareModalProps {
 }
 
 export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
+  const dispatch = useAppDispatch();
+  const { folders } = useAppSelector((state) => state.vaults);
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [vaultData, setVaultData] = React.useState({
     category: '',
@@ -46,14 +48,13 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
   });
   const [characterCount, setCharacterCount] = React.useState(0);
   const [openGeneratorModal, setOpenGeneratorModal] = React.useState(false);
-  const [folders, setFolders] = React.useState<IFolder[]>([]);
   const maxCharacters = 300;
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
     props,
     ref,
   ) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
   // handlers of the modal
@@ -97,22 +98,6 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     setCharacterCount(value.length);
   };
 
-  const getAllFolders = async () => {
-    authorizedFetch('http://localhost:4000/api/user-folder', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setFolders(data);
-      })
-      .catch((err) => {
-        throw new Error('Failed to get folders' + err.message);
-      });
-  };
-
   const handleSubmit = async (e: any) => {
     if (!vaultData.username || !vaultData.password) {
       return;
@@ -125,41 +110,28 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     const vaultPW = vaultData.password;
 
     const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
+    const encryptedUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      vaultData.username,
+    );
+    const encryptedNote = await CustomCrypto.encrypt(vaultKey, vaultData.note);
 
-    console.log('encryptedVaultPW', encryptedVaultPW);
+    console.log('encryptedUsername', encryptedUsername);
 
     const newVault: ICreateVault = {
       category: vaultData.category,
       name: vaultData.name,
       folder: vaultData.folder,
       link: vaultData.link,
-      username: vaultData.username,
+      username: encryptedUsername,
       password: encryptedVaultPW,
-      note: vaultData.note,
+      note: encryptedNote,
     };
 
     console.log('newVault', newVault);
 
-    // const decryptedDataj = await CustomCrypto.decrypt(vaultKey, encryptedVaultPW);
-    //   console.log('decrypted data', decryptedDataj);
-
-    authorizedFetch('http://localhost:4000/api/vault', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVault),
-    })
-      .then((res) => {
-        if (res.status !== 201) {
-          throw new Error('Failed to create vault');
-        } else {
-          return res.json();
-        }
-      })
-      .catch((err) => {
-        throw new Error('Failed to create vault' + err.message);
-      });
+    dispatch(createVaultRequest(newVault));
+    handleClose();
   };
 
   // update category state
@@ -169,9 +141,9 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     }
   }, [vaultData, vaultData.category]);
 
-  React.useEffect(() => {
-    getAllFolders();
-  }, []);
+  // React.useEffect(() => {
+  //   dispatch(getAllFoldersRequest());
+  // }, [dispatch]);
 
   return (
     <div>
@@ -187,7 +159,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
+          severity='success'
           sx={{ width: '100%' }}
         >
           Folder Created
@@ -197,8 +169,8 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-labelledby='modal-modal-title'
+        aria-describedby='modal-modal-description'
       >
         <Box sx={style}>
           <Box
@@ -208,7 +180,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
               marginTop: '20px',
             }}
           >
-            <Typography variant="h5">Add Vault</Typography>
+            <Typography variant='h5'>Add Vault</Typography>
           </Box>
           <Box
             sx={{
@@ -225,24 +197,22 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                 }}
               >
                 {/* Main Grid Container */}
-                <Grid container spacing={1} alignItems="center">
+                <Grid container spacing={1} alignItems='center'>
                   {/* 1. Grid item containing category input */}
                   <Grid item xs={6}>
-                    <label htmlFor="category">Vault Category</label>
+                    <label htmlFor='category'>Vault Category</label>
                     <select
-                      name="category"
-                      id="category"
-                      value={vaultData.category}
-                      className="input-field"
+                      name='category'
+                      id='category'
+                      defaultValue={vaultData.category}
+                      className='input-field'
                       style={{ marginBottom: '10px', padding: '5px' }}
                       onChange={(e) =>
                         setVaultData({ ...vaultData, category: e.target.value })
                       }
                     >
-                      <option value="Login" selected>
-                        Login
-                      </option>
-                      <option value="Secret Note">Note</option>
+                      <option value='Login'>Login</option>
+                      <option value='Secret Note'>Note</option>
                     </select>
                   </Grid>
                   <Grid item xs={6}>
@@ -258,12 +228,12 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                     sx={{ pt: '8px', pb: '8px' }}
                   >
                     <Grid item xs={6}>
-                      <label htmlFor="name">Alias</label>
+                      <label htmlFor='name'>Alias</label>
                       <input
-                        type="text"
+                        type='text'
                         value={vaultData.name}
-                        name="name"
-                        className="input-field"
+                        name='name'
+                        className='input-field'
                         style={{ marginBottom: '10px', padding: '5px' }}
                         onChange={(e) =>
                           setVaultData({
@@ -274,12 +244,12 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                       />
                     </Grid>
                     <Grid item xs={6}>
-                      <label htmlFor="folder">Choose Folder</label>
+                      <label htmlFor='folder'>Choose Folder</label>
                       <select
-                        name="folder"
-                        id="folder"
-                        value={vaultData.folder}
-                        className="input-field"
+                        name='folder'
+                        id='folder'
+                        defaultValue={vaultData.folder}
+                        className='input-field'
                         style={{ marginBottom: '10px', padding: '5px' }}
                         onChange={(e) =>
                           setVaultData({
@@ -288,7 +258,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                           })
                         }
                       >
-                        <option value="value" selected></option>
+                        <option value='value'></option>
                         {folders.map((folder: IFolder) => (
                           <option key={folder._id} value={folder._id}>
                             {folder.folderName}
@@ -303,12 +273,12 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                       {/* 3. Grid item containing username input and password input */}
                       <Grid container item xs={12} spacing={4}>
                         <Grid item xs={6}>
-                          <label htmlFor="username">Username</label>
+                          <label htmlFor='username'>Username</label>
                           <input
                             value={vaultData.username}
-                            name="username"
+                            name='username'
                             required
-                            className="input-field"
+                            className='input-field'
                             style={{
                               marginBottom: '10px',
                               padding: '5px',
@@ -325,14 +295,14 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                         <Grid container item xs={6}>
                           {/* 3.1 Grid item containing password input and generator button */}
                           <Grid item xs={10}>
-                            <label htmlFor="password">Password</label>
+                            <label htmlFor='password'>Password</label>
                             <input
-                              id="password"
-                              type="password"
+                              id='password'
+                              type='password'
                               value={vaultData.password}
-                              name="password"
+                              name='password'
                               required
-                              className="input-field"
+                              className='input-field'
                               style={{ marginBottom: '10px', padding: '5px' }}
                               onChange={(e) =>
                                 setVaultData({
@@ -342,16 +312,17 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                               }
                             />
                           </Grid>
-                          <Grid item xs={2} 
-                                sx={{display: 'flex', alignItems: 'center' }}
-                          
+                          <Grid
+                            item
+                            xs={2}
+                            sx={{ display: 'flex', alignItems: 'center' }}
                           >
-                            <Tooltip title="Generate safe password" arrow>
+                            <Tooltip title='Generate safe password' arrow>
                               <Button
                                 onClick={handleGeneratorModalOpen}
-                                type="button"
-                                variant="text"
-                                sx={{ color: 'green'}}
+                                type='button'
+                                variant='text'
+                                sx={{ color: 'green' }}
                               >
                                 <AutoAwesomeTwoToneIcon
                                   sx={{ fontSize: '2rem', mt: 1 }}
@@ -364,13 +335,13 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
 
                       {/* 4. Grid item containing URI input */}
                       <Grid item xs={6}>
-                        <label htmlFor="link">URI</label>
+                        <label htmlFor='link'>URI</label>
                         <input
-                          type="text"
+                          type='text'
                           value={vaultData.link}
-                          name="link"
-                          placeholder="https://example.com"
-                          className="input-field"
+                          name='link'
+                          placeholder='https://example.com'
+                          className='input-field'
                           style={{ marginBottom: '10px', padding: '5px' }}
                           onChange={(e) =>
                             setVaultData({ ...vaultData, link: e.target.value })
@@ -385,16 +356,17 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
 
                   {/* 5. Grid item containing note input */}
                   <Grid item xs={12}>
-                    <label htmlFor="note">Note</label>
+                    <label htmlFor='note'>Note</label>
                     <textarea
-                      id="note"
-                      typeof="text"
-                      name="note"
-                      className="input-field"
+                      id='note'
+                      typeof='text'
+                      name='note'
+                      className='input-field'
                       value={vaultData.note}
                       onChange={handleNoteChange}
                       rows={3}
                       cols={50}
+                      maxLength={maxCharacters}
                       style={{
                         resize: 'vertical',
                         maxWidth: '100%',
@@ -404,7 +376,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
 
                     {characterCount <= 300 ? (
                       <Typography
-                        variant="body2"
+                        variant='body2'
                         sx={{
                           display: 'flex',
                           justifyContent: 'flex-start',
@@ -418,7 +390,7 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                       </Typography>
                     ) : (
                       <Typography
-                        variant="body2"
+                        variant='body2'
                         sx={{
                           display: 'flex',
                           justifyContent: 'flex-end',
@@ -436,9 +408,9 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
                   <Grid container item xs={8} spacing={2}>
                     <Grid item xs={3}>
                       <Button
-                        type="submit"
+                        type='submit'
                         onClick={handleSubmit}
-                        variant="contained"
+                        variant='contained'
                         sx={{
                           marginBottom: '10px',
                           backgroundColor: '#007bff',
@@ -451,9 +423,9 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
 
                     <Grid item xs={4}>
                       <Button
-                        type="reset"
+                        type='reset'
                         onClick={() => handleReset()}
-                        variant="contained"
+                        variant='contained'
                         sx={{
                           marginBottom: '10px',
                           backgroundColor: '#6c757d',

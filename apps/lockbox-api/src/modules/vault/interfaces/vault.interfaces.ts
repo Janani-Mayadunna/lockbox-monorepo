@@ -20,12 +20,12 @@ export interface ICreateVault {
 }
 
 export interface IUpdateVault {
+  category?: string;
   link?: string;
   username?: string;
   password?: string;
   note?: string;
   folder?: UserFolder;
-  category?: string;
   name?: string;
 }
 

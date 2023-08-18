@@ -6,27 +6,34 @@ export function generateSalt() {
 
 export function generateUserKeyPair(): any {
   const userECDHKeyPair: crypto.ECDH = crypto.createECDH('secp256k1');
+
   userECDHKeyPair.generateKeys();
+
   const userPublicKey = userECDHKeyPair.getPublicKey().toString('base64');
-  const userPrivateKey = userECDHKeyPair.getPrivateKey();
+  const userPrivateKey = userECDHKeyPair.getPrivateKey().toString('base64');
+
   return { userPublicKey, userPrivateKey };
 }
 
 export function restoreUserECDH(userPrivateKey: Buffer) {
   const userECDHKeyPair: crypto.ECDH = crypto.createECDH('secp256k1');
   userECDHKeyPair.setPrivateKey(userPrivateKey);
+
   return userECDHKeyPair;
 }
 
 export function computeSharedSecret(
-  userPrivateKey: Buffer,
+  userPrivateKey: string,
   otherUserPublicKey: string,
 ): string {
-  const restoredUserECDHKeyPair = restoreUserECDH(userPrivateKey);
+  const privateKeyBuffer = Buffer.from(userPrivateKey, 'base64');
+  const restoredUserECDHKeyPair = restoreUserECDH(privateKeyBuffer);
+
   const sharedSecret = restoredUserECDHKeyPair.computeSecret(
     otherUserPublicKey,
     'base64',
     'hex',
   );
+
   return sharedSecret;
 }

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 export default class CustomCrypto {
-  private static iteration = 3000;
+  private static iteration = 100000;
   private static encryptionAlgorithm = 'AES-GCM';
   private static ivLength = 12;
   private static saltLength = 16;

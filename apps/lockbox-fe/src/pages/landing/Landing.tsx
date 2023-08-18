@@ -8,7 +8,7 @@ const Landing = () => {
     <div>
       <Container>
         <Box sx={{ marginTop: '3rem', marginBottom: '2rem' }}>
-          <Typography variant="h3">Landing Page</Typography>
+          <Typography variant='h3'>Landing Page</Typography>
         </Box>
         <br />
 

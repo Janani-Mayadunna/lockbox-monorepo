@@ -17,6 +17,7 @@ interface MenuParameters {
   password: string;
   username: string;
   link?: string;
+  alias: string;
 }
 
 const StyledMenu = styled((props: MenuProps) => (
@@ -66,7 +67,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
   ref,
 ) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
 //props for the menu
@@ -75,6 +76,7 @@ export default function CustomizedMenus({
   password,
   username,
   link,
+  alias,
 }: MenuParameters) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -161,13 +163,13 @@ export default function CustomizedMenus({
       <DirectShareModal
         open={openDirectShareModal}
         setOpenModal={setOpenDirectShareModal}
-        ModalData={{ password, username, link } as MenuParameters}
+        ModalData={{ password, username, link, alias } as MenuParameters}
       />
 
       <Button
-        id="demo-customized-button"
+        id='demo-customized-button'
         aria-controls={open ? 'demo-customized-menu' : undefined}
-        aria-haspopup="true"
+        aria-haspopup='true'
         aria-expanded={open ? 'true' : undefined}
         disableElevation
         onClick={handleClick}
@@ -181,14 +183,14 @@ export default function CustomizedMenus({
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
+          severity='success'
           sx={{ width: '100%' }}
         >
           Password Copied to Clipboard
         </Alert>
       </Snackbar>
       <StyledMenu
-        id="demo-customized-menu"
+        id='demo-customized-menu'
         MenuListProps={{
           'aria-labelledby': 'demo-customized-button',
         }}
@@ -212,7 +214,7 @@ export default function CustomizedMenus({
           </MenuItem>
         </Tooltip> */}
 
-        <Tooltip title="Share password with other users" arrow>
+        <Tooltip title='Share password with other users' arrow>
           <MenuItem onClick={handleDirectShareModalOpen}>
             <SendIcon />
             Direct Share

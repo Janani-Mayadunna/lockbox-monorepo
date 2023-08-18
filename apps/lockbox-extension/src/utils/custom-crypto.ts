@@ -116,7 +116,7 @@ export default class CustomCrypto {
       // return encrypted string
       return base64Buff;
     } catch (error) {
-      console.error(`Error: ${error}`);
+      // console.error(`Error: ${error}`);
       return '';
     }
   }
@@ -167,7 +167,7 @@ export default class CustomCrypto {
       // Returns the result of running encoding's decoder.
       return CustomCrypto.decoder.decode(decryptedContent);
     } catch (error) {
-      console.error(`Error: ${error}`);
+      // console.error(`Error: ${error}`);
       return '';
     }
   }

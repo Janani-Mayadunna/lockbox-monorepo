@@ -1,9 +1,8 @@
 import ROUTE from '../constants/route';
 import Auth from '../pages/auth/login/Auth.tsx';
-import Dashboard from '../pages/dashboard/Dashboard.tsx';
+import Dashboard from '../pages/dashboard/index.tsx';
 import { Route, Routes } from 'react-router-dom';
 import Landing from '../pages/landing/Landing.tsx';
-import PasswordAdd from '../pages/add-password/PasswordAdd.tsx';
 import SignUp from '../pages/auth/sign-up/SignUp.tsx';
 import PublicSharedVault from '../pages/public-shared/index.tsx';
 import ReceivedPasswordsVault from '../pages/vault-received/index.tsx';
@@ -26,17 +25,13 @@ const routers = [
     component: Dashboard,
   },
   {
-    path: ROUTE.PASSWORD_VAULT_ADD,
-    component: PasswordAdd,
-  },
-  {
     path: ROUTE.PUBLIC_SHARED,
     component: PublicSharedVault,
   },
   {
     path: ROUTE.USERS_SHARED,
     component: ReceivedPasswordsVault,
-  }
+  },
 ];
 
 const Router = () => (

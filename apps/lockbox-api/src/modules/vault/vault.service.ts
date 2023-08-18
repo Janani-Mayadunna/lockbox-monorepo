@@ -50,12 +50,6 @@ export class VaultService {
       throw new NotFoundException(`User not found`);
     }
 
-    if (vault.note?.length > 300) {
-      throw new BadRequestException(
-        'Note length exceeds the limit of 300 characters',
-      );
-    }
-
     Object.assign(vault, { user: currentUser._id });
     const newVault: Vault = await this.vaultModel.create(vault);
     currentUser.vaults.push(newVault);
@@ -232,11 +226,12 @@ export class VaultService {
     return otherUserPublicKey;
   }
 
-  async getUserPrivateKey(userId: string): Promise<Buffer> {
+  async getUserPrivateKey(userId: string): Promise<string> {
     const user = await this.userModel.findById(userId);
     if (!user) {
       throw new NotFoundException(`User not found to fetch private key`);
     }
+
     const userPrivateKey = user.privateKey;
     return userPrivateKey;
   }
@@ -272,6 +267,7 @@ export class VaultService {
         vaultLink: createSharedVaultData.vaultLink,
         vaultUsername: createSharedVaultData.vaultUsername,
         vaultPassword: createSharedVaultData.vaultPassword,
+        vaultAlias: createSharedVaultData.vaultAlias,
         sharedUserEmail: senderEmail,
         sharedUserName: senderName,
         isAllowedToSave: createSharedVaultData.isAllowedToSave,

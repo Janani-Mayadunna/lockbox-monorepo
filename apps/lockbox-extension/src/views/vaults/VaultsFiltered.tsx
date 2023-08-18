@@ -24,7 +24,14 @@ const VaultsFiltered = (props: Props) => {
               onClick={() => navigate('/vaults/update', { state: vault })}
               key={vault._id}
               variant='outlined'
-              sx={{ backgroundColor: '#91b9ce', p: 0, mt: 1, ml: 1, mr: 1 }}
+              sx={{
+                backgroundColor: '#91b9ce',
+                p: 0,
+                mt: 1,
+                ml: 1,
+                mr: 1,
+                cursor: 'pointer',
+              }}
             >
               <CardContent
                 style={{

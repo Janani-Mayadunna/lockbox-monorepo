@@ -108,6 +108,7 @@ const Vaults: React.FC<{}> = () => {
         <TextField
           variant='outlined'
           fullWidth
+          size='medium'
           placeholder='Search...'
           sx={{ padding: 0 }}
           InputProps={{

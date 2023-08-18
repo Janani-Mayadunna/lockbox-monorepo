@@ -8,6 +8,9 @@ import {
   LOGOUT_FAILURE,
   LOGOUT_REQUEST,
   LOGOUT_SUCCESS,
+  SIGNUP_FAILURE,
+  SIGNUP_REQUEST,
+  SIGNUP_SUCCESS,
 } from './actionTypes';
 import {
   GetCurrentuser,
@@ -22,6 +25,11 @@ import {
   LogoutFailure,
   LogoutRequest,
   LogoutSuccess,
+  SignupFailure,
+  SignupRequest,
+  SignupRequestPayload,
+  SignupSuccess,
+  SignupSuccessPayload,
 } from './types';
 
 export const loginRequest = (payload: LoginPayload): LoginRequest => ({
@@ -66,4 +74,23 @@ export const logoutSuccess = (): LogoutSuccess => ({
 export const logoutFailure = (error: any): LogoutFailure => ({
   type: LOGOUT_FAILURE,
   payload: { error },
+});
+
+export const signupRequest = (
+  payload: SignupRequestPayload,
+): SignupRequest => ({
+  type: SIGNUP_REQUEST,
+  payload,
+});
+
+export const signupSuccess = (
+  payload: SignupSuccessPayload,
+): SignupSuccess => ({
+  type: SIGNUP_SUCCESS,
+  payload,
+});
+
+export const signupFailure = (payload: any): SignupFailure => ({
+  type: SIGNUP_FAILURE,
+  payload,
 });

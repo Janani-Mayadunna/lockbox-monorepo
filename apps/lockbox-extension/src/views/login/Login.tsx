@@ -1,9 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { hashPassword } from '../../utils/crypto';
-import { getAllVaults, userLogin } from '../../utils/api';
-import { chromeStorageGet } from '../../utils/chrome-utils';
-import { authorizedFetch } from '../../utils/request-interceptor';
+import { userLogin } from '../../utils/api';
+import { Container } from '@mui/material';
 
 const Login: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -38,7 +37,6 @@ const Login: React.FC<{}> = () => {
     });
   };
 
-  
   React.useEffect(() => {
     chrome.storage.local.get(['token']).then((result) => {
       if (result.token) {
@@ -75,44 +73,48 @@ const Login: React.FC<{}> = () => {
   // }, []);
 
   return (
-    <div>
-      <h1>LockBox Password Manager</h1>
+    <Container
+      sx={{ height: '400px', minWidth: '300px', overflowY: 'scroll', pb: 8 }}
+    >
       <div>
-        <label htmlFor='email'>Email:</label>
-        <input
-          type='text'
-          id='email'
-          value={data.email}
-          onChange={(e) => setData({ ...data, email: e.target.value })}
-        />
-      </div>
-      <div>
-        <label htmlFor='password'>Password:</label>
-        <input
-          type='password'
-          id='password'
-          value={data.password}
-          onChange={(e) => setData({ ...data, password: e.target.value })}
-        />
-      </div>
-      <div>
-        <button
-          onClick={handleLogin}
-          id='save'
-          style={{
-            marginBottom: '10px',
-            marginTop: '10px',
-            color: 'black',
-          }}
-        >
-          Login
-        </button>
+        <h1>LockBox Password Manager</h1>
+        <div>
+          <label htmlFor='email'>Email:</label>
+          <input
+            type='text'
+            id='email'
+            value={data.email}
+            onChange={(e) => setData({ ...data, email: e.target.value })}
+          />
+        </div>
+        <div>
+          <label htmlFor='password'>Password:</label>
+          <input
+            type='password'
+            id='password'
+            value={data.password}
+            onChange={(e) => setData({ ...data, password: e.target.value })}
+          />
+        </div>
+        <div>
+          <button
+            onClick={handleLogin}
+            id='save'
+            style={{
+              marginBottom: '10px',
+              marginTop: '10px',
+              color: 'black',
+            }}
+          >
+            Login
+          </button>
 
-        <button onClick={() => navigate('/dashboard')}>Go to dash</button>
+          <button onClick={() => navigate('/dashboard')}>Go to dash</button>
 
-        <br />
+          <br />
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 

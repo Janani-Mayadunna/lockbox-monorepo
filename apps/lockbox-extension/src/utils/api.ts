@@ -7,7 +7,7 @@ import {
   getVaultKey,
 } from './request-interceptor';
 
-const backendUrl = 'http://localhost:4000/api';
+export const backendUrl = 'http://localhost:4000/api';
 
 export function userLogin(email: string, hashedPassword: string) {
   fetch(`${backendUrl}/auth/login`, {
@@ -177,7 +177,7 @@ export async function getDecryptedAllVaults() {
 
   const vaultData = await new Promise<string[] | null>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === 'getAllVaults') {
+      if (message.action === 'updateAllVaults') {
         resolve(message.userVaults || null);
       }
     });
@@ -242,7 +242,7 @@ export async function getFolders() {
 
 export async function getByCategories(keyword: string[]) {
   //get all vaults
-  chrome.runtime.sendMessage({ action: 'getAllVaults' })
+  chrome.runtime.sendMessage({ action: 'getAllVaults' });
 
   const userVaults = await new Promise<string[] | []>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -252,14 +252,54 @@ export async function getByCategories(keyword: string[]) {
     });
   });
 
-  console.log('all vaults for categories', userVaults)
+  console.log('all vaults for categories', userVaults);
 
   // get all vaults which have category = keyword
   const vaultsByCategories = userVaults.filter((vault: any) => {
-    return vault.category === keyword
-  })
+    return vault.category === keyword;
+  });
 
-  console.log('vaults by categories', vaultsByCategories)
+  console.log('vaults by categories', vaultsByCategories);
 
   return vaultsByCategories;
+}
+
+async function getTabVaultsFromStorage() {
+  chrome.runtime.sendMessage({ action: 'getTabVaults' });
+
+  const tabVaults = await new Promise<string[] | []>((resolve) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.action === 'updateTabVaults') {
+        resolve(message.tabVaults || []);
+      }
+    });
+  });
+
+  console.log('tab vaults api', tabVaults);
+
+  return tabVaults;
+}
+
+export async function decryptTabVaults() {
+  const vaultKey = await getVaultKey();
+
+  const tabVaults = await getTabVaultsFromStorage();
+
+  const decryptedData = await Promise.all(
+    tabVaults.map(async (row: any) => {
+      const decryptedVaultPW = await CustomCrypto.decrypt(
+        vaultKey,
+        row.password
+      );
+
+      return {
+        ...row,
+        password: decryptedVaultPW,
+      };
+    })
+  );
+
+  console.log('decrypted tab vaults', decryptedData);
+
+  return decryptedData;
 }

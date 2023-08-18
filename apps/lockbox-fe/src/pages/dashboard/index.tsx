@@ -1,7 +1,7 @@
 import { Box, Button, Container, Grid, Tooltip } from '@mui/material';
 import UserVaultTable from './components/vault/UserVault';
 import FilterBar from './components/filters-bar/FiltersSidebar';
-import ResponsiveAppBar from '../../../src/components/global/AppBar';
+import ResponsiveAppBar from '../../components/global/AppBar';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 import React from 'react';
@@ -81,9 +81,9 @@ const Dashboard: React.FC = () => {
                   </Box>
 
                   <Box>
-                    <Tooltip title="Add new folder">
+                    <Tooltip title='Add new folder'>
                       <Button
-                        variant="text"
+                        variant='text'
                         sx={{ marginRight: '10px' }}
                         onClick={handleNewFolderModalOpen}
                       >
@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
 
                     {/* <Link to="/password-vault/add"> */}
                     <Button
-                      variant="contained"
+                      variant='contained'
                       sx={{ backgroundColor: 'green' }}
                       onClick={handleNewVaultModalOpen}
                     >

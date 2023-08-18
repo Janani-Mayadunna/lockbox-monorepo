@@ -11,7 +11,7 @@ function authInterceptor(request: Request): Request {
 
 export function authorizedFetch(
   url: string,
-  options: RequestInit
+  options: RequestInit,
 ): Promise<Response> {
   const request = new Request(url, options);
   const interceptedRequest = authInterceptor(request);
