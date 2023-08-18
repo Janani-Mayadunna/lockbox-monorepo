@@ -1,4 +1,4 @@
-import { ICreateVault, IFolder, IVault } from '../interfaces';
+import { ICreateVault, IFolder, IUpdateVault, IVault } from '../interfaces';
 import {
   CREATE_VAULT_FAILURE,
   CREATE_VAULT_REQUEST,
@@ -9,6 +9,12 @@ import {
   GET_VAULTS_FAILURE,
   GET_VAULTS_REQUEST,
   GET_VAULTS_SUCCESS,
+  GET_VAULT_BY_ID_FAILURE,
+  GET_VAULT_BY_ID_REQUEST,
+  GET_VAULT_BY_ID_SUCCESS,
+  UPDATE_VAULT_FAILURE,
+  UPDATE_VAULT_REQUEST,
+  UPDATE_VAULT_SUCCESS,
 } from './actionTypes';
 
 /* STATE OF VAULT */
@@ -89,6 +95,41 @@ export type GetAllFoldersFailure = {
   payload: any;
 };
 
+/* Update vault */
+export type UpdateVaultRequest = {
+  type: typeof UPDATE_VAULT_REQUEST;
+  payload: {
+    id: string;
+    data: IUpdateVault;
+  };
+};
+
+export type UpdateVaultSuccess = {
+  type: typeof UPDATE_VAULT_SUCCESS;
+  payload: any;
+};
+
+export type UpdateVaultFailure = {
+  type: typeof UPDATE_VAULT_FAILURE;
+  payload: any;
+};
+
+/* Get vault by id */
+export type GetVaultByIdRequest = {
+  type: typeof GET_VAULT_BY_ID_REQUEST;
+  payload: string;
+};
+
+export type GetVaultByIdSuccess = {
+  type: typeof GET_VAULT_BY_ID_SUCCESS;
+  payload: IVault;
+};
+
+export type GetVaultByIdFailure = {
+  type: typeof GET_VAULT_BY_ID_FAILURE;
+  payload: any;
+};
+
 export type VaultAction =
   | GetVaultRequest
   | GetVaultsSuccess
@@ -98,4 +139,10 @@ export type VaultAction =
   | CreateVaultFailure
   | GetAllFoldersRequest
   | GetAllFoldersSuccess
-  | GetAllFoldersFailure;
+  | GetAllFoldersFailure
+  | UpdateVaultRequest
+  | UpdateVaultSuccess
+  | UpdateVaultFailure
+  | GetVaultByIdRequest
+  | GetVaultByIdSuccess
+  | GetVaultByIdFailure;

@@ -1,4 +1,4 @@
-import { ICreateVault, IFolder } from '../interfaces';
+import { ICreateVault, IFolder, IUpdateVault, IVault } from '../interfaces';
 import {
   CREATE_VAULT_FAILURE,
   CREATE_VAULT_REQUEST,
@@ -9,6 +9,12 @@ import {
   GET_VAULTS_FAILURE,
   GET_VAULTS_REQUEST,
   GET_VAULTS_SUCCESS,
+  GET_VAULT_BY_ID_FAILURE,
+  GET_VAULT_BY_ID_REQUEST,
+  GET_VAULT_BY_ID_SUCCESS,
+  UPDATE_VAULT_FAILURE,
+  UPDATE_VAULT_REQUEST,
+  UPDATE_VAULT_SUCCESS,
 } from './actionTypes';
 import {
   CreateVaultFailure,
@@ -17,11 +23,17 @@ import {
   GetAllFoldersFailure,
   GetAllFoldersRequest,
   GetAllFoldersSuccess,
+  GetVaultByIdFailure,
+  GetVaultByIdRequest,
+  GetVaultByIdSuccess,
   GetVaultRequest,
   GetVaultsFailure,
   GetVaultsFailurePayload,
   GetVaultsSuccess,
   GetVaultsSuccessPayload,
+  UpdateVaultFailure,
+  UpdateVaultRequest,
+  UpdateVaultSuccess,
 } from './types';
 
 /* Get all vaults*/
@@ -80,5 +92,43 @@ export const getAllFoldersSuccess = (
 
 export const getAllFoldersFailure = (payload: any): GetAllFoldersFailure => ({
   type: GET_ALL_FOLDERS_FAILURE,
+  payload,
+});
+
+/* Update a vault */
+export const updateVaultRequest = (
+  payload: {
+    id: string;
+    data: IUpdateVault;
+  },
+): UpdateVaultRequest => ({
+  type: UPDATE_VAULT_REQUEST,
+  payload,
+});
+
+export const updateVaultSuccess = (payload: any): UpdateVaultSuccess => ({
+  type: UPDATE_VAULT_SUCCESS,
+  payload,
+});
+
+export const updateVaultFailure = (payload: any): UpdateVaultFailure => ({
+  type: UPDATE_VAULT_FAILURE,
+  payload,
+});
+
+export const getVaultByIdRequest = (
+  id: string,
+): GetVaultByIdRequest => ({
+  type: GET_VAULT_BY_ID_REQUEST,
+  payload: id ,
+});
+
+export const getVaultByIdSuccess = (payload: IVault): GetVaultByIdSuccess => ({
+  type: GET_VAULT_BY_ID_SUCCESS,
+  payload,
+});
+
+export const getVaultByIdFailure = (payload: any): GetVaultByIdFailure => ({
+  type: GET_VAULT_BY_ID_FAILURE,
   payload,
 });
