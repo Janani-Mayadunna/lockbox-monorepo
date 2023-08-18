@@ -1,0 +1,14 @@
+image: node:14
+
+pipelines:
+  default:
+    - step:
+        name: Build Frontend and Backend
+        script:
+          - npm install -g pnpm
+          - pnpm install
+          - pnpm run --filter lockbox-api build
+          - pnpm run --filter lockbox-fe build
+        artifacts:
+          - lockbox-api/build/**
+          - lockbox-fe/build/**
