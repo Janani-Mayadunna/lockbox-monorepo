@@ -14,7 +14,7 @@ import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 import GenPassModal from './GenPassModal';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import '../../styles/VaultAddModal.css';
-import { IFolder, IUpdateVault, IVault } from '../../interfaces';
+import { IFolder, IUpdateVault } from '../../interfaces';
 import {
   MenuItem,
   TextField,
@@ -66,7 +66,6 @@ export default function VaultUpdateModal({
   const [openGeneratorModal, setOpenGeneratorModal] = React.useState(false);
   const [folders, setFolders] = React.useState<IFolder[]>([]);
   const [showPassword, setShowPassword] = React.useState(false);
-  const [isDataSet, setIsDataSet] = React.useState(true);
 
   const maxCharacters = 300;
 
