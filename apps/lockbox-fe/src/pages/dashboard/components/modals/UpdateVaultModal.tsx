@@ -14,7 +14,17 @@ import CustomCrypto from '../../../../../src/helpers/custom-crypto';
 import GenPassModal from './GenPassModal';
 import AutoAwesomeTwoToneIcon from '@mui/icons-material/AutoAwesomeTwoTone';
 import '../../styles/VaultAddModal.css';
-import { ICreateVault, IFolder } from '../../interfaces';
+import { IFolder, IUpdateVault, IVault } from '../../interfaces';
+import {
+  MenuItem,
+  TextField,
+  InputAdornment,
+  IconButton,
+  OutlinedInput,
+} from '@mui/material';
+import { VisibilityOff, Visibility } from '@mui/icons-material';
+import { useAppDispatch, useAppSelector } from '../../../../../src/store';
+import { getVaultByIdRequest, updateVaultRequest } from '../../redux/actions';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -31,7 +41,7 @@ const style = {
 interface ShareModalProps {
   open: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-  data: any;
+  data: string;
 }
 
 export default function VaultUpdateModal({
@@ -39,19 +49,25 @@ export default function VaultUpdateModal({
   setOpenModal,
   data,
 }: ShareModalProps) {
+  const dispatch = useAppDispatch();
+  const { singleVault, loading } = useAppSelector((state) => state.vaults);
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [vaultData, setVaultData] = React.useState({
-    category: '',
-    name: '',
-    folder: '',
-    username: '',
-    password: '',
-    link: '',
-    note: '',
+    category: singleVault ? singleVault.category : '',
+    name: singleVault ? singleVault.name : '',
+    folder: singleVault ? singleVault.folder : '',
+    username: singleVault ? singleVault.username : '',
+    password: singleVault ? singleVault.password : '',
+    link: singleVault ? singleVault.link : '',
+    note: singleVault ? singleVault.note : '',
   });
   const [characterCount, setCharacterCount] = React.useState(0);
   const [openGeneratorModal, setOpenGeneratorModal] = React.useState(false);
   const [folders, setFolders] = React.useState<IFolder[]>([]);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isDataSet, setIsDataSet] = React.useState(true);
+
   const maxCharacters = 300;
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -61,10 +77,19 @@ export default function VaultUpdateModal({
     return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+  };
+
   // handlers of the modal
   const handleClose = () => {
     setOpenModal(false);
     handleReset();
+    setShowPassword(false);
   };
 
   const handleGeneratorModalOpen = () => {
@@ -118,69 +143,70 @@ export default function VaultUpdateModal({
       });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleUpdate = async (e: any) => {
     if (!vaultData.username || !vaultData.password) {
       return;
     }
+    let encryptedNote = '';
 
     e.preventDefault();
-    handleReset();
 
     const vaultKey = getVaultKey();
     const vaultPW = vaultData.password;
 
     const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
+    const encryptedUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      vaultData.username,
+    );
 
-    console.log('encryptedVaultPW', encryptedVaultPW);
+    if (vaultData.note) {
+      encryptedNote = await CustomCrypto.encrypt(vaultKey, vaultData.note);
+    }
 
-    const newVault: ICreateVault = {
+    const newVault: IUpdateVault = {
       category: vaultData.category,
       name: vaultData.name,
       folder: vaultData.folder,
       link: vaultData.link,
-      username: vaultData.username,
+      username: encryptedUsername,
       password: encryptedVaultPW,
-      note: vaultData.note,
+      note: encryptedNote,
     };
 
     console.log('newVault', newVault);
 
-    // const decryptedDataj = await CustomCrypto.decrypt(vaultKey, encryptedVaultPW);
-    //   console.log('decrypted data', decryptedDataj);
+    const payload = {
+      id: data,
+      data: newVault,
+    };
 
-    authorizedFetch('http://localhost:4000/api/vault', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVault),
-    })
-      .then((res) => {
-        if (res.status !== 201) {
-          throw new Error('Failed to create vault');
-        } else {
-          return res.json();
-        }
-      })
-      .catch((err) => {
-        throw new Error('Failed to create vault' + err.message);
-      });
+    dispatch(updateVaultRequest(payload));
   };
 
-  // update category state
   React.useEffect(() => {
-    if (vaultData.category === '') {
-      setVaultData({ ...vaultData, category: 'Login' });
+    if (open) {
+      dispatch(getVaultByIdRequest(data));
     }
-  }, [vaultData, vaultData.category]);
+  }, [dispatch, data, open]);
+
+  React.useEffect(() => {
+    if (singleVault) {
+      setVaultData({
+        category: singleVault.category,
+        name: singleVault.name,
+        folder: singleVault.folder ? singleVault.folder : '',
+        username: singleVault.username,
+        password: singleVault.password,
+        link: singleVault.link ? singleVault.link : '',
+        note: singleVault.note ? singleVault.note : '',
+      });
+    }
+  }, [singleVault]);
 
   React.useEffect(() => {
     getAllFolders();
   }, []);
-
-  React.useEffect(() => {
-    console.log('data', data);
-  }, [data]);
 
   return (
     <div>
@@ -217,7 +243,7 @@ export default function VaultUpdateModal({
               marginTop: '20px',
             }}
           >
-            <Typography variant='h5'>Add Vault</Typography>
+            {/* <Typography variant='h5'>Add Vault</Typography> */}
           </Box>
           <Box
             sx={{
@@ -234,246 +260,264 @@ export default function VaultUpdateModal({
                 }}
               >
                 {/* Main Grid Container */}
-                <Grid container spacing={1} alignItems='center'>
-                  {/* 1. Grid item containing category input */}
-                  <Grid item xs={6}>
-                    <label htmlFor='category'>Vault Category</label>
-                    <select
-                      name='category'
-                      id='category'
-                      value={vaultData.category}
-                      className='input-field'
-                      style={{ marginBottom: '10px', padding: '5px' }}
-                      onChange={(e) =>
-                        setVaultData({ ...vaultData, category: e.target.value })
-                      }
-                    >
-                      <option value='Login' selected>
-                        Login
-                      </option>
-                      <option value='Secret Note'>Note</option>
-                    </select>
-                  </Grid>
-                  <Grid item xs={6}>
-                    {/* Empty */}
-                  </Grid>
-
-                  {/* 2. Grid item containing alias input and folder input */}
-                  <Grid
-                    container
-                    item
-                    xs={12}
-                    spacing={4}
-                    sx={{ pt: '8px', pb: '8px' }}
-                  >
+                {loading ? (
+                  <div>Loading...</div>
+                ) : (
+                  <Grid container spacing={1} alignItems='center'>
+                    {/* 1. Grid item containing category input */}
                     <Grid item xs={6}>
-                      <label htmlFor='name'>Alias</label>
-                      <input
-                        type='text'
-                        value={vaultData.name}
-                        name='name'
+                      <label htmlFor='category'>Vault Category</label>
+                      <TextField
+                        select
+                        name='category'
+                        id='category'
+                        value={vaultData.category}
+                        variant='outlined'
+                        size='small'
                         className='input-field'
-                        style={{ marginBottom: '10px', padding: '5px' }}
+                        style={{ marginBottom: '10px' }}
                         onChange={(e) =>
                           setVaultData({
                             ...vaultData,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <label htmlFor='folder'>Choose Folder</label>
-                      <select
-                        name='folder'
-                        id='folder'
-                        value={vaultData.folder}
-                        className='input-field'
-                        style={{ marginBottom: '10px', padding: '5px' }}
-                        onChange={(e) =>
-                          setVaultData({
-                            ...vaultData,
-                            folder: e.target.value,
+                            category: e.target.value,
                           })
                         }
                       >
-                        <option value='value' selected></option>
-                        {folders.map((folder: IFolder) => (
-                          <option key={folder._id} value={folder._id}>
-                            {folder.folderName}
-                          </option>
-                        ))}
-                      </select>
+                        <MenuItem value='Login'>Login</MenuItem>
+                        <MenuItem value='Secret Note'>Note</MenuItem>
+                      </TextField>
                     </Grid>
-                  </Grid>
+                    <Grid item xs={6}>
+                      {/* Empty */}
+                    </Grid>
 
-                  {vaultData.category === 'Login' ? (
-                    <>
-                      {/* 3. Grid item containing username input and password input */}
-                      <Grid container item xs={12} spacing={4}>
-                        <Grid item xs={6}>
-                          <label htmlFor='username'>Username</label>
-                          <input
-                            value={vaultData.username}
-                            name='username'
-                            required
-                            className='input-field'
-                            style={{
-                              marginBottom: '10px',
-                              padding: '5px',
-                              // backgroundColor: 'rgb(234 234 234 / 50%)',
-                            }}
-                            onChange={(e) =>
-                              setVaultData({
-                                ...vaultData,
-                                username: e.target.value,
-                              })
-                            }
-                          />
-                        </Grid>
-                        <Grid container item xs={6}>
-                          {/* 3.1 Grid item containing password input and generator button */}
-                          <Grid item xs={10}>
-                            <label htmlFor='password'>Password</label>
-                            <input
-                              id='password'
-                              type='password'
-                              value={vaultData.password}
-                              name='password'
+                    {/* 2. Grid item containing alias input and folder input */}
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      spacing={4}
+                      sx={{ pt: '8px', pb: '8px' }}
+                    >
+                      <Grid item xs={6}>
+                        <label htmlFor='name'>Alias</label>
+                        <TextField
+                          type='text'
+                          value={vaultData.name}
+                          name='name'
+                          variant='outlined'
+                          size='small'
+                          className='input-field'
+                          style={{ marginBottom: '10px' }}
+                          onChange={(e) =>
+                            setVaultData({ ...vaultData, name: e.target.value })
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <label htmlFor='folder'>Folder</label>
+                        <TextField
+                          select
+                          name='folder'
+                          id='folder'
+                          value={vaultData.folder}
+                          variant='outlined'
+                          size='small'
+                          className='input-field'
+                          style={{ marginBottom: '10px' }}
+                          onChange={(e) =>
+                            setVaultData({
+                              ...vaultData,
+                              folder: e.target.value,
+                            })
+                          }
+                        >
+                          <MenuItem value=''></MenuItem>
+                          {folders.map((folder: IFolder) => (
+                            <MenuItem key={folder._id} value={folder._id}>
+                              {folder.folderName}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Grid>
+                    </Grid>
+
+                    {vaultData.category === 'Login' ? (
+                      <>
+                        {/* 3. Grid item containing username input and password input */}
+                        <Grid container item xs={12} spacing={4}>
+                          <Grid item xs={6}>
+                            <label htmlFor='username'>Username</label>
+                            <TextField
+                              type='text'
+                              value={vaultData.username}
+                              name='username'
                               required
+                              variant='outlined'
+                              size='small'
                               className='input-field'
-                              style={{ marginBottom: '10px', padding: '5px' }}
+                              style={{ marginBottom: '10px' }}
                               onChange={(e) =>
                                 setVaultData({
                                   ...vaultData,
-                                  password: e.target.value,
+                                  username: e.target.value,
                                 })
                               }
                             />
                           </Grid>
-                          <Grid item xs={2}>
-                            <Tooltip title='Generate safe password' arrow>
-                              <Button
-                                onClick={handleGeneratorModalOpen}
-                                type='button'
-                                variant='text'
-                                sx={{ color: 'green' }}
-                              >
-                                <AutoAwesomeTwoToneIcon
-                                  sx={{ fontSize: '2rem' }}
-                                />
-                              </Button>
-                            </Tooltip>
+                          <Grid container item xs={6}>
+                            {/* 3.1 Grid item containing password input and generator button */}
+                            <Grid item xs={10}>
+                              <label htmlFor='password'>Password</label>
+
+                              <OutlinedInput
+                                sx={{ width: '100%' }}
+                                id='outlined-adornment-password'
+                                type={showPassword ? 'text' : 'password'}
+                                size='small'
+                                onChange={(e) =>
+                                  setVaultData({
+                                    ...vaultData,
+                                    password: e.target.value,
+                                  })
+                                }
+                                endAdornment={
+                                  <InputAdornment position='end'>
+                                    <IconButton
+                                      aria-label='toggle password visibility'
+                                      onClick={handleClickShowPassword}
+                                      onMouseDown={handleMouseDownPassword}
+                                      edge='end'
+                                    >
+                                      {showPassword ? (
+                                        <VisibilityOff />
+                                      ) : (
+                                        <Visibility />
+                                      )}
+                                    </IconButton>
+                                  </InputAdornment>
+                                }
+                                label='Password'
+                                value={vaultData.password}
+                              />
+                            </Grid>
+                            <Grid item xs={2} sx={{ display: 'flex' }}>
+                              <Tooltip title='Generate safe password' arrow>
+                                <Button
+                                  onClick={handleGeneratorModalOpen}
+                                  type='button'
+                                  variant='text'
+                                  sx={{ color: 'green' }}
+                                >
+                                  <AutoAwesomeTwoToneIcon
+                                    sx={{ fontSize: '2rem', mt: '10px' }}
+                                  />
+                                </Button>
+                              </Tooltip>
+                            </Grid>
                           </Grid>
                         </Grid>
-                      </Grid>
 
-                      {/* 4. Grid item containing URI input */}
-                      <Grid item xs={6}>
-                        <label htmlFor='link'>URI</label>
-                        <input
-                          type='text'
-                          value={vaultData.link}
-                          name='link'
-                          placeholder='https://example.com'
-                          className='input-field'
-                          style={{ marginBottom: '10px', padding: '5px' }}
-                          onChange={(e) =>
-                            setVaultData({ ...vaultData, link: e.target.value })
-                          }
-                        />
-                      </Grid>
-                      <Grid item xs={6}></Grid>
-                    </>
-                  ) : (
-                    ''
-                  )}
-
-                  {/* 5. Grid item containing note input */}
-                  <Grid item xs={12}>
-                    <label htmlFor='note'>Note</label>
-                    <textarea
-                      id='note'
-                      typeof='text'
-                      name='note'
-                      className='input-field'
-                      value={vaultData.note}
-                      onChange={handleNoteChange}
-                      rows={3}
-                      cols={50}
-                      style={{
-                        resize: 'vertical',
-                        maxWidth: '100%',
-                        minHeight: '80px',
-                      }}
-                    />
-
-                    {characterCount <= 300 ? (
-                      <Typography
-                        variant='body2'
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'flex-start',
-                          marginRight: '5px',
-                          color: 'green',
-                          marginBottom: '15px',
-                        }}
-                      >
-                        Remaining Characters:{' '}
-                        {maxCharacters - vaultData.note.length} / 300
-                      </Typography>
+                        {/* 4. Grid item containing URI input */}
+                        <Grid item xs={6}>
+                          <label htmlFor='link'>URI</label>
+                          <TextField
+                            type='text'
+                            value={vaultData.link}
+                            name='link'
+                            placeholder='https://example.com'
+                            variant='outlined'
+                            size='small'
+                            className='input-field'
+                            style={{ marginBottom: '10px' }}
+                            onChange={(e) =>
+                              setVaultData({
+                                ...vaultData,
+                                link: e.target.value,
+                              })
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}></Grid>
+                      </>
                     ) : (
-                      <Typography
-                        variant='body2'
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'flex-end',
-                          color: 'red',
-                          marginRight: '5px',
-                          marginBottom: '15px',
-                        }}
-                      >
-                        Passed maximum character count
-                      </Typography>
+                      ''
                     )}
-                  </Grid>
 
-                  {/* 6. Grid item containing submit button */}
-                  <Grid container item xs={8} spacing={2}>
-                    <Grid item xs={3}>
-                      <Button
-                        type='submit'
-                        onClick={handleSubmit}
-                        variant='contained'
-                        sx={{
-                          marginBottom: '10px',
-                          backgroundColor: '#007bff',
-                          color: 'black',
-                        }}
-                      >
-                        Submit
-                      </Button>
+                    {/* 5. Grid item containing note input */}
+                    <Grid item xs={12}>
+                      <label htmlFor='note'>Note</label>
+                      <TextField
+                        id='note'
+                        name='note'
+                        multiline
+                        variant='outlined'
+                        size='small'
+                        className='input-field'
+                        value={vaultData.note}
+                        onChange={handleNoteChange}
+                        rows={3}
+                        inputProps={{ maxLength: maxCharacters }}
+                        style={{ resize: 'vertical', marginBottom: '10px' }}
+                      />
+
+                      <Box sx={{ mt: 6 }}>
+                        {characterCount <= 300 ? (
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'flex-start',
+                              marginRight: '5px',
+                              color: 'green',
+                              marginBottom: '15px',
+                            }}
+                          >
+                            Remaining Characters:{' '}
+                            {vaultData.note && vaultData.note !== ''
+                              ? maxCharacters - vaultData.note.length
+                              : maxCharacters}{' '}
+                            / 300
+                          </Typography>
+                        ) : (
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                              color: 'red',
+                              marginRight: '5px',
+                              marginBottom: '15px',
+                            }}
+                          >
+                            Passed maximum character count
+                          </Typography>
+                        )}
+                      </Box>
                     </Grid>
 
-                    <Grid item xs={4}>
-                      <Button
-                        type='reset'
-                        onClick={() => handleReset()}
-                        variant='contained'
-                        sx={{
-                          marginBottom: '10px',
-                          backgroundColor: '#6c757d',
-                          color: 'black',
-                        }}
-                      >
-                        Reset
-                      </Button>
+                    {/* 6. Grid item containing submit button */}
+                    <Grid container item xs={8} spacing={2}>
+                      <Grid item xs={6}>
+                        <Button
+                          type='submit'
+                          onClick={handleUpdate}
+                          variant='contained'
+                          sx={{
+                            marginBottom: '10px',
+                            backgroundColor: '#007bff',
+                            color: 'black',
+                          }}
+                        >
+                          Save
+                        </Button>
+                      </Grid>
+                    </Grid>
+                    <Grid item xs={2}>
+                      {/* Empty */}
                     </Grid>
                   </Grid>
-                  <Grid item xs={4}>
-                    {/* Empty */}
-                  </Grid>
-                </Grid>
+                )}
               </form>
             </Box>
           </Box>

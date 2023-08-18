@@ -12,7 +12,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
-import { IVault } from '../../interfaces';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
 import { getAllFoldersRequest, getVaultRequest } from '../../redux/actions';
@@ -62,15 +61,7 @@ export default function UserVaultTable({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState<IVault>({
-    _id: '',
-    name: '',
-    link: '',
-    username: '',
-    password: '',
-    note: '',
-    folder: '',
-  });
+  const [selectedRow, setSelectedRow] = React.useState('');
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -83,9 +74,13 @@ export default function UserVaultTable({
     setPage(0);
   };
 
-  const handleUpdateModalOpen = async (data: any) => {
+  const handleUpdateModalOpen = async (data: string) => {
+    // dispatch(getVaultByIdRequest(data));
+
     setSelectedRow(data);
-    setOpenUpdateModal(true);
+      // setTimeout(() => {
+        setOpenUpdateModal(true);
+      // }, 1500);
   };
 
   // get all vaults API call
@@ -102,6 +97,10 @@ export default function UserVaultTable({
   React.useEffect(() => {
     dispatch(getAllFoldersRequest());
   }, [dispatch]);
+
+  React.useEffect(() => {
+    console.log('selected row', selectedRow);
+  }, [selectedRow]);
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', px: 4, py: 2 }}>
@@ -154,7 +153,6 @@ export default function UserVaultTable({
                           key={row._id}
                           sx={{
                             '&:last-child td, &:last-child th': { border: 0 },
-                            cursor: 'pointer',
                           }}
                         >
                           <TableCell align='left'>
@@ -181,7 +179,8 @@ export default function UserVaultTable({
                           </TableCell>
                           <TableCell
                             align='left'
-                            onClick={() => handleUpdateModalOpen(row)}
+                            sx={{ cursor: 'pointer' }}
+                            onClick={() => handleUpdateModalOpen(row._id)}
                           >
                             {row.name}
                           </TableCell>

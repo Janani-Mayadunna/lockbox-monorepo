@@ -5,7 +5,7 @@ export interface IFolder {
 
 export interface IVault {
   _id: string;
-  category?: string;
+  category: string;
   name: string;
   folder?: string;
   link?: string;
@@ -15,6 +15,16 @@ export interface IVault {
 }
 
 export interface ICreateVault {
+  category?: string;
+  name: string;
+  folder?: string;
+  link?: string;
+  username: string;
+  password: string;
+  note?: string;
+}
+
+export interface IUpdateVault {
   category?: string;
   name: string;
   folder?: string;

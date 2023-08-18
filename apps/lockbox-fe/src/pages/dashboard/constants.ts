@@ -13,6 +13,14 @@ const API = {
     path: `${BASE_URL}/user-folder`,
     method: 'GET',
   },
+  UPDATE_VAULT: {
+    path: `${BASE_URL}/vault`,
+    method: 'PUT',
+  },
+  GET_SINGLE_VAULT: {
+    path: `${BASE_URL}/vault/vaults`,
+    method: 'GET',
+  },
 };
 
 export default API;
