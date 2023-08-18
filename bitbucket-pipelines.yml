@@ -5,6 +5,7 @@ pipelines:
     - step:
         name: Build Frontend and Backend
         script:
+          - npm install -g pnpm
           - pnpm install --filter lockbox-api
           - pnpm install --filter lockbox-fe
           - pnpm run --filter lockbox-api build
