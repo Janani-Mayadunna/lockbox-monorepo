@@ -11,23 +11,27 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Snackbar,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { backendUrl, getFolders } from '../../../utils/api';
-import {
-  authorizedFetch,
-  getVaultKey,
-} from '../../../utils/request-interceptor';
-import { ICreateVault, IFolder } from '../../../interfaces/vault.interfaces';
-import CustomCrypto from '../../../utils/custom-crypto';
+import { createVault, getFolders } from '../../../utils/api';
+import { IFolder } from '../../../interfaces/vault.interfaces';
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
 
 const VaultsAdd = () => {
   const [vaultData, setVaultData] = React.useState({
-    category: '',
+    category: 'Login',
     name: '',
     folder: '',
     username: '',
@@ -38,6 +42,8 @@ const VaultsAdd = () => {
   const [characterCount, setCharacterCount] = React.useState(0);
   const [folders, setFolders] = React.useState([]);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
 
   const maxCharacters = 300;
   const navigate = useNavigate();
@@ -45,6 +51,17 @@ const VaultsAdd = () => {
   const getAllFolders = async () => {
     const userFolder = await getFolders();
     setFolders(userFolder);
+  };
+
+  // handler of snackbar
+  const handleSnackbarClose = (
+    e?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -75,46 +92,19 @@ const VaultsAdd = () => {
     setCharacterCount(0);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     handleReset();
 
-    const vaultKey = await getVaultKey();
+    const success = await createVault(vaultData);
 
-    const vaultPW = vaultData.password;
-
-    const encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, vaultPW);
-
-    console.log('encrypted vault pw', encryptedVaultPW);
-
-    const newVault: ICreateVault = {
-      category: vaultData.category,
-      name: vaultData.name,
-      folder: vaultData.folder,
-      link: vaultData.link,
-      username: vaultData.username,
-      password: encryptedVaultPW,
-      note: vaultData.note,
-    };
-
-    console.log('new vault', newVault);
-
-    await authorizedFetch(`${backendUrl}/vault`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newVault),
-    })
-      .then((res) => {
-        if (res.status === 201) {
-          console.log('vault added');
-          navigate('/dashboard');
-        } else {
-          console.log('vault not added');
-        }
-      })
-      .catch((err) => console.log(err));
+    if (success) {
+      setIsSuccess(true);
+      setSnackbarOpen(true);
+    } else {
+      setIsSuccess(false);
+      setSnackbarOpen(true);
+    }
   };
 
   React.useEffect(() => {
@@ -122,7 +112,30 @@ const VaultsAdd = () => {
   }, []);
 
   return (
-    <Container>
+    <div>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2500}
+        onClose={handleSnackbarClose}
+      >
+        {isSuccess ? (
+          <Alert
+            onClose={handleSnackbarClose}
+            severity='success'
+            sx={{ width: '90%' }}
+          >
+            Vault Added!
+          </Alert>
+        ) : (
+          <Alert
+            onClose={handleSnackbarClose}
+            severity='error'
+            sx={{ width: '90%' }}
+          >
+            Failed to add vault!
+          </Alert>
+        )}
+      </Snackbar>
       <h1>Vaults Update</h1>
       <button style={{ margin: '16px' }} onClick={() => navigate('/dashboard')}>
         Back
@@ -153,7 +166,9 @@ const VaultsAdd = () => {
                 setVaultData({ ...vaultData, category: e.target.value })
               }
             >
-              <MenuItem value='Login'>Login</MenuItem>
+              <MenuItem selected value='Login'>
+                Login
+              </MenuItem>
               <MenuItem value='Secret Note' disabled>
                 Secret Note
               </MenuItem>
@@ -192,6 +207,7 @@ const VaultsAdd = () => {
               sx={{ backgroundColor: '#f0f4f8cc' }}
               label='Alias'
               id='name'
+              required
               name='name'
               size='small'
               defaultValue={vaultData.name}
@@ -208,6 +224,7 @@ const VaultsAdd = () => {
               sx={{ backgroundColor: '#f0f4f8cc' }}
               label='Username'
               id='username'
+              required
               name='username'
               size='small'
               defaultValue={vaultData.username}
@@ -227,12 +244,11 @@ const VaultsAdd = () => {
             }}
             variant='outlined'
           >
-            <InputLabel htmlFor='password'>
-              Password
-            </InputLabel>
+            <InputLabel htmlFor='password'>Password</InputLabel>
             <OutlinedInput
               sx={{ backgroundColor: '#f0f4f8cc' }}
               id='password'
+              required
               type={showPassword ? 'text' : 'password'}
               size='small'
               endAdornment={
@@ -340,7 +356,7 @@ const VaultsAdd = () => {
           </Button>
         </Stack>
       </Box>
-    </Container>
+    </div>
   );
 };
 

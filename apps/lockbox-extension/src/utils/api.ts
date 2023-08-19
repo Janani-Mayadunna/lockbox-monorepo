@@ -1,4 +1,4 @@
-import { IVault, Row } from '../interfaces/vault.interfaces';
+import { ICreateVault, IVault, Row } from '../interfaces/vault.interfaces';
 import { generateVaultKey } from './crypto';
 import CustomCrypto from './custom-crypto';
 import {
@@ -272,4 +272,49 @@ export async function decryptTabVaults() {
   );
 
   return decryptedData;
+}
+
+/* Create vault */
+export async function createVault(newVault: ICreateVault): Promise<boolean> {
+  const vaultKey = await getVaultKey();
+  let encryptedVaultNote = '';
+  let encryptedVaultUsername = '';
+  let encryptedVaultPW = '';
+  let success = false;
+
+  if (newVault.password !== '') {
+    encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, newVault.password);
+  }
+
+  if (newVault.username !== '') {
+    encryptedVaultUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      newVault.username
+    );
+  }
+
+  if (newVault.note !== '') {
+    encryptedVaultNote = await CustomCrypto.encrypt(vaultKey, newVault.note);
+  } else {
+    encryptedVaultNote = '';
+  }
+
+  const response = await authorizedFetch(`${backendUrl}/vault`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...newVault,
+      password: encryptedVaultPW,
+      username: encryptedVaultUsername,
+      note: encryptedVaultNote,
+    }),
+  });
+
+  if (response.status === 201) {
+    success = true;
+  }
+
+  return success;
 }
