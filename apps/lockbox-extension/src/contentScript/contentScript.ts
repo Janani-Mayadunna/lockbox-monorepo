@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'connectionEstablished') {
-    sendResponse({ response: 'Current tab url received' });
+    sendResponse({ response: 'Current tab url received', url: message.data });
   } else {
     sendResponse({ response: 'Autofill data received' });
 
@@ -28,10 +28,11 @@ const getElements = ({
     if (input.type === 'password') {
       console.log('input', input);
       input.value = password;
-    } else if (
+    } 
+    if (
       input.type === 'text' &&
-      (input.name === 'login' ||
-        input.name === 'username' ||
+      (input.name === 'username' ||
+        input.name === 'login' ||
         input.name === 'email')
     ) {
       input.value = username;
