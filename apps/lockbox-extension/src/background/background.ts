@@ -182,6 +182,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 console.log('background script running');
 
+function extractDomain(url) {
+  // Remove "https://"
+  url = url.replace(/^(https?:\/\/)?/, '');
+
+  // Remove "www."
+  url = url.replace(/^www\./, '');
+
+  // Split the URL at the first "/"
+  const parts = url.split('/');
+
+  // The first part after splitting is the domain
+  const domain = parts[0];
+
+  return domain;
+}
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.active) {
     if (tab.url?.startsWith('chrome://')) {
@@ -194,10 +210,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
       chrome.storage.local.get(['userVaults'], (result) => {
         const vaults = result.userVaults;
-        const tabVaults = vaults.filter(
-          (vault: { link: string }) =>
-            vault.link && tab.url.includes(vault.link)
-        );
+
+        const tabVaults = vaults.filter((vault: any) => {
+          const extractedDomain = extractDomain(vault.link);
+          return extractedDomain && tab.url.includes(extractedDomain);
+        });
 
         chrome.storage.local.set({ tabVaults: tabVaults });
       });
