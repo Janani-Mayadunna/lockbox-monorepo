@@ -4,6 +4,17 @@ export interface Row {
   password: string;
 }
 
+export interface IVault {
+  _id: string;
+  category: string;
+  name: string;
+  folder?: string;
+  link?: string;
+  username: string;
+  password: string;
+  note?: string;
+}
+
 export interface ICreateVault {
   link?: string;
   username: string;

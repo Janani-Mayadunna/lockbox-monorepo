@@ -43,6 +43,7 @@ const Dashboard = () => {
           position: 'absolute',
           bottom: 0,
           width: '-webkit-fill-available',
+          zIndex: 100,
         }}
       >
         <BottomNav onNavChange={handleNavChange} />

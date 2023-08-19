@@ -1,4 +1,4 @@
-import { Row } from '../interfaces/vault.interfaces';
+import { ICreateVault, IVault, Row } from '../interfaces/vault.interfaces';
 import { generateVaultKey } from './crypto';
 import CustomCrypto from './custom-crypto';
 import {
@@ -24,11 +24,6 @@ export function userLogin(email: string, hashedPassword: string) {
       response.json().then((data) => {
         if (response.status === 201) {
           const token = data.access_token;
-
-          /* Since chrome.storage.session type is not supported, I've sorted to emulate session storage 
-          instead using local storage and adding listeners for browser.runtime.onStartup, 
-          browser.runtime.onSuspend, browser.runtime.onInstalled that will clear 'session' storage data.*/
-          //   chrome.storage.
 
           chrome.runtime.sendMessage({ action: 'login' }, (response) => {
             console.log('Background script response:', response);
@@ -114,42 +109,7 @@ export async function getAllUserVaults() {
     });
 }
 
-async function decryptedPasswords(vaultData: any) {
-  const vaultKey = await getVaultKey();
-
-  const decryptedData = await Promise.all(
-    vaultData.map(async (row: Row) => {
-      const decryptedVaultPW = await CustomCrypto.decrypt(
-        vaultKey,
-        row.password
-      );
-
-      return {
-        ...row,
-        password: decryptedVaultPW,
-      };
-    })
-  );
-  return decryptedData;
-}
-
-export async function getDecryptedVaults() {
-  await getAllUserVaults();
-
-  const vaultData = await new Promise<string | null>((resolve) => {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === 'getAllUserVaults') {
-        resolve(message.userVaults || null);
-      }
-    });
-  });
-  const decryptedData = await decryptedPasswords(vaultData);
-  console.log('decrypted data', decryptedData);
-  return decryptedData;
-}
-
 // get all vaults api
-
 export async function getAllVaults() {
   await authorizedFetch('http://localhost:4000/api/vault', {
     method: 'GET',
@@ -174,6 +134,7 @@ export async function getAllVaults() {
 
 export async function getDecryptedAllVaults() {
   const vaultKey = await getVaultKey();
+  let decryptedNote = '';
 
   const vaultData = await new Promise<string[] | null>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -191,9 +152,20 @@ export async function getDecryptedAllVaults() {
         row.password
       );
 
+      const decryptedVaultUsername = await CustomCrypto.decrypt(
+        vaultKey,
+        row.username
+      );
+
+      if (row.note) {
+        decryptedNote = await CustomCrypto.decrypt(vaultKey, row.note);
+      }
+
       return {
         ...row,
         password: decryptedVaultPW,
+        username: decryptedVaultUsername,
+        note: decryptedNote,
       };
     })
   );
@@ -252,14 +224,10 @@ export async function getByCategories(keyword: string[]) {
     });
   });
 
-  console.log('all vaults for categories', userVaults);
-
   // get all vaults which have category = keyword
   const vaultsByCategories = userVaults.filter((vault: any) => {
     return vault.category === keyword;
   });
-
-  console.log('vaults by categories', vaultsByCategories);
 
   return vaultsByCategories;
 }
@@ -274,8 +242,6 @@ async function getTabVaultsFromStorage() {
       }
     });
   });
-
-  console.log('tab vaults api', tabVaults);
 
   return tabVaults;
 }
@@ -292,14 +258,63 @@ export async function decryptTabVaults() {
         row.password
       );
 
+      const decryptedVaultUsername = await CustomCrypto.decrypt(
+        vaultKey,
+        row.username
+      );
+
       return {
         ...row,
         password: decryptedVaultPW,
+        username: decryptedVaultUsername,
       };
     })
   );
 
-  console.log('decrypted tab vaults', decryptedData);
-
   return decryptedData;
+}
+
+/* Create vault */
+export async function createVault(newVault: ICreateVault): Promise<boolean> {
+  const vaultKey = await getVaultKey();
+  let encryptedVaultNote = '';
+  let encryptedVaultUsername = '';
+  let encryptedVaultPW = '';
+  let success = false;
+
+  if (newVault.password !== '') {
+    encryptedVaultPW = await CustomCrypto.encrypt(vaultKey, newVault.password);
+  }
+
+  if (newVault.username !== '') {
+    encryptedVaultUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      newVault.username
+    );
+  }
+
+  if (newVault.note !== '') {
+    encryptedVaultNote = await CustomCrypto.encrypt(vaultKey, newVault.note);
+  } else {
+    encryptedVaultNote = '';
+  }
+
+  const response = await authorizedFetch(`${backendUrl}/vault`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...newVault,
+      password: encryptedVaultPW,
+      username: encryptedVaultUsername,
+      note: encryptedVaultNote,
+    }),
+  });
+
+  if (response.status === 201) {
+    success = true;
+  }
+
+  return success;
 }

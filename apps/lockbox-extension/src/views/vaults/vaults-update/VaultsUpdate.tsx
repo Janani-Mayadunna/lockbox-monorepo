@@ -56,7 +56,7 @@ const VaultsUpdate = (props: Props) => {
   };
 
   const handleUpdateVault = async () => {
-    console.log('in update')
+    console.log('in update');
     const data = {
       name: state.name,
       username: state.username,
@@ -111,12 +111,13 @@ const VaultsUpdate = (props: Props) => {
       >
         <Stack spacing={1.5}>
           <FormControl size='small' sx={{ mt: 1.5 }}>
-            <InputLabel id='category_select'>Category</InputLabel>
-            <Select
+            <TextField
+              select
+              size='small'
               sx={{ backgroundColor: '#f0f4f8cc' }}
-              labelId='category_select'
               id='category'
-              defaultValue={state.category}
+              name='category'
+              value={state.category}
               label='Category'
               onChange={(e) =>
                 setUpdatedData({ ...updatedData, category: e.target.value })
@@ -127,32 +128,34 @@ const VaultsUpdate = (props: Props) => {
               </MenuItem>
               <MenuItem value='Login'>Login</MenuItem>
               <MenuItem value='Secret Note'>Secret Note</MenuItem>
-            </Select>
+            </TextField>
           </FormControl>
-          <FormControl size='small' sx={{ mt: 3 }}>
-            <InputLabel id='folder_select'>Folder</InputLabel>
-            <Select
+
+          {/* <FormControl size='small' sx={{ mt: 3 }}>
+            <TextField
+            select
               sx={{ backgroundColor: '#f0f4f8cc' }}
-              labelId='folder_select'
               id='folder'
-              defaultValue={state.folder}
+              name='folder'
+              value={state.folder}
               label='Folder'
               onChange={(e) =>
                 setUpdatedData({ ...updatedData, folder: e.target.value })
               }
             >
               <MenuItem value=''>
-                <em>None</em>
               </MenuItem>
               {folders &&
                 folders.map((folder: IFolder) => (
-                  <MenuItem key={folder.folderName} value={folder._id}>
+                  <MenuItem key={folder._id} value={folder._id}>
                     {folder.folderName}
                   </MenuItem>
                 ))}
-            </Select>
-          </FormControl>
+            </TextField>
+          </FormControl> */}
+
           <Divider sx={{ mt: 2, mb: 2 }} />
+
           <FormControl>
             <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
@@ -209,12 +212,13 @@ const VaultsUpdate = (props: Props) => {
                 </InputAdornment>
               }
               label='Password'
-              defaultValue={state.password}
+              value={state.password}
               onChange={(e) =>
                 setUpdatedData({ ...updatedData, password: e.target.value })
               }
             />
           </FormControl>
+
           <FormControl>
             <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
