@@ -28,7 +28,9 @@ const getElements = ({
     if (input.type === 'password') {
       console.log('input', input);
       input.value = password;
-    } 
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
     if (
       input.type === 'text' &&
       (input.name === 'username' ||
@@ -36,6 +38,12 @@ const getElements = ({
         input.name === 'email')
     ) {
       input.value = username;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    } else if (input.type === 'email') {
+      input.value = username;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }
 };
