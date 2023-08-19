@@ -4,7 +4,12 @@ import {
 } from '../../../../src/helpers/request-interceptor';
 import { ICreateVault, IFolder, IUpdateVault, IVault } from '../interfaces';
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { CreateVaultRequest, GetVaultByIdRequest, GetVaults, UpdateVaultRequest } from './types';
+import {
+  CreateVaultRequest,
+  GetVaultByIdRequest,
+  GetVaults,
+  UpdateVaultRequest,
+} from './types';
 import {
   createVaultFailure,
   createVaultSuccess,

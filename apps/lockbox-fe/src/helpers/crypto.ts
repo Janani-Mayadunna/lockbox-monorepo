@@ -68,7 +68,7 @@ export function decryptVault({
         return str;
       }
     } catch (error: any) {
-      throw new Error('Unable to decrypt', error.message);
+      throw new Error('Unable to decrypt');
     }
   } else {
     throw new Error('Unable to decrypt vault');
