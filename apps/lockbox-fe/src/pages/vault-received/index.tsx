@@ -25,6 +25,7 @@ import { ICreateVault } from '../dashboard/interfaces';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ENVIRONMENT from '../../../src/helpers/environment';
 
 interface VaultData {
   vaultId: any;
@@ -164,7 +165,7 @@ const ReceivedPasswordsVault = () => {
   };
 
   const handleVaultDelete = async (id: string) => {
-    await authorizedFetch('http://localhost:4000/api/vault/delete-received', {
+    await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/delete-received`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -189,7 +190,7 @@ const ReceivedPasswordsVault = () => {
   };
 
   const getAllReceivedVaults = async () => {
-    await authorizedFetch('http://localhost:4000/api/vault/received-vaults', {
+    await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/received-vaults`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -205,7 +206,7 @@ const ReceivedPasswordsVault = () => {
   };
 
   const createVault = async (newVault: ICreateVault) => {
-    authorizedFetch('http://localhost:4000/api/vault', {
+    authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

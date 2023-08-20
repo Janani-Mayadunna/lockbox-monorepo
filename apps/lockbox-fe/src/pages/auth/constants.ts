@@ -1,4 +1,6 @@
-const baseUrl = 'http://localhost:4000/api/auth';
+import ENVIRONMENT from "../../../src/helpers/environment";
+
+const baseUrl = `${ENVIRONMENT.BACKEND_API}/auth`;
 
 const API = {
   LOGIN: {

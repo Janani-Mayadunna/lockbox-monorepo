@@ -17,6 +17,7 @@ import {
   authorizedFetch,
   getUserSalt,
 } from '../../../helpers/request-interceptor';
+import ENVIRONMENT from '../../../../src/helpers/environment';
 
 const Auth = () => {
   const dispatch = useAppDispatch();
@@ -70,7 +71,7 @@ const Auth = () => {
   };
 
   const handleGetUser = async () => {
-    await authorizedFetch('http://localhost:4000/api/auth/current-user', {
+    await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/auth/current-user`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
