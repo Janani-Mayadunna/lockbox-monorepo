@@ -20,7 +20,10 @@ export interface IAuth {
 export interface AuthState {
   pending: boolean;
   error: string | null;
-  token: string | null;
+  token: {
+    access_token: string;
+    userId: string;
+  };
   isLoggedIn: boolean;
   message: string | null;
 }
@@ -38,7 +41,10 @@ export interface LoginPayload {
 }
 
 export interface LoginSuccessPayload {
-  token: string;
+  token: {
+    access_token: string;
+    userId: string;
+  };
 }
 
 export interface LoginFailurePayload {

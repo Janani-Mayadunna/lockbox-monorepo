@@ -145,7 +145,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
         <Collapse in={isFilterByFolderOpen}>
           <List>
             {folders &&
-              folders.map((folder: IFolder) => (
+              folders?.map((folder: IFolder) => (
                 <ListItemButton
                   sx={{ pt: 0, pb: 0, pl: 7 }}
                   key={folder._id}

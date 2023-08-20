@@ -78,9 +78,9 @@ export default function UserVaultTable({
     // dispatch(getVaultByIdRequest(data));
 
     setSelectedRow(data);
-      // setTimeout(() => {
-        setOpenUpdateModal(true);
-      // }, 1500);
+    // setTimeout(() => {
+    setOpenUpdateModal(true);
+    // }, 1500);
   };
 
   // get all vaults API call
@@ -109,7 +109,7 @@ export default function UserVaultTable({
         setOpenModal={setOpenUpdateModal}
         data={selectedRow}
       />
-      {vaults && vaults.length === 0 ? (
+      {vaults && vaults?.length === 0 ? (
         <Box>
           <Typography variant='body1' align='center'>
             No Vaults Found

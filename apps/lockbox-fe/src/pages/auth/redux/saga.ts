@@ -11,6 +11,7 @@ import {
 } from './actions';
 import {
   LoginPayload,
+  LoginSuccessPayload,
   SignupRequest,
   SignupRequestPayload,
   SignupSuccessPayload,
@@ -35,7 +36,12 @@ const login = async (payload: LoginPayload) => {
       localStorage.setItem('jwt-lockbox', JSON.stringify(token));
       localStorage.setItem('isLoggedIn', JSON.stringify(true));
 
-      return token;
+      return {
+        token: {
+          access_token: token.access_token,
+          userId: token.userId,
+        },
+      };
     } else {
       throw new Error('Login failed');
     }
@@ -46,11 +52,18 @@ const login = async (payload: LoginPayload) => {
 
 function* loginSaga(action: any) {
   try {
-    const response: { token: string } = yield call(login, {
+    const response: LoginSuccessPayload = yield call(login, {
       values: action.payload.values,
     });
 
-    yield put(loginSuccess({ token: response.token }));
+    yield put(
+      loginSuccess({
+        token: {
+          access_token: response.token.access_token,
+          userId: response.token.userId,
+        },
+      }),
+    );
   } catch (error: any) {
     yield put(loginFailure({ error: error.message }));
   }
@@ -59,7 +72,7 @@ function* loginSaga(action: any) {
 function* logoutSaga() {
   try {
     localStorage.removeItem('jwt-lockbox');
-    localStorage.setItem('isLoggedIn', JSON.stringify(false));
+    localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('current-user');
     localStorage.removeItem('VK');
 
