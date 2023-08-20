@@ -5,6 +5,7 @@ const ROUTE = {
   DASHBOARD: '/dashboard',
   PUBLIC_SHARED: '/vault/shared/:sharedToken',
   USERS_SHARED: '/vault/received',
+  USERS_RELOG: '/relog',
 };
 
 export default ROUTE;
