@@ -10,6 +10,7 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { FormControlLabel, Checkbox } from '@mui/material';
 import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
 import CustomCrypto from '../../../../../src/helpers/custom-crypto';
+import ENVIRONMENT from '../../../../../src/helpers/environment';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -73,7 +74,7 @@ export default function DirectShareModal({
   const computeAgreedSecret = () => {
     const email = shareEmail;
 
-    authorizedFetch('http://localhost:4000/api/vault/shared-secret', {
+    authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/shared-secret`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -101,7 +102,7 @@ export default function DirectShareModal({
       if (computeSecret === '') {
         console.log('computeSecret is empty');
       } else {
-        await authorizedFetch('http://localhost:4000/api/vault/direct-share', {
+        await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/direct-share`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
