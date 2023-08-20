@@ -1,4 +1,4 @@
-import ENVIRONMENT from "../../../src/helpers/environment";
+import ENVIRONMENT from '../../../src/helpers/environment';
 
 const baseUrl = `${ENVIRONMENT.BACKEND_API}/auth`;
 
@@ -10,6 +10,10 @@ const API = {
   SIGNUP: {
     path: `${baseUrl}/signup`,
     method: 'POST',
+  },
+  CURRENT_USER: {
+    path: `${baseUrl}/auth/current-user`,
+    method: 'GET',
   },
 };
 export default API;

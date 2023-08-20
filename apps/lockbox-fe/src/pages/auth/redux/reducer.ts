@@ -15,7 +15,10 @@ import { AuthAction, AuthState } from './types';
 const initialState: AuthState = {
   pending: false,
   error: null,
-  token: null,
+  token: {
+    access_token: '',
+    userId: '',
+  },
   isLoggedIn: false,
   message: null,
 };
@@ -33,15 +36,12 @@ const reducers = (state = initialState, action: AuthAction) => {
         pending: false,
         token: action.payload.token,
         error: null,
-        // isLoggedIn: true,
       };
     case LOGIN_FAILURE:
       return {
         ...state,
         pending: false,
-        token: '',
         error: action.payload.error,
-        // isLoggedIn: false,
       };
     case GET_CURRENT_USER:
       return {
@@ -75,7 +75,6 @@ const reducers = (state = initialState, action: AuthAction) => {
     case SIGNUP_FAILURE:
       return {
         ...state,
-        // success: false,
         pending: false,
         error: action.payload.error,
       };

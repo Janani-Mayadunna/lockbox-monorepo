@@ -6,8 +6,10 @@ import Landing from '../pages/landing/Landing.tsx';
 import SignUp from '../pages/auth/sign-up/SignUp.tsx';
 import PublicSharedVault from '../pages/public-shared/index.tsx';
 import ReceivedPasswordsVault from '../pages/vault-received/index.tsx';
+import AuthVerify from '../components/auth/AuthVerify.tsx';
+import UserRelog from '../pages/relog/index.tsx';
 
-const routers = [
+const publicRoutes = [
   {
     path: ROUTE.COMMON_LANDING,
     component: Landing,
@@ -20,6 +22,13 @@ const routers = [
     path: ROUTE.SIGNUP,
     component: SignUp,
   },
+  {
+    path: ROUTE.USERS_RELOG,
+    component: UserRelog,
+  },
+];
+
+const routers = [
   {
     path: ROUTE.DASHBOARD,
     component: Dashboard,
@@ -36,8 +45,19 @@ const routers = [
 
 const Router = () => (
   <Routes>
-    {routers.map((route) => (
+    {publicRoutes.map((route) => (
       <Route element={<route.component />} path={route.path} key={route.path} />
+    ))}
+    {routers.map((route) => (
+      <Route
+        element={
+          <AuthVerify>
+            <route.component />
+          </AuthVerify>
+        }
+        path={route.path}
+        key={route.path}
+      />
     ))}
   </Routes>
 );

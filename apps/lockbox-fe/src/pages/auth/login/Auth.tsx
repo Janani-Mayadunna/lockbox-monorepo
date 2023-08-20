@@ -53,8 +53,12 @@ const Auth = () => {
     };
 
     try {
-      await dispatch(loginRequest(data));
+      dispatch(loginRequest(data));
       setBackdropOpen(true);
+
+      // the time out is set because to decrypt password, username, notes and other fields it takes some time.
+      // otherwise an error is thrown because the fields are not decrypted yet
+      // ideally 2 s is enough to decrypt all fields
       setTimeout(() => {
         setBackdropOpen(false);
         navigate('/dashboard');
@@ -158,25 +162,23 @@ const Auth = () => {
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
-          <Link to='/dashboard' style={{ textDecoration: 'none' }}>
-            <Button
-              onClick={handleSubmit}
-              type='submit'
-              sx={{
-                borderRadius: '4px',
-                marginTop: '20px',
-                padding: '10px 20px',
-                backgroundColor: '#007bff',
-                color: '#fff',
-                '&:hover': {
-                  backgroundColor: '#0056b3',
-                },
-              }}
-              variant='contained'
-            >
-              Login
-            </Button>
-          </Link>
+          <Button
+            onClick={handleSubmit}
+            type='submit'
+            sx={{
+              borderRadius: '4px',
+              marginTop: '20px',
+              padding: '10px 20px',
+              backgroundColor: '#007bff',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#0056b3',
+              },
+            }}
+            variant='contained'
+          >
+            Login
+          </Button>
 
           <Button
             sx={{
@@ -189,7 +191,13 @@ const Auth = () => {
               },
             }}
           >
-            <Link to='/signup'> New here? Sign Up</Link>
+            <Link
+              to='/signup'
+              style={{ textDecoration: 'none', textTransform: 'capitalize' }}
+            >
+              {' '}
+              New here? Sign Up
+            </Link>
           </Button>
         </Box>
       </form>

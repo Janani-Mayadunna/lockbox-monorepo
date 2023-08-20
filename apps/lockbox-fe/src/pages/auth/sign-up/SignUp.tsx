@@ -57,7 +57,7 @@ const SignUp = () => {
       <form>
         <Box
           sx={{
-            backgroundColor: 'rgb(173 167 179 / 54%)',
+            backgroundColor: '#8cb1d78a',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -152,10 +152,10 @@ const SignUp = () => {
               borderRadius: '4px',
               marginTop: '20px',
               padding: '10px 20px',
-              backgroundColor: '#ff9800',
+              backgroundColor: '#2946a4',
               color: '#fff',
               '&:hover': {
-                backgroundColor: '#f57c00',
+                backgroundColor: '#192f77',
               },
             }}
             variant='contained'
@@ -174,7 +174,13 @@ const SignUp = () => {
               },
             }}
           >
-            <Link to='/auth'> Already have an account? Login</Link>
+            <Link
+              style={{ textDecoration: 'none', textTransform: 'capitalize' }}
+              to='/auth'
+            >
+              {' '}
+              Already have an account? Login
+            </Link>
           </Button>
         </Box>
       </form>
