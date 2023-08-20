@@ -9,8 +9,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import { Backdrop, Card, CircularProgress } from '@mui/material';
-import { LoginPayload, LoginSuccessPayload } from '../auth/redux/types';
-import { useAppDispatch, useAppSelector } from '../../../src/store';
+import { LoginPayload } from '../auth/redux/types';
+import { useAppDispatch } from '../../../src/store';
 import { useNavigate } from 'react-router';
 import { loginRequest, logoutRequest } from '../auth/redux/actions';
 import { generateVaultKey, hashPassword } from '../../../src/helpers/crypto';
@@ -26,9 +26,7 @@ export default function SignIn() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthentication();
   const authenticated = isAuthenticated();
-  const [isLogged, setIsLogged] = React.useState(false);
 
-  const { token }: LoginSuccessPayload = useAppSelector((state) => state.auth);
   const [backdropOpen, setBackdropOpen] = React.useState(false);
 
   const [user, setUser] = React.useState({
