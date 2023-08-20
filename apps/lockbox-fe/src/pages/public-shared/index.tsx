@@ -5,6 +5,7 @@ import { decryptVault } from '../../helpers/crypto';
 import { Box, Container } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import ENVIRONMENT from '../../../src/helpers/environment';
 
 const PublicSharedVault = () => {
   const { sharedToken } = useParams();
@@ -13,7 +14,7 @@ const PublicSharedVault = () => {
   const [linkExpired, setLinkExpired] = useState(false);
 
   const verifySharedLink = () => {
-    fetch(`http://localhost:4000/api/vault/verify-link/${sharedToken}`, {
+    fetch(`${ENVIRONMENT.BACKEND_API}/vault/verify-link/${sharedToken}`, {
       method: 'Get',
       headers: {
         'Content-Type': 'application/json',

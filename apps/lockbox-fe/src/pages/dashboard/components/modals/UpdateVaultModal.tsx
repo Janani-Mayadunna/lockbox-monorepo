@@ -25,6 +25,7 @@ import {
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
 import { getVaultByIdRequest, updateVaultRequest } from '../../redux/actions';
+import ENVIRONMENT from '../../../../../src/helpers/environment';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -127,7 +128,7 @@ export default function VaultUpdateModal({
   };
 
   const getAllFolders = async () => {
-    authorizedFetch('http://localhost:4000/api/user-folder', {
+    authorizedFetch(`${ENVIRONMENT.BACKEND_API}/user-folder`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

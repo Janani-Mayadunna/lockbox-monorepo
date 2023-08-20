@@ -8,6 +8,7 @@ import Modal from '@mui/material/Modal';
 import { Grid, Snackbar } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
+import ENVIRONMENT from '../../../../../src/helpers/environment';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -58,7 +59,7 @@ export default function FolderAddModal({
   };
 
   const handleFolderCreate = async () => {
-    authorizedFetch('http://localhost:4000/api/user-folder', {
+    authorizedFetch(`${ENVIRONMENT.BACKEND_API}/user-folder`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

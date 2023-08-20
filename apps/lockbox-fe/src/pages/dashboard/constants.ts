@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:4000/api';
+import ENVIRONMENT from "../../../src/helpers/environment";
+
+const BASE_URL = `${ENVIRONMENT.BACKEND_API}`;
 
 const API = {
   GET_VAULTS: {
