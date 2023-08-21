@@ -160,7 +160,7 @@ export default function UserVaultTable({
                             row.link.split('//')[1] ? (
                               <img
                                 src={`https://icons.bitwarden.net/${
-                                  row.link.split('//')[1]
+                                  new URL(row.link).hostname
                                 }/icon.png`}
                                 alt='logo'
                                 style={{
