@@ -7,8 +7,11 @@ import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
 import React from 'react';
 import FolderAddModal from './components/modals/FolderAddModal';
 import VaultAddModal from './components/modals/VaultAddModal';
+import { useAppDispatch } from '../../../src/store';
+import { getAllFoldersRequest } from './redux/actions';
 
 const Dashboard: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [folderModalOpen, setFolderModalOpen] = React.useState(false);
   const [vaultModalOpen, setVaultModalOpen] = React.useState(false);
   const [selectedFilter, setSelectedFilter] = React.useState({
@@ -29,6 +32,12 @@ const Dashboard: React.FC = () => {
   const handleNewVaultModalOpen = () => {
     setVaultModalOpen(true);
   };
+
+  React.useEffect(() => {
+    if (!folderModalOpen) {
+      dispatch(getAllFoldersRequest());
+    }
+  }, [dispatch, folderModalOpen]);
 
   return (
     <>
