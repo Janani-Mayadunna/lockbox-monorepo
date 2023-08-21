@@ -384,7 +384,7 @@ const ReceivedPasswordsVault = () => {
             {decryptedVaults.length === 0 ? (
               <Box>
                 <Typography variant='body1' align='center'>
-                  No Vaults Found
+                  No Items Found
                 </Typography>
               </Box>
             ) : (
