@@ -436,7 +436,7 @@ const ReceivedPasswordsVault = () => {
                                 row.vaultLink.split('//')[1] ? (
                                   <img
                                     src={`https://icons.bitwarden.net/${
-                                      row.vaultLink.split('//')[1]
+                                      new URL(row.vaultLink).hostname
                                     }/icon.png`}
                                     alt='logo'
                                     style={{

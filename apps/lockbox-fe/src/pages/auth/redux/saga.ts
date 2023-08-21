@@ -33,8 +33,8 @@ const login = async (payload: LoginPayload) => {
     if (response.status === 201) {
       const token = await response.json();
 
-      localStorage.setItem('jwt-lockbox', JSON.stringify(token));
-      localStorage.setItem('isLoggedIn', JSON.stringify(true));
+      sessionStorage.setItem('jwt-lockbox', JSON.stringify(token));
+      sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
 
       return {
         token: {
@@ -71,10 +71,10 @@ function* loginSaga(action: any) {
 
 function* logoutSaga() {
   try {
-    localStorage.removeItem('jwt-lockbox');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('current-user');
-    localStorage.removeItem('VK');
+    sessionStorage.removeItem('jwt-lockbox');
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('current-user');
+    sessionStorage.removeItem('VK');
 
     yield put(logoutSuccess());
   } catch (error: any) {
