@@ -112,7 +112,7 @@ export default function UserVaultTable({
       {vaults && vaults?.length === 0 ? (
         <Box>
           <Typography variant='body1' align='center'>
-            No Vaults Found
+            No Items Found
           </Typography>
         </Box>
       ) : (
@@ -179,8 +179,9 @@ export default function UserVaultTable({
                           </TableCell>
                           <TableCell
                             align='left'
-                            sx={{ cursor: 'pointer' }}
+                            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
                             onClick={() => handleUpdateModalOpen(row._id)}
+                            
                           >
                             {row.name}
                           </TableCell>

@@ -3,7 +3,6 @@ import { styled, alpha } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import EditIcon from '@mui/icons-material/Edit';
 import Divider from '@mui/material/Divider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -116,50 +115,8 @@ export default function CustomizedMenus({
     setOpenDirectShareModal(true);
   };
 
-  // handler of link share modal
-  // const handleLinkShareModalOpen = () => {
-  //   setOpenLinkShareModal(true);
-  // };
-
-  // handler of link share
-  // const handleLinkShare = () => {
-  //   handleLinkShareModalOpen();
-
-  //   const vaultKey = getVaultKey();
-
-  //   const encryptedSharedPassword = encryptVault({
-  //     vaultPassword: password,
-  //     vaultKey: vaultKey,
-  //   });
-
-  //   authorizedFetch('http://localhost:4000/api/vault/shared', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({ password: encryptedSharedPassword }),
-  //   })
-  //     .then((res) => res.text())
-  //     .then((data) => {
-  //       setShareLink(data);
-  //     })
-  //     .catch((err: any) => {
-  //       throw new Error(err);
-  //     });
-
-  //   handleClose();
-  // };
-
-  //handle direct share
-
   return (
     <div>
-      {/* <LinkShareModal
-        open={openLinkShareModal}
-        setOpenModal={setOpenLinkShareModal}
-        data={shareLink}
-      /> */}
-
       <DirectShareModal
         open={openDirectShareModal}
         setOpenModal={setOpenDirectShareModal}
@@ -198,21 +155,14 @@ export default function CustomizedMenus({
         open={open}
         onClose={handleClose}
       >
-        <MenuItem>
+        {/* <MenuItem>
           <EditIcon />
           Edit
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleCopyToClipboard}>
           <FileCopyIcon />
           Copy Password
         </MenuItem>
-
-        {/* <Tooltip title="Share password with non-users" arrow>
-          <MenuItem onClick={handleLinkShare}>
-            <SendIcon />
-            Share Via Link
-          </MenuItem>
-        </Tooltip> */}
 
         <Tooltip title='Share password with other users' arrow>
           <MenuItem onClick={handleDirectShareModalOpen}>
