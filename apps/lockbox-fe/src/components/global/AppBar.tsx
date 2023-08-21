@@ -81,19 +81,22 @@ function ResponsiveAppBar() {
             src='https://clipart.coolclips.com/480/vectors/tf05191/CoolClips_vc017972.png'
             alt='logo'
           />
+
           <Typography
             variant='h5'
             noWrap
-            component='a'
-            href='/'
+            component='button'
+            onClick={() => navigate('/')}
             sx={{
               mr: 10,
               display: { xs: 'none', md: 'flex' },
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
+              color: 'white',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
             }}
           >
             LockBox
