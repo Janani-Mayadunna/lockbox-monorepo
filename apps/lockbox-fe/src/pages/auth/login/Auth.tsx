@@ -9,25 +9,24 @@ import {
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import ResponsiveAppBar from '../../../components/global/AppBar';
-import { useAppDispatch } from '../../../store';
+import { useAppDispatch, useAppSelector } from '../../../store';
 import { loginRequest } from '../redux/actions';
-import { LoginPayload } from '../redux/types';
+import { LoginPayload, LoginSuccessPayload } from '../redux/types';
 import { generateVaultKey, hashPassword } from '../../../helpers/crypto';
 import {
   authorizedFetch,
   getUserSalt,
 } from '../../../helpers/request-interceptor';
 import ENVIRONMENT from '../../../../src/helpers/environment';
+import useAuthentication from '../../../../src/components/auth/hooks/use-authentication';
 
 const Auth = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthentication();
+  const authenticated = isAuthenticated();
 
-  React.useEffect(() => {
-    if (localStorage.getItem('jwt-lockbox')) {
-      navigate('/dashboard');
-    }
-  }, [navigate]);
+  const { token }: LoginSuccessPayload = useAppSelector((state) => state.auth);
 
   const [user, setUser] = useState({
     email: '',
@@ -56,48 +55,61 @@ const Auth = () => {
       dispatch(loginRequest(data));
       setBackdropOpen(true);
 
-      // the time out is set because to decrypt password, username, notes and other fields it takes some time.
-      // otherwise an error is thrown because the fields are not decrypted yet
-      // ideally 2 s is enough to decrypt all fields
       setTimeout(() => {
         setBackdropOpen(false);
-        navigate('/dashboard');
       }, 2000);
     } catch (err: any) {
       throw new Error(err);
     }
-
-    localStorage.getItem('jwt-blogapp');
-
-    setTimeout(() => {
-      handleGetUser();
-    }, 2000);
   };
 
-  const handleGetUser = async () => {
-    await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/auth/current-user`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res?) => res.json())
-      .then((data) => {
-        localStorage.setItem('current-user', JSON.stringify(data.user));
+  React.useEffect(() => {
+    // the time out is set because to decrypt password, username, notes and other fields it takes some time.
+    // otherwise an error is thrown because the fields are not decrypted yet
+    // ideally 2 s is enough to decrypt all fields
+    if (authenticated) {
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+    }
+  }, [authenticated, navigate]);
+
+  React.useEffect(() => {
+    const handleGetUser = async () => {
+      await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/auth/current-user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-      .catch((err: any) => {
-        throw new Error(err);
+        .then((res?) => res.json())
+        .then((data) => {
+          localStorage.setItem('current-user', JSON.stringify(data.user));
+        })
+        .catch((err: any) => {
+          throw new Error(err);
+        });
+
+      const salt = getUserSalt();
+
+      const vaultKey = generateVaultKey({
+        hashedPassword: hashedPassword,
+        email: user.email,
+        salt: salt,
       });
+      localStorage.setItem('VK', vaultKey);
+    };
 
-    const salt = getUserSalt();
+    if (authenticated) {
+      handleGetUser();
+    }
+  }, [authenticated, hashedPassword, token?.access_token, user.email]);
 
-    const vaultKey = generateVaultKey({
-      hashedPassword: hashedPassword,
-      email: user.email,
-      salt: salt,
-    });
-    localStorage.setItem('VK', vaultKey);
-  };
+  React.useEffect(() => {
+    if (localStorage.getItem('jwt-lockbox')) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   return (
     <div>
