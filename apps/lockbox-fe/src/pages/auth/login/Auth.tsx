@@ -32,9 +32,22 @@ const Auth = () => {
     email: '',
     password: '',
   });
+  const [passwordError, setPasswordError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+
+  let isPasswordValid = true;
+  let isEmailValid = true;
 
   const [backdropOpen, setBackdropOpen] = React.useState(false);
   const hashedPassword = hashPassword(user.password);
+
+  const passwordRegex = new RegExp(
+    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\S+$).{8,20}$/,
+  );
+
+  const emailRegex = new RegExp(
+    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+  );
 
   //handler backdrop loading state
   const handleClose = () => {
@@ -44,6 +57,13 @@ const Auth = () => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
+    isEmailValid = emailRegex.test(user.email);
+
+    isPasswordValid = passwordRegex.test(user.password);
+
+    setPasswordError(!isPasswordValid);
+    setEmailError(!isEmailValid);
+
     let data: LoginPayload = {
       values: {
         email: user.email,
@@ -51,15 +71,17 @@ const Auth = () => {
       },
     };
 
-    try {
-      dispatch(loginRequest(data));
-      setBackdropOpen(true);
+    if (isEmailValid && isPasswordValid) {
+      try {
+        dispatch(loginRequest(data));
+        setBackdropOpen(true);
 
-      setTimeout(() => {
-        setBackdropOpen(false);
-      }, 2000);
-    } catch (err: any) {
-      throw new Error(err);
+        setTimeout(() => {
+          setBackdropOpen(false);
+        }, 2000);
+      } catch (err: any) {
+        throw new Error(err);
+      }
     }
   };
 
@@ -148,7 +170,7 @@ const Auth = () => {
             name='email'
             value={user.email}
             margin='normal'
-            type='text'
+            type='email'
             label='Email'
             variant='outlined'
             sx={{
@@ -156,6 +178,9 @@ const Auth = () => {
               borderRadius: '4px',
               width: '90%',
             }}
+            inputProps={{ minLength: 3 }}
+            error={emailError}
+            helperText={emailError ? 'Invalid email' : ''}
             onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
 
@@ -171,6 +196,9 @@ const Auth = () => {
               borderRadius: '4px',
               width: '90%',
             }}
+            inputProps={{ minLength: 8 }}
+            error={passwordError}
+            helperText={passwordError ? 'Invalid Password' : ''}
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 

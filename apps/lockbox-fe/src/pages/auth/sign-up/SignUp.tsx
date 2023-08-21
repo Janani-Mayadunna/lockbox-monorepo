@@ -17,6 +17,8 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 
 const SignUp = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const { message } = useAppSelector((state) => state.auth);
 
   const [user, setUser] = useState({
@@ -25,10 +27,29 @@ const SignUp = () => {
     password: '',
     salt: '',
   });
-  const navigate = useNavigate();
+  const [passwordError, setPasswordError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+
+  let isPasswordValid = true;
+  let isEmailValid = true;
+
+  const passwordRegex = new RegExp(
+    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\S+$).{8,20}$/,
+  );
+
+  const emailRegex = new RegExp(
+    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+  );
 
   function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+
+    isEmailValid = emailRegex.test(user.email);
+
+    isPasswordValid = passwordRegex.test(user.password);
+
+    setPasswordError(!isPasswordValid);
+    setEmailError(!isEmailValid);
 
     const hashedPassword = hashPassword(user.password);
 
@@ -39,7 +60,9 @@ const SignUp = () => {
       salt: user.salt,
     };
 
-    dispatch(signupRequest(newUser));
+    if (isPasswordValid && isEmailValid) {
+      dispatch(signupRequest(newUser));
+    }
   }
 
   React.useEffect(() => {
@@ -86,6 +109,7 @@ const SignUp = () => {
               borderRadius: '4px',
               width: '90%',
             }}
+            inputProps={{ minLength: 3 }}
             onChange={(e) => setUser({ ...user, name: e.target.value })}
           />
 
@@ -94,9 +118,11 @@ const SignUp = () => {
             value={user.email}
             margin='normal'
             required
-            type='text'
+            type='email'
             label='Email'
             variant='outlined'
+            error={emailError}
+            helperText={emailError ? 'Invalid email' : ''}
             sx={{
               backgroundColor: 'white',
               width: '90%',
@@ -118,6 +144,13 @@ const SignUp = () => {
               width: '90%',
               borderRadius: '4px',
             }}
+            inputProps={{ minLength: 8 }}
+            error={passwordError}
+            helperText={
+              passwordError
+                ? 'Minimum 8 characters with atleast one uppercase, lowercase, number & special character required'
+                : ''
+            }
             onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
 
