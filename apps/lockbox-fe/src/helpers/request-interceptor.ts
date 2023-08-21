@@ -1,10 +1,13 @@
 function authInterceptor(request: Request): Request {
-  const tokenString = localStorage.getItem('jwt-lockbox');
+  let tokenString = '' as string | null;
+  tokenString = localStorage.getItem('jwt-lockbox');
   const userToken = JSON.parse(tokenString!);
-  const access_token = userToken.access_token;
+  const access_token: string = userToken.access_token;
 
   if (access_token) {
     request.headers.set('Authorization', `Bearer ${access_token}`);
+  } else {
+    request.headers.delete('Authorization');
   }
   return request;
 }

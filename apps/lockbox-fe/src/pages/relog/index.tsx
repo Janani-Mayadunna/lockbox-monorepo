@@ -9,8 +9,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import ResponsiveAppBar from '../../../src/components/global/AppBar';
 import { Backdrop, Card, CircularProgress } from '@mui/material';
-import { LoginPayload } from '../auth/redux/types';
-import { useAppDispatch } from '../../../src/store';
+import { LoginPayload, LoginSuccessPayload } from '../auth/redux/types';
+import { useAppDispatch, useAppSelector } from '../../../src/store';
 import { useNavigate } from 'react-router';
 import { loginRequest, logoutRequest } from '../auth/redux/actions';
 import { generateVaultKey, hashPassword } from '../../../src/helpers/crypto';
@@ -26,6 +26,7 @@ export default function SignIn() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthentication();
   const authenticated = isAuthenticated();
+  const { token }: LoginSuccessPayload = useAppSelector((state) => state.auth);
 
   const [backdropOpen, setBackdropOpen] = React.useState(false);
 
@@ -54,42 +55,46 @@ export default function SignIn() {
       dispatch(loginRequest(loginData));
       setBackdropOpen(true);
 
-      // if dispatch is success, navigate to dashboard
+      setTimeout(() => {
+        setBackdropOpen(false);
+      }, 2000);
     } catch (error: any) {
       throw new Error(error);
     }
 
     localStorage.getItem('jwt-blogapp');
-
-    setTimeout(() => {
-      handleGetUser();
-    }, 2000);
   };
 
-  const handleGetUser = async () => {
-    await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/auth/current-user`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res?) => res.json())
-      .then((data) => {
-        localStorage.setItem('current-user', JSON.stringify(data.user));
+  React.useEffect(() => {
+    const handleGetUser = async () => {
+      await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/auth/current-user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-      .catch((err: any) => {
-        throw new Error(err);
+        .then((res?) => res.json())
+        .then((data) => {
+          localStorage.setItem('current-user', JSON.stringify(data.user));
+        })
+        .catch((err: any) => {
+          throw new Error(err);
+        });
+
+      const salt = getUserSalt();
+
+      const vaultKey = generateVaultKey({
+        hashedPassword: hashedPassword,
+        email: user.email,
+        salt: salt,
       });
+      localStorage.setItem('VK', vaultKey);
+    };
 
-    const salt = getUserSalt();
-
-    const vaultKey = generateVaultKey({
-      hashedPassword: hashedPassword,
-      email: user.email,
-      salt: salt,
-    });
-    localStorage.setItem('VK', vaultKey);
-  };
+    if (authenticated) {
+      handleGetUser();
+    }
+  }, [authenticated, hashedPassword, token.access_token, user.email]);
 
   React.useEffect(() => {
     if (!authenticated) {
