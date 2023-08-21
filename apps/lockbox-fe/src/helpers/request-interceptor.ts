@@ -1,6 +1,6 @@
 function authInterceptor(request: Request): Request {
   let tokenString = '' as string | null;
-  tokenString = localStorage.getItem('jwt-lockbox');
+  tokenString = sessionStorage.getItem('jwt-lockbox');
   const userToken = JSON.parse(tokenString!);
   const access_token: string = userToken.access_token;
 
@@ -22,20 +22,20 @@ export function authorizedFetch(
 }
 
 export function getVaultKey(): string {
-  const storedVaultKey = localStorage.getItem('VK');
+  const storedVaultKey = sessionStorage.getItem('VK');
   const vaultKey = storedVaultKey!;
   return vaultKey;
 }
 
 export function getUserSalt(): string {
-  const storedVaultKey = localStorage.getItem('current-user');
+  const storedVaultKey = sessionStorage.getItem('current-user');
   const userData = JSON.parse(storedVaultKey!);
   const salt = userData.salt;
   return salt;
 }
 
 export function getLoggedIn(): boolean {
-  const isLoggedIn = localStorage.getItem('isLoggedIn');
+  const isLoggedIn = sessionStorage.getItem('isLoggedIn');
   const loggedIn = isLoggedIn === 'true' ? true : false;
   return loggedIn;
 }
