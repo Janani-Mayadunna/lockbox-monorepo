@@ -174,8 +174,6 @@ export default function VaultUpdateModal({
       note: encryptedNote,
     };
 
-    console.log('newVault', newVault);
-
     const payload = {
       id: data,
       data: newVault,

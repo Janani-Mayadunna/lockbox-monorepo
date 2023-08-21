@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -98,9 +97,7 @@ export default function UserVaultTable({
     dispatch(getAllFoldersRequest());
   }, [dispatch]);
 
-  React.useEffect(() => {
-    console.log('selected row', selectedRow);
-  }, [selectedRow]);
+  React.useEffect(() => {}, [selectedRow]);
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', px: 4, py: 2 }}>
@@ -179,9 +176,11 @@ export default function UserVaultTable({
                           </TableCell>
                           <TableCell
                             align='left'
-                            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                            sx={{
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                            }}
                             onClick={() => handleUpdateModalOpen(row._id)}
-                            
                           >
                             {row.name}
                           </TableCell>

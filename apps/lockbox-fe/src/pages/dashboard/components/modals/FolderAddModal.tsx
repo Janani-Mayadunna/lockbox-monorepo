@@ -69,7 +69,6 @@ export default function FolderAddModal({
       }),
     })
       .then((res) => {
-        console.log('res', res);
         if (res.status === 201) {
           setSnackbarOpen(true);
           handleClose();
