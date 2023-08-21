@@ -116,8 +116,6 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
     );
     const encryptedNote = await CustomCrypto.encrypt(vaultKey, vaultData.note);
 
-    console.log('encryptedUsername', encryptedUsername);
-
     const newVault: ICreateVault = {
       category: vaultData.category,
       name: vaultData.name,
@@ -127,8 +125,6 @@ export default function VaultAddModal({ open, setOpenModal }: ShareModalProps) {
       password: encryptedVaultPW,
       note: encryptedNote,
     };
-
-    console.log('newVault', newVault);
 
     dispatch(createVaultRequest(newVault));
     handleClose();

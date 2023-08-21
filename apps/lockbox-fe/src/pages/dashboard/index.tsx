@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
                       sx={{ backgroundColor: 'green' }}
                       onClick={handleNewVaultModalOpen}
                     >
-                      New Vault
+                      New Item
                       <EnhancedEncryptionIcon sx={{ marginLeft: '10px' }} />
                     </Button>
                     {/* </Link> */}

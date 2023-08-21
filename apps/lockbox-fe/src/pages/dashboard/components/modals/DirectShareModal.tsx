@@ -100,7 +100,6 @@ export default function DirectShareModal({
       );
 
       if (computeSecret === '') {
-        console.log('computeSecret is empty');
       } else {
         await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/direct-share`, {
           method: 'POST',
