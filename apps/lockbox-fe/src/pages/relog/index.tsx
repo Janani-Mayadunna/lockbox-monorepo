@@ -62,7 +62,7 @@ export default function SignIn() {
       throw new Error(error);
     }
 
-    localStorage.getItem('jwt-blogapp');
+    sessionStorage.getItem('jwt-blogapp');
   };
 
   React.useEffect(() => {
@@ -75,7 +75,7 @@ export default function SignIn() {
       })
         .then((res?) => res.json())
         .then((data) => {
-          localStorage.setItem('current-user', JSON.stringify(data.user));
+          sessionStorage.setItem('current-user', JSON.stringify(data.user));
         })
         .catch((err: any) => {
           throw new Error(err);
@@ -88,7 +88,7 @@ export default function SignIn() {
         email: user.email,
         salt: salt,
       });
-      localStorage.setItem('VK', vaultKey);
+      sessionStorage.setItem('VK', vaultKey);
     };
 
     if (authenticated) {

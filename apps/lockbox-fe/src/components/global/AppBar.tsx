@@ -61,7 +61,7 @@ function ResponsiveAppBar() {
     }
     if (item === 'Logout') {
       handleCloseUserMenu();
-      localStorage.removeItem('jwt-lockbox');
+      sessionStorage.removeItem('jwt-lockbox');
       dispatch(logoutRequest());
       navigate('/');
     }
