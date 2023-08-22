@@ -4,6 +4,7 @@ import BottomNav from './components/BottomNav';
 import Vaults from './components/Filters';
 import AddVault from './components/AddVault';
 import CurrentTabVaults from './components/CurrentTabVaults';
+import Settings from './components/Settings';
 
 const Dashboard = () => {
   const [selectedValue, setSelectedValue] =
@@ -30,6 +31,8 @@ const Dashboard = () => {
               <div>Generator</div>
             ) : selectedValue === 'current_tab_vaults' ? (
               <CurrentTabVaults />
+            ) : selectedValue === 'settings' ? (
+              <Settings />
             ) : (
               ''
             )}

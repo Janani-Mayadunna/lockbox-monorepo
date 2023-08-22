@@ -7,6 +7,7 @@ import {
   getVaultKey,
 } from './request-interceptor';
 
+// export const backendUrl = 'http://localhost:4000/api';
 export const backendUrl = 'https://surge-lockbox-prod.up.railway.app/api';
 
 export function userLogin(email: string, hashedPassword: string) {
@@ -111,7 +112,7 @@ export async function getAllUserVaults() {
 
 // get all vaults api
 export async function getAllVaults() {
-  await authorizedFetch('https://surge-lockbox-prod.up.railway.app/api/vault', {
+  await authorizedFetch(`${backendUrl}/vault`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ export async function getDecryptedAllVaults() {
 
 export async function setFoldersToStorage() {
   //map over userFolders and get each folder
-  await authorizedFetch(`https://surge-lockbox-prod.up.railway.app/api/user-folder`, {
+  await authorizedFetch(`${backendUrl}/user-folder`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -317,4 +318,8 @@ export async function createVault(newVault: ICreateVault): Promise<boolean> {
   }
 
   return success;
+}
+
+export const logOut = async () => {
+  await chrome.storage.local.clear();
 }

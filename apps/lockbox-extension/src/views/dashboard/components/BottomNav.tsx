@@ -6,6 +6,7 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 interface BottomNavProps {
   onNavChange: (newValue: string) => void;
@@ -28,25 +29,30 @@ export default function BottomNav({ onNavChange }: BottomNavProps) {
         onChange={handleChange}
         sx={{ pr: 1, WebkitTextStrokeWidth: 'medium' }}
       >
-        <BottomNavigationAction
+        <BottomNavigationAction sx={{ minWidth: '60px', borderBlockEnd: '1px solid #b6c9d6'}}
           label='Fill'
           value='current_tab_vaults'
           icon={<KeyboardDoubleArrowLeftIcon />}
         />
-        <BottomNavigationAction
+        <BottomNavigationAction sx={{ minWidth: '60px'}}
           label='Vaults'
           value='all_vaults'
           icon={<FolderZipIcon />}
         />
-        <BottomNavigationAction
+        <BottomNavigationAction sx={{ minWidth: '60px'}}
           label='Add'
           value='add_vault'
           icon={<AddCircleOutlineIcon />}
         />
-        <BottomNavigationAction
+        <BottomNavigationAction sx={{ minWidth: '60px'}}
           label='Generate'
           value='generator'
           icon={<AutoAwesomeIcon />}
+        />
+        <BottomNavigationAction sx={{ minWidth: '60px'}}
+          label='Settings'
+          value='settings'
+          icon={<SettingsIcon />}
         />
       </BottomNavigation>
     </Box>
