@@ -2,7 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { hashPassword } from '../../utils/crypto';
 import { userLogin } from '../../utils/api';
-import { Container } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  Container,
+  TextField,
+  Typography,
+} from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const Login: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -13,20 +22,10 @@ const Login: React.FC<{}> = () => {
   });
   const hashedPassword = hashPassword(data.password);
 
-  const handleLogin = async () => {
+  const handleLogin = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
     userLogin(data.email, hashedPassword);
-
-    // const retToken = await new Promise<string | null>((resolve) => {
-    //   chrome.runtime.sendMessage(
-    //     { action: 'getToken' },
-    //     (response) => {
-    //       console.log('Background script response:', response);
-    //       // when using use response.token
-    //     }
-    //   );
-    // });
-
-    // console.log('retToken', retToken);
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'tokenUpdated') {
@@ -45,73 +44,82 @@ const Login: React.FC<{}> = () => {
     });
   }, [navigate]);
 
-  // const getAllVaults = async () => {
-  //   await authorizedFetch('https://surge-lockbox-prod.up.railway.app/api/vault', {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       console.log('just data login', data);
-  //       // chrome.runtime.sendMessage(
-  //       //   { action: 'setAllUserVaults', userVaults: data },
-  //       //   (response) => {
-  //       //     console.log('Background script response:', response);
-  //       //   }
-  //       // );
-  //     })
-  //     .catch((err: any) => {
-  //       // throw new Error(err);
-  //       console.log('err', err);
-  //     });
-  // };
-
-  // React.useEffect(() => {
-  //   getAllVaults();
-  // }, []);
-
   return (
     <Container
       sx={{ height: '400px', minWidth: '300px', overflowY: 'scroll', pb: 8 }}
     >
       <div>
-        <h1>LockBox Password Manager</h1>
-        <div>
-          <label htmlFor='email'>Email:</label>
-          <input
-            type='text'
-            id='email'
-            value={data.email}
-            onChange={(e) => setData({ ...data, email: e.target.value })}
-          />
-        </div>
-        <div>
-          <label htmlFor='password'>Password:</label>
-          <input
-            type='password'
-            id='password'
-            value={data.password}
-            onChange={(e) => setData({ ...data, password: e.target.value })}
-          />
-        </div>
-        <div>
-          <button
-            onClick={handleLogin}
-            id='save'
-            style={{
-              marginBottom: '10px',
-              marginTop: '10px',
-              color: 'black',
+        <Box sx={{ pt: 2 }}>
+          <Typography
+            variant='h5'
+            sx={{
+              display: ' flex',
+              justifyContent: 'center',
+              fontWeight: '600',
             }}
           >
-            Login
-          </button>
+            L O C K B O X
+          </Typography>
+        </Box>
+        <div>
+          <Card sx={{ mt: 2, p: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <Avatar sx={{ m: 1, bgcolor: '#130e4f', alignItems: 'center' }}>
+                <LockOutlinedIcon />
+              </Avatar>
+            </Box>
+            <Typography
+              sx={{ color: 'blue', display: 'flex', textAlign: 'center' }}
+            ></Typography>
 
-          <button onClick={() => navigate('/dashboard')}>Go to dash</button>
+            <Box
+              sx={{
+                marginTop: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Box component='form' noValidate sx={{ mt: 1 }}>
+                <TextField
+                  margin='normal'
+                  value={data.email}
+                  required
+                  fullWidth
+                  size='small'
+                  id='email'
+                  label='Email Address'
+                  name='email'
+                  autoFocus
+                  onChange={(e) => setData({ ...data, email: e.target.value })}
+                />
+                <TextField
+                  margin='normal'
+                  required
+                  value={data.password}
+                  fullWidth
+                  size='small'
+                  name='password'
+                  label='Master Password'
+                  type='password'
+                  id='password'
+                  onChange={(e) =>
+                    setData({ ...data, password: e.target.value })
+                  }
+                />
 
-          <br />
+                <Button
+                  type='submit'
+                  fullWidth
+                  variant='contained'
+                  onClick={handleLogin}
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Login
+                </Button>
+              </Box>
+            </Box>
+          </Card>
         </div>
       </div>
     </Container>

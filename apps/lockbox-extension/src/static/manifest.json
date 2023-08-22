@@ -1,17 +1,17 @@
 {
-  "name": "LockBox Chrome Extension",
+  "name": "LockBox",
   "description": "Chrome Extension for password management app LockBox",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "manifest_version": 3,
   "icons": {
-    "16": "icon.png",
-    "48": "icon.png",
-    "128": "icon.png"
+    "16": "icon2.png",
+    "48": "icon2.png",
+    "128": "icon2.png"
   },
   "action": {
     "default_popup": "popup.html",
     "default_title": "LockBox Extension",
-    "default_icon": "icon.png"
+    "default_icon": "icon2.png"
   },
   "permissions": ["storage", "tabs", "activeTab", "webNavigation", "scripting"],
   "options_page": "options.html",
