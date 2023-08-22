@@ -47,7 +47,7 @@ const VaultsFiltered = (props: Props) => {
                     {vault.link?.split('//') && vault.link.split('//')[1] ? (
                       <img
                         src={`https://icons.bitwarden.net/${
-                          vault.link.split('//')[1]
+                          new URL(vault.link).hostname
                         }/icon.png`}
                         alt='logo'
                         style={{

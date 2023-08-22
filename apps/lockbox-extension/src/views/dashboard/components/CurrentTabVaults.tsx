@@ -38,7 +38,7 @@ const CurrentTabVaults: React.FC<{}> = () => {
 
   return (
     <div>
-      <h1>CurrentTabVaults</h1>
+      <h1>Current Tab Vaults</h1>
 
       <Box>
         {tabVaults.map((vault: any) => (

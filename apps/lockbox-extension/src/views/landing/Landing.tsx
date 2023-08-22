@@ -7,7 +7,7 @@ type Props = {}
 const Landing = (props: Props) => {
 
     const getAllVaults = async () => {
-    await authorizedFetch('http://localhost:4000/api/vault', {
+    await authorizedFetch('https://surge-lockbox-prod.up.railway.app/api/vault', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ import {
   getVaultKey,
 } from './request-interceptor';
 
-export const backendUrl = 'http://localhost:4000/api';
+export const backendUrl = 'https://surge-lockbox-prod.up.railway.app/api';
 
 export function userLogin(email: string, hashedPassword: string) {
   fetch(`${backendUrl}/auth/login`, {
@@ -111,7 +111,7 @@ export async function getAllUserVaults() {
 
 // get all vaults api
 export async function getAllVaults() {
-  await authorizedFetch('http://localhost:4000/api/vault', {
+  await authorizedFetch('https://surge-lockbox-prod.up.railway.app/api/vault', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ export async function getDecryptedAllVaults() {
 
 export async function setFoldersToStorage() {
   //map over userFolders and get each folder
-  await authorizedFetch(`http://localhost:4000/api/user-folder`, {
+  await authorizedFetch(`https://surge-lockbox-prod.up.railway.app/api/user-folder`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
