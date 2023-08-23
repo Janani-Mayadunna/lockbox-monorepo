@@ -13,13 +13,22 @@ import {
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-const Login: React.FC<{}> = () => {
+const Login = () => {
   const navigate = useNavigate();
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'replaceToLogin') {
+      setValidity(false);
+      location.href = 'popup.html';
+    }
+    sendResponse({ response: 'login' });
+  });
 
   const [data, setData] = React.useState({
     email: '',
     password: '',
   });
+  const [validity, setValidity] = React.useState<boolean>(true);
   const hashedPassword = hashPassword(data.password);
 
   const handleLogin = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -29,7 +38,7 @@ const Login: React.FC<{}> = () => {
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'tokenUpdated') {
-        if (message.token) {
+        if (message?.token) {
           navigate('/dashboard');
         }
       }
@@ -37,8 +46,16 @@ const Login: React.FC<{}> = () => {
   };
 
   React.useEffect(() => {
+    chrome.storage.local.get(['token'], (token) => {
+      if (!token) {
+        chrome.storage.local.clear();
+      }
+    });
+  }, [validity]);
+
+  React.useEffect(() => {
     chrome.storage.local.get(['token']).then((result) => {
-      if (result.token) {
+      if (result?.token) {
         navigate('/dashboard');
       }
     });

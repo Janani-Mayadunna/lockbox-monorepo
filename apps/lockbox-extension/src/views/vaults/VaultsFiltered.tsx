@@ -19,7 +19,7 @@ const VaultsFiltered = (props: Props) => {
           <Typography>{title}</Typography>
         </Box>
         <Box>
-          {vault.map((vault: any) => (
+          {vault?.map((vault: any) => (
             <Card
               onClick={() => navigate('/vaults/update', { state: vault })}
               key={vault._id}

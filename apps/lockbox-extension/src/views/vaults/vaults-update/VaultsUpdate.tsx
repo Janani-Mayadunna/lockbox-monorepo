@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { backendUrl, getFolders } from '../../../utils/api';
+import { backendUrl, getFolders, logOut } from '../../../utils/api';
 import { authorizedFetch } from '../../../utils/request-interceptor';
 
 type Props = {};
@@ -27,8 +27,14 @@ interface IFolder {
 }
 
 const VaultsUpdate = (props: Props) => {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'replaceToLogin') {
+      setValidity(false);
+    }
+  });
   const { state } = useLocation();
   const [folders, setFolders] = React.useState([]);
+  const [validity, setValidity] = React.useState<boolean>(true);
   const [updatedData, setUpdatedData] = React.useState({
     name: '',
     username: '',
@@ -80,13 +86,20 @@ const VaultsUpdate = (props: Props) => {
     });
   };
 
-  React.useEffect(() => {
-    console.log('state', state);
-  }, [state]);
+  // React.useEffect(() => {
+  //   console.log('state', state);
+  // }, [state]);
 
   React.useEffect(() => {
     getAllFolders();
   }, []);
+
+  React.useEffect(() => {
+    if (!validity) {
+      logOut();
+      navigate('/');
+    }
+  }, [validity]);
 
   return (
     <Container

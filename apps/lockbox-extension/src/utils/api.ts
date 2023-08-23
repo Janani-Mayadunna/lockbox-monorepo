@@ -1,4 +1,4 @@
-import { ICreateVault, IVault, Row } from '../interfaces/vault.interfaces';
+import { ICreateVault } from '../interfaces/vault.interfaces';
 import { generateVaultKey } from './crypto';
 import CustomCrypto from './custom-crypto';
 import {
@@ -7,8 +7,8 @@ import {
   getVaultKey,
 } from './request-interceptor';
 
-// export const backendUrl = 'http://localhost:4000/api';
-export const backendUrl = 'https://surge-lockbox-prod.up.railway.app/api';
+export const backendUrl = 'http://localhost:4000/api';
+// export const backendUrl = 'https://surge-lockbox-prod.up.railway.app/api';
 
 export function userLogin(email: string, hashedPassword: string) {
   fetch(`${backendUrl}/auth/login`, {
@@ -27,13 +27,13 @@ export function userLogin(email: string, hashedPassword: string) {
           const token = data.access_token;
 
           chrome.runtime.sendMessage({ action: 'login' }, (response) => {
-            console.log('Background script response:', response);
+            // console.log('Background script response:', response);
           });
 
           chrome.runtime.sendMessage(
             { action: 'setToken', token: token },
             (response) => {
-              console.log('Background script response:', response);
+              // console.log('Background script response:', response);
             }
           );
 
@@ -64,7 +64,7 @@ export async function getCurrentUser(email: string, hashedPassword: string) {
       chrome.runtime.sendMessage(
         { action: 'setCurrentUser', currentUser: currentUser },
         (response) => {
-          console.log('Background script response:', response);
+          // console.log('Background script response:', response);
         }
       );
     })
@@ -83,7 +83,7 @@ export async function getCurrentUser(email: string, hashedPassword: string) {
   chrome.runtime.sendMessage(
     { action: 'setVaultKey', vaultKey: vaultKey },
     (response) => {
-      console.log('Background script response:', response);
+      // console.log('Background script response:', response);
     }
   );
 }
@@ -101,7 +101,7 @@ export async function getAllUserVaults() {
       chrome.runtime.sendMessage(
         { action: 'setAllUserVaults', userVaults: data },
         (response) => {
-          console.log('Background script response:', response);
+          // console.log('Background script response:', response);
         }
       );
     })
@@ -123,7 +123,7 @@ export async function getAllVaults() {
       chrome.runtime.sendMessage(
         { action: 'setAllVaults', userVaults: data },
         (response) => {
-          console.log('Background script response:', response);
+          // console.log('Background script response:', response);
         }
       );
     })
@@ -137,7 +137,11 @@ export async function getDecryptedAllVaults() {
   const vaultKey = await getVaultKey();
   let decryptedNote = '';
 
-  const vaultData = await new Promise<string[] | null>((resolve) => {
+  chrome.runtime.sendMessage({ action: 'getAllVaults' }, (response) => {
+    // console.log('Background script response:', response);
+  });
+
+  const vaultData = await new Promise<string[] | []>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'updateAllVaults') {
         resolve(message.userVaults || null);
@@ -147,7 +151,7 @@ export async function getDecryptedAllVaults() {
 
   //map over vaultData and decrypt each password
   const decryptedData = await Promise.all(
-    vaultData.map(async (row: any) => {
+    vaultData?.map(async (row: any) => {
       const decryptedVaultPW = await CustomCrypto.decrypt(
         vaultKey,
         row.password
@@ -188,7 +192,7 @@ export async function setFoldersToStorage() {
       chrome.runtime.sendMessage(
         { action: 'setUserFolders', userFolders: data },
         (response) => {
-          console.log('Background script response:', response);
+          // console.log('Background script response:', response);
         }
       );
     })
@@ -199,7 +203,7 @@ export async function setFoldersToStorage() {
 
 export async function getFolders() {
   chrome.runtime.sendMessage({ action: 'getUserFolders' }, (response) => {
-    console.log('Background script response:', response);
+    // console.log('Background script response:', response);
   });
 
   const userFolders = await new Promise<string[] | []>((resolve) => {
@@ -253,7 +257,7 @@ export async function decryptTabVaults() {
   const tabVaults = await getTabVaultsFromStorage();
 
   const decryptedData = await Promise.all(
-    tabVaults.map(async (row: any) => {
+    tabVaults?.map(async (row: any) => {
       const decryptedVaultPW = await CustomCrypto.decrypt(
         vaultKey,
         row.password
@@ -322,4 +326,4 @@ export async function createVault(newVault: ICreateVault): Promise<boolean> {
 
 export const logOut = async () => {
   await chrome.storage.local.clear();
-}
+};
