@@ -24,7 +24,6 @@ export interface AuthState {
     access_token: string;
     userId: string;
   };
-  isLoggedIn: boolean;
   message: string | null;
 }
 

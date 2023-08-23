@@ -34,8 +34,8 @@ export function getUserSalt(): string {
   return salt;
 }
 
-export function getLoggedIn(): boolean {
-  const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-  const loggedIn = isLoggedIn === 'true' ? true : false;
-  return loggedIn;
+export function getCurrentUserData(): any {
+  const storedVaultKey = sessionStorage.getItem('current-user');
+  const userData = JSON.parse(storedVaultKey!);
+  return userData;
 }

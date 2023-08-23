@@ -146,7 +146,7 @@ const updateVault = async (payload: { id: string; data: IUpdateVault }) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload.data),
     },
   );
 
@@ -155,7 +155,10 @@ const updateVault = async (payload: { id: string; data: IUpdateVault }) => {
 
 export function* updateVaultSaga(action: UpdateVaultRequest): any {
   try {
-    const response = yield call(updateVault, action.payload);
+    const response = yield call(updateVault, {
+      id: action.payload.id,
+      data: action.payload.data,
+    });
 
     yield put(updateVaultSuccess(response));
     yield put(getVaultRequest('', ''));
