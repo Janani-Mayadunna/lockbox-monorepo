@@ -34,8 +34,6 @@ const login = async (payload: LoginPayload) => {
       const token = await response.json();
 
       sessionStorage.setItem('jwt-lockbox', JSON.stringify(token));
-      sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
-
       return {
         token: {
           access_token: token.access_token,
@@ -72,7 +70,6 @@ function* loginSaga(action: any) {
 function* logoutSaga() {
   try {
     sessionStorage.removeItem('jwt-lockbox');
-    sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('current-user');
     sessionStorage.removeItem('VK');
 

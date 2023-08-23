@@ -14,7 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../src/store';
 import { logoutRequest } from '../../../src/pages/auth/redux/actions';
-import { getLoggedIn } from '../../../src/helpers/request-interceptor';
+import { getCurrentUserData } from '../../../src/helpers/request-interceptor';
 
 const pages = [
   { title: 'Password Vault', path: '/dashboard' },
@@ -25,12 +25,16 @@ const settings = ['Profile', 'Password Vault', 'Logout'];
 function ResponsiveAppBar() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [isLogged, setIsLogged] = React.useState(false);
+  const [user, setUser] = React.useState({
+    name: '',
+  });
+
 
   React.useEffect(() => {
-    const isUserLogged = getLoggedIn();
-    setIsLogged(isUserLogged);
-  }, [isLogged]);
+    const userData = getCurrentUserData();
+    setUser(userData);
+  }, []);
+
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
@@ -102,7 +106,7 @@ function ResponsiveAppBar() {
             LockBox
           </Typography>
 
-          {isLogged ? (
+          {user ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
                 size='large'
@@ -167,7 +171,7 @@ function ResponsiveAppBar() {
             LockBox
           </Typography>
 
-          {isLogged ? (
+          {user ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
                 <Button
@@ -188,10 +192,10 @@ function ResponsiveAppBar() {
           )}
 
           <Box sx={{ flexGrow: 0 }}>
-            {isLogged ? (
+            {user ? (
               <Tooltip title='Open settings'>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
+                  <Avatar alt={user.name.toUpperCase()} src='/static/images/avatar/2.jpg' />
                 </IconButton>
               </Tooltip>
             ) : (
