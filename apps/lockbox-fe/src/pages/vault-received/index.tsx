@@ -164,6 +164,11 @@ const ReceivedPasswordsVault = () => {
     await getAllReceivedVaults();
   };
 
+  const handleCopyToClipboard = (vaultPassword: string) => {
+    navigator.clipboard.writeText(vaultPassword);
+    setSnackbarOpen(true);
+  };
+
   const handleVaultDelete = async (id: string) => {
     await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/delete-received`, {
       method: 'DELETE',
@@ -285,102 +290,6 @@ const ReceivedPasswordsVault = () => {
           </Typography>
 
           <Box>
-            {/* map over vaultData array and display */}
-            {/* {decryptedVaults.map((data: any, index: any) => (
-              <Accordion key={index} sx={{ mb: 1 }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                  sx={{ backgroundColor: '#ebeef4' }}
-                >
-                  <Typography variant="subtitle1" component="h5">
-                    Shared by : {data.sharedUserName}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Box display="flex" justifyContent="space-around">
-                    <Box>
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Username: </strong> {data.vaultUsername}
-                      </Typography>
-                      {data.vaultLink !== '' ? (
-                        <Typography
-                          gutterBottom
-                          sx={{ mt: 1, mb: 1 }}
-                          variant="h6"
-                        >
-                          <strong>Website: </strong> {data.vaultLink}
-                        </Typography>
-                      ) : (
-                        ''
-                      )}
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Password:</strong> {data.vaultPassword}
-                      </Typography>
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Sender Name:</strong> {data.sharedUserName}
-                      </Typography>
-                      <Typography
-                        gutterBottom
-                        sx={{ mt: 1, mb: 1 }}
-                        variant="h6"
-                      >
-                        <strong>Sender Email:</strong> {data.sharedUserEmail}
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      {data.isAllowedToSave ? (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          sx={{ mt: 4, mb: 4 }}
-                          onClick={() =>
-                            handleAddToVault(
-                              data.vaultPassword,
-                              data.vaultUsername,
-                              data.vaultLink,
-                              data.vaultId,
-                              data.vaultAlias,
-                            )
-                          }
-                        >
-                          Add to My Vault
-                        </Button>
-                      ) : (
-                        ''
-                      )}
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        sx={{
-                          width: 150,
-                        }}
-                        onClick={() => {
-                          handleVaultDelete(data.vaultId);
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-                  </Box>
-                </AccordionDetails>
-              </Accordion>
-            ))} */}
-
             {decryptedVaults.length === 0 ? (
               <Box>
                 <Typography variant='body1' align='center'>
@@ -509,17 +418,16 @@ const ReceivedPasswordsVault = () => {
                                     )}
 
                                     <Grid item xs={4} sx={{ display: 'flex' }}>
-                                      <ContentCopyIcon />
-                                      {/* <Typography
-                                        variant="caption"
-                                        sx={{
-                                          ml: 1,
-                                          display: 'flex',
-                                          alignItems: 'flex-end',
-                                        }}
+                                      <Box
+                                        onClick={() =>
+                                          handleCopyToClipboard(
+                                            row.vaultPassword,
+                                          )
+                                        }
+                                        sx={{ cursor: 'pointer' }}
                                       >
-                                        Copy
-                                      </Typography> */}
+                                        <ContentCopyIcon />
+                                      </Box>
                                     </Grid>
 
                                     <Grid item xs={4} sx={{ display: 'flex' }}>
