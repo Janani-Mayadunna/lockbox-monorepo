@@ -5,14 +5,33 @@ import Vaults from './components/Filters';
 import AddVault from './components/AddVault';
 import CurrentTabVaults from './components/CurrentTabVaults';
 import Settings from './components/Settings';
+import { useNavigate } from 'react-router-dom';
+import { logOut } from '../../utils/api';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'replaceToLogin') {
+      setValidity(false);
+    }
+    sendResponse({ response: 'dashboard' });
+  });
+
+  const [validity, setValidity] = React.useState<boolean>(true);
   const [selectedValue, setSelectedValue] =
     React.useState<string>('all_vaults');
 
   const handleNavChange = (newValue: string) => {
     setSelectedValue(newValue);
   };
+
+  React.useEffect(() => {
+    if (!validity) {
+      logOut();
+      navigate('/');
+    }
+  }, [validity]);
 
   return (
     <>

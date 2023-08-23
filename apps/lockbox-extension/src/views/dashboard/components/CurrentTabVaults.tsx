@@ -8,7 +8,7 @@ const CurrentTabVaults: React.FC<{}> = () => {
 
   const getTabVaults = async () => {
     const currentTabVaults = await decryptTabVaults();
-    console.log('currentTabVaults', currentTabVaults);
+    // console.log('currentTabVaults', currentTabVaults);
     setTabVaults(currentTabVaults);
   };
 
@@ -23,7 +23,7 @@ const CurrentTabVaults: React.FC<{}> = () => {
     chrome.runtime.sendMessage(
       { action: 'autoFill', username, password },
       (response) => {
-        console.log('Background script response:', response);
+        // console.log('Background script response:', response);
       }
     );
   };
@@ -32,16 +32,16 @@ const CurrentTabVaults: React.FC<{}> = () => {
     getTabVaults();
   }, []);
 
-  React.useEffect(() => {
-    console.log('tabVaults', tabVaults);
-  }, [tabVaults]);
+  // React.useEffect(() => {
+  //   console.log('tabVaults', tabVaults);
+  // }, [tabVaults]);
 
   return (
     <div>
       <h1>Current Tab Vaults</h1>
 
       <Box>
-        {tabVaults.map((vault: any) => (
+        {tabVaults?.map((vault: any) => (
           <Card
             onClick={() =>
               handleAutoFill({

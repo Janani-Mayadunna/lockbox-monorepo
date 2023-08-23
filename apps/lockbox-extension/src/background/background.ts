@@ -1,5 +1,13 @@
+import { logOut } from '../utils/api';
+import jwt_decode from 'jwt-decode';
+
+let popupOpen = true;
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
+    case 'popupOpened':
+      popupOpen = true;
+      break;
     case 'login':
       console.log('Received login action from popup');
       sendResponse({ message: 'Login action received' });
@@ -172,6 +180,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           console.log('autofill', response);
         });
       });
+      break;
+    case 'routeChanged':
+      console.log('routeChanged');
+      sendResponse({ message: 'routeChanged' });
+      chrome.runtime.sendMessage({
+        action: 'checkTokenValidity',
+      });
+      break;
+    case 'tokenExpired':
+      chrome.runtime.sendMessage({
+        action: 'replaceToLogin',
+      });
+      break;
     default:
       break;
   }
@@ -180,20 +201,75 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
+let isPortConnected = false;
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === 'popupPort') {
+    isPortConnected = true;
+
+    port.onDisconnect.addListener(() => {
+      isPortConnected = false;
+    });
+
+    if (isPortConnected) {
+    }
+  }
+});
+
+function getValueFromStorage(key, callback) {
+  chrome.storage.local.get([key], (result) => {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
+      callback(undefined); // Or handle the error in some way
+    } else {
+      callback(result[key]);
+    }
+  });
+}
+
+/* ALARM */
+chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  console.log('popupOpen', popupOpen);
+  if (alarm.name === 'tokenCheckAlarm') {
+    getValueFromStorage('token', (token) => {
+      if (token) {
+        const user: { exp: number; iat: number } = jwt_decode(token);
+        const expirationBuffer = ((user.exp - user.iat) / 5) * 4;
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        const remainingTime = user.exp - currentTime;
+        console.log('remainingTime', remainingTime);
+
+        const isValid = remainingTime > expirationBuffer;
+        console.log('isValid', isValid);
+
+        if (!isValid && alarm.name === 'tokenCheckAlarm') {
+          chrome.alarms.clearAll();
+
+          chrome.runtime.sendMessage(
+            {
+              action: 'tokenExpired',
+            },
+            (response) => {
+              console.log('response jj', response);
+            }
+          );
+
+          logOut();
+        }
+      }
+    });
+  }
+});
+
 console.log('background script running');
 
 function extractDomain(url) {
-  // Remove "https://"
-  url = url.replace(/^(https?:\/\/)?/, '');
-
-  // Remove "www."
-  url = url.replace(/^www\./, '');
-
-  // Split the URL at the first "/"
-  const parts = url.split('/');
-
-  // The first part after splitting is the domain
-  const domain = parts[0];
+  url = url.replace(/^(https?:\/\/)?/, ''); // Remove "https://"
+  url = url.replace(/^www\./, ''); // Remove "www."
+  const parts = url.split('/'); // Split the URL at the first "/"
+  const domain = parts[0]; // The first part after splitting is the domain
 
   return domain;
 }
@@ -209,9 +285,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       });
 
       chrome.storage.local.get(['userVaults'], (result) => {
-        const vaults = result.userVaults;
+        const vaults = result?.userVaults;
 
-        const tabVaults = vaults.filter((vault: any) => {
+        const tabVaults = vaults?.filter((vault: any) => {
           const extractedDomain = extractDomain(vault.link);
           return extractedDomain && tab.url.includes(extractedDomain);
         });
@@ -235,7 +311,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 /*
   Using tabs onActivated (doesn't work wwhen navigating from scratch. 
-  only listenes when an already exisitng tab gets activated) 
+  only listnes when an already exisitng tab gets activated) 
+   * code below is for reference for future use * 
 */
 
 // chrome.tabs.onActivated.addListener((tab) => {
@@ -275,3 +352,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     }
 //   });
 // });
+
+
+ /* BUG - Handle the runtime error when listening end doesnt exist*/

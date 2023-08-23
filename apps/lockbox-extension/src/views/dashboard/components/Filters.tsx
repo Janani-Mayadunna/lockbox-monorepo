@@ -16,11 +16,21 @@ import {
   getAllVaults,
   getDecryptedAllVaults,
   getFolders,
+  logOut,
 } from '../../../utils/api';
 import { useNavigate } from 'react-router-dom';
 
 const Vaults: React.FC<{}> = () => {
   const navigate = useNavigate();
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'replaceToLogin') {
+      setValidity(false);
+    }
+    sendResponse({ response: 'filters' });
+  });
+
+  const [validity, setValidity] = React.useState<boolean>(true);
   const [vaults, setVaults] = React.useState([]);
   const [folders, setFolders] = React.useState([]);
   const [logins, setLogins] = React.useState({
@@ -31,6 +41,13 @@ const Vaults: React.FC<{}> = () => {
     vaultsArray: [],
     count: 0,
   });
+
+  React.useEffect(() => {
+    if (!validity) {
+      logOut();
+      navigate('/');
+    }
+  }, [validity]);
 
   const getVaults = async () => {
     await getAllVaults();
@@ -252,49 +269,50 @@ const Vaults: React.FC<{}> = () => {
           <Typography>Folders</Typography>
         </Box>
         <Box>
-          {folders.map((folder: any) => (
-            <Card
-              onClick={() =>
-                handleFolderClick(folder.vaults, folder.folderName)
-              }
-              key={folder._id}
-              variant='outlined'
-              sx={{
-                backgroundColor: '#91b9ce',
-                p: 0,
-                mt: 1,
-                ml: 1,
-                mr: 1,
-                cursor: 'pointer',
-              }}
-            >
-              <CardContent
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingBottom: '0px',
-                  paddingTop: '0px',
+          {folders &&
+            folders.map((folder: any) => (
+              <Card
+                onClick={() =>
+                  handleFolderClick(folder.vaults, folder.folderName)
+                }
+                key={folder._id}
+                variant='outlined'
+                sx={{
+                  backgroundColor: '#91b9ce',
+                  p: 0,
+                  mt: 1,
+                  ml: 1,
+                  mr: 1,
+                  cursor: 'pointer',
                 }}
               >
-                <Box sx={{ padding: 1 }}>
-                  <Typography sx={{ fontSize: '1rem' }}>
-                    {folder.folderName}
-                  </Typography>
-                </Box>
-                <Box style={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant='body1' style={{ marginRight: '10px' }}>
-                    {folder.vaults.length}
-                  </Typography>
-                  <Typography>
-                    <ArrowForwardIosIcon
-                      sx={{ fontSize: '1rem', display: 'flex' }}
-                    />
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+                <CardContent
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingBottom: '0px',
+                    paddingTop: '0px',
+                  }}
+                >
+                  <Box sx={{ padding: 1 }}>
+                    <Typography sx={{ fontSize: '1rem' }}>
+                      {folder.folderName}
+                    </Typography>
+                  </Box>
+                  <Box style={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant='body1' style={{ marginRight: '10px' }}>
+                      {folder.vaults.length}
+                    </Typography>
+                    <Typography>
+                      <ArrowForwardIosIcon
+                        sx={{ fontSize: '1rem', display: 'flex' }}
+                      />
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
         </Box>
       </Box>
     </div>
