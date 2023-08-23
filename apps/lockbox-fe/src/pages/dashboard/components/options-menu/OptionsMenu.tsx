@@ -6,7 +6,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SendIcon from '@mui/icons-material/Send';
+import ShareIcon from '@mui/icons-material/Share';
+import LaunchIcon from '@mui/icons-material/Launch';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Snackbar, Tooltip } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
@@ -115,6 +116,10 @@ export default function CustomizedMenus({
     setOpenDirectShareModal(true);
   };
 
+  const handleLaunch = (link: string | URL ) => () => {
+    window.open(link, '_blank');
+  };
+
   return (
     <div>
       <DirectShareModal
@@ -155,10 +160,12 @@ export default function CustomizedMenus({
         open={open}
         onClose={handleClose}
       >
-        {/* <MenuItem>
-          <EditIcon />
-          Edit
-        </MenuItem> */}
+        {link? (
+          <MenuItem onClick={handleLaunch(link)}>
+          <LaunchIcon />
+          Launch
+        </MenuItem>
+        ): null}
         <MenuItem onClick={handleCopyToClipboard}>
           <FileCopyIcon />
           Copy Password
@@ -166,7 +173,7 @@ export default function CustomizedMenus({
 
         <Tooltip title='Share password with other users' arrow>
           <MenuItem onClick={handleDirectShareModalOpen}>
-            <SendIcon />
+            <ShareIcon />
             Direct Share
           </MenuItem>
         </Tooltip>
