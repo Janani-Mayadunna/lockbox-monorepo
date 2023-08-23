@@ -53,11 +53,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
   };
 
   // Listen for window resize events and update the responsiveness state
-  const handleResize = () => {
-    setIsResponsive(window.innerWidth < 750);
-    // console.log('window.innerWidth: ', window.innerWidth);
-    // console.log('isResponsive: ', isResponsive);
-  };
+  
 
   // Folder menu
 
@@ -71,11 +67,29 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
 
   // Attach and detach window resize event listener
   React.useEffect(() => {
+    const handleResize = () => {
+      setIsResponsive(window.innerWidth < 750);
+      // console.log('window.innerWidth: ', window.innerWidth);
+      // console.log('isResponsive: ', isResponsive);
+    };
+    
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isResponsive]);
+
+  React.useEffect(() => {
+    if (isResponsive) {
+      setIsAllVaultsOpen(false);
+      setIsFilterByCategoryOpen(false);
+      setIsFilterByFolderOpen(false);
+    } else {
+      setIsAllVaultsOpen(true);
+      setIsFilterByCategoryOpen(true);
+      setIsFilterByFolderOpen(true);
+    }
+  }, [isResponsive]);
 
   return (
     <div>
@@ -103,7 +117,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterSelect }) => {
             pt: 4,
             display: {
               xs: 'none',
-              sm: 'none',
+              sm: 'block',
               md: 'block',
               lg: 'block',
             },

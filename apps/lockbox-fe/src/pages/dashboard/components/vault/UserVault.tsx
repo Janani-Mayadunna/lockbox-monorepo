@@ -13,7 +13,11 @@ import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
-import { getAllFoldersRequest, getVaultRequest } from '../../redux/actions';
+import {
+  getAllFoldersRequest,
+  getVaultByIdRequest,
+  getVaultRequest,
+} from '../../redux/actions';
 
 interface Column {
   id: 'image' | 'name' | 'username' | 'actions';
@@ -30,7 +34,7 @@ interface Column {
   display?: {
     xs: 'none' | 'block';
     sm: 'none' | 'block';
-    md: 'none' | 'revert' 
+    md: 'none' | 'revert';
     lg: 'none' | 'revert';
   };
   p?: {
@@ -131,7 +135,7 @@ export default function UserVaultTable({
   };
 
   const handleUpdateModalOpen = async (data: string) => {
-    // dispatch(getVaultByIdRequest(data));
+    dispatch(getVaultByIdRequest(data));
 
     setSelectedRow(data);
     // setTimeout(() => {
@@ -295,7 +299,6 @@ export default function UserVaultTable({
                                 md: columns[2].display?.md,
                                 lg: columns[2].display?.lg,
                               },
-
                             }}
                             align='left'
                           >
