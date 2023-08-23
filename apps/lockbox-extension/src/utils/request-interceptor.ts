@@ -4,15 +4,17 @@ async function authInterceptor(request: Request): Promise<Request> {
     // when using use response.token
   });
 
-  const token = await new Promise<string | null>((resolve) => {
+  const token = await new Promise<string>((resolve) => {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'tokenUpdated') {
-        resolve(message.token || null);
+        resolve(message.token);
       }
     });
   });
   if (token) {
     request.headers.set('Authorization', `Bearer ${token}`);
+  } else {
+    request.headers.delete('Authorization');
   }
 
   return request;
@@ -29,7 +31,7 @@ export async function authorizedFetch(
 
 export async function getVaultKey(): Promise<string> {
   chrome.runtime.sendMessage({ action: 'getVaultKey' }, (response) => {
-    console.log('Background script response:', response);
+    // console.log('Background script response:', response);
     // when using use response.token
   });
 
@@ -45,7 +47,7 @@ export async function getVaultKey(): Promise<string> {
 
 export async function getUserSalt() {
   chrome.runtime.sendMessage({ action: 'getCurrentUser' }, (response) => {
-    console.log('Background script response:', response);
+    // console.log('Background script response:', response);
     // when using use response.token
   });
   
