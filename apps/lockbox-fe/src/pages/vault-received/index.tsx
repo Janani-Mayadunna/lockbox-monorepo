@@ -2,6 +2,7 @@ import {
   Box,
   Container,
   Grid,
+  Paper,
   Snackbar,
   Table,
   TableBody,
@@ -45,6 +46,12 @@ interface Column {
   label: string;
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
+  display?: {
+    xs: 'none' | 'block';
+    sm: 'none' | 'block';
+    md: 'none' | 'block';
+    lg: 'none' | 'block';
+  };
   format?: (value: number) => string;
 }
 
@@ -55,6 +62,12 @@ const columns: readonly Column[] = [
     label: 'Sender',
     minWidth: 100,
     align: 'left',
+    display: {
+      xs: 'none',
+      sm: 'none',
+      md: 'block',
+      lg: 'block',
+    },
   },
   {
     id: 'sender_email',
@@ -67,6 +80,12 @@ const columns: readonly Column[] = [
     label: 'URI',
     minWidth: 100,
     align: 'center',
+    display: {
+      xs: 'none',
+      sm: 'none',
+      md: 'block',
+      lg: 'block',
+    },
   },
   {
     id: 'username',
@@ -164,11 +183,6 @@ const ReceivedPasswordsVault = () => {
     await getAllReceivedVaults();
   };
 
-  const handleCopyToClipboard = (vaultPassword: string) => {
-    navigator.clipboard.writeText(vaultPassword);
-    setSnackbarOpen(true);
-  };
-
   const handleVaultDelete = async (id: string) => {
     await authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/delete-received`, {
       method: 'DELETE',
@@ -192,6 +206,12 @@ const ReceivedPasswordsVault = () => {
       });
 
     await getAllReceivedVaults();
+  };
+
+  // handler of copy
+  const handleCopyToClipboard = (vaultPassword: string) => {
+    navigator.clipboard.writeText(vaultPassword);
+    setSnackbarOpen(true);
   };
 
   const getAllReceivedVaults = async () => {
@@ -265,7 +285,7 @@ const ReceivedPasswordsVault = () => {
   return (
     <>
       <ResponsiveAppBar />
-      <Container sx={{ width: 1000 }}>
+      <Container>
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={2500}
@@ -281,7 +301,13 @@ const ReceivedPasswordsVault = () => {
         </Snackbar>
         <div>
           <Typography
-            sx={{ mt: 4, mb: 4 }}
+            sx={{
+              mt: 4,
+              mb: 4,
+              fontFamily: 'Roboto',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
             variant='h4'
             component='h2'
             gutterBottom
@@ -289,178 +315,250 @@ const ReceivedPasswordsVault = () => {
             Shared Passwords
           </Typography>
 
-          <Box>
-            {decryptedVaults.length === 0 ? (
-              <Box>
-                <Typography variant='body1' align='center'>
-                  No Items Found
-                </Typography>
-              </Box>
-            ) : (
-              <>
-                <TableContainer sx={{ maxHeight: 500, maxWidth: 1000 }}>
-                  <Table
-                    stickyHeader
-                    aria-label='sticky table'
-                    sx={{ minWidth: 650 }}
+          <Paper
+            sx={{
+              width: '100%',
+              overflow: 'hidden',
+              px: {
+                xs: 0,
+                sm: 0,
+                md: 2,
+                lg: 2,
+              },
+              py: {
+                xs: 0,
+                sm: 0,
+                md: 2,
+                lg: 2,
+              },
+            }}
+          >
+            <Box>
+              {decryptedVaults?.length === 0 ? (
+                <Box>
+                  <Typography variant='body1' align='center'>
+                    No Items Found
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  <TableContainer
+                    sx={{
+                      maxHeight: 500,
+                      maxWidth: {
+                        xs: 500,
+                        sm: 600,
+                        md: 800,
+                        lg: 1000,
+                      },
+                    }}
                   >
-                    <TableHead>
-                      <TableRow>
-                        {columns.map((column) => (
-                          <TableCell
-                            key={column.id}
-                            align={column.align}
-                            style={{
-                              minWidth: column.minWidth,
-                              fontWeight: 'bold',
-                              fontSize: '1rem',
-                            }}
-                          >
-                            {column.label}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {decryptedVaults
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage,
-                        )
-                        .map((row) => {
-                          return (
-                            <TableRow
-                              hover
-                              role='checkbox'
-                              tabIndex={-1}
-                              key={row.vaultId}
+                    <Table
+                      stickyHeader
+                      aria-label='sticky table'
+                      sx={{
+                        minWidth: {
+                          xs: 40,
+                          sm: 100,
+                          md: 800,
+                          lg: 650,
+                        },
+                      }}
+                    >
+                      <TableHead>
+                        <TableRow>
+                          {columns.map((column) => (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
                               sx={{
-                                '&:last-child td, &:last-child th': {
-                                  border: 0,
+                                minWidth: column.minWidth,
+                                fontWeight: 'bold',
+                                fontSize: '1rem',
+                                display: {
+                                  xs: column.display?.xs,
+                                  sm: column.display?.sm,
+                                  md: column.display?.md,
+                                  lg: column.display?.lg,
                                 },
                               }}
                             >
-                              <TableCell align='left'>
-                                {row.vaultLink?.split('//') &&
-                                row.vaultLink.split('//')[1] ? (
-                                  <img
-                                    src={`https://icons.bitwarden.net/${
-                                      new URL(row.vaultLink).hostname
-                                    }/icon.png`}
-                                    alt='logo'
-                                    style={{
-                                      width: '30px',
-                                      height: '30px',
-                                      borderRadius: '30%',
-                                    }}
-                                  />
-                                ) : (
-                                  <img
-                                    src='https://cdn-icons-png.flaticon.com/512/3170/3170748.png'
-                                    alt='logo'
-                                    style={{ width: '30px', height: '30px' }}
-                                  />
-                                )}
-                              </TableCell>
-                              <TableCell
-                                align='left'
-                                // onClick={() => handleUpdateModalOpen(row)}
+                              {column.label}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {decryptedVaults
+                          .slice(
+                            page * rowsPerPage,
+                            page * rowsPerPage + rowsPerPage,
+                          )
+                          .map((row) => {
+                            return (
+                              <TableRow
+                                hover
+                                role='checkbox'
+                                tabIndex={-1}
+                                key={row.vaultId}
+                                sx={{
+                                  '&:last-child td, &:last-child th': {
+                                    border: 0,
+                                  },
+                                }}
                               >
-                                {row.sharedUserName}
-                              </TableCell>
-                              <TableCell align='left'>
-                                {row.sharedUserEmail}
-                              </TableCell>
-                              <TableCell align='left'>
-                                {row.vaultLink}
-                              </TableCell>
-                              <TableCell align='left'>
-                                {row.vaultUsername}
-                              </TableCell>
-                              <TableCell align='center'>
-                                <Box
+                                <TableCell align='left'>
+                                  {row.vaultLink?.split('//') &&
+                                  row.vaultLink.split('//')[1] ? (
+                                    <img
+                                      src={`https://icons.bitwarden.net/${
+                                        new URL(row.vaultLink).hostname
+                                      }/icon.png`}
+                                      alt='logo'
+                                      style={{
+                                        width: '30px',
+                                        height: '30px',
+                                        borderRadius: '30%',
+                                      }}
+                                    />
+                                  ) : (
+                                    <img
+                                      src='https://cdn-icons-png.flaticon.com/512/3170/3170748.png'
+                                      alt='logo'
+                                      style={{ width: '30px', height: '30px' }}
+                                    />
+                                  )}
+                                </TableCell>
+                                <TableCell
+                                  align='left'
+                                  // onClick={() => handleUpdateModalOpen(row)}
                                   sx={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                    ml: 6,
+                                    display: {
+                                      xs: columns[1].display?.xs,
+                                      sm: columns[1].display?.sm,
+                                      md: columns[1].display?.md,
+                                      lg: columns[1].display?.lg,
+                                    },
                                   }}
                                 >
-                                  <Grid container spacing={2} columns={12}>
-                                    {row.isAllowedToSave ? (
+                                  {row.sharedUserName}
+                                </TableCell>
+                                <TableCell align='left'>
+                                  {row.sharedUserEmail}
+                                </TableCell>
+                                <TableCell
+                                  align='left'
+                                  sx={{
+                                    display: {
+                                      xs: columns[1].display?.xs,
+                                      sm: columns[1].display?.sm,
+                                      md: columns[1].display?.md,
+                                      lg: columns[1].display?.lg,
+                                    },
+                                  }}
+                                >
+                                  {row.vaultLink}
+                                </TableCell>
+                                <TableCell align='left'>
+                                  {row.vaultUsername}
+                                </TableCell>
+                                <TableCell align='center'>
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      justifyContent: 'flex-end',
+                                      ml: 6,
+                                    }}
+                                  >
+                                    <Grid container spacing={2} columns={12}>
+                                      {row.isAllowedToSave ? (
+                                        <Grid
+                                          item
+                                          xs={4}
+                                          sx={{ display: 'flex' }}
+                                        >
+                                          <Tooltip title='Save to your vault'>
+                                            <Box
+                                              onClick={() =>
+                                                handleAddToVault(
+                                                  row.vaultPassword,
+                                                  row.vaultUsername,
+                                                  row.vaultLink,
+                                                  row.vaultId,
+                                                  row.vaultAlias,
+                                                )
+                                              }
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              <AddCircleOutlineIcon />
+                                            </Box>
+                                          </Tooltip>
+                                        </Grid>
+                                      ) : (
+                                        <Grid
+                                          item
+                                          xs={4}
+                                          sx={{ display: 'flex' }}
+                                        ></Grid>
+                                      )}
+
                                       <Grid
                                         item
                                         xs={4}
                                         sx={{ display: 'flex' }}
                                       >
-                                        <Tooltip title='Save to your vault'>
+                                        <Tooltip title='Copy password to clipboard'>
                                           <Box
                                             onClick={() =>
-                                              handleAddToVault(
+                                              handleCopyToClipboard(
                                                 row.vaultPassword,
-                                                row.vaultUsername,
-                                                row.vaultLink,
-                                                row.vaultId,
-                                                row.vaultAlias,
                                               )
                                             }
                                             sx={{ cursor: 'pointer' }}
                                           >
-                                            <AddCircleOutlineIcon />
+                                            <ContentCopyIcon />
                                           </Box>
                                         </Tooltip>
                                       </Grid>
-                                    ) : (
+
                                       <Grid
                                         item
                                         xs={4}
                                         sx={{ display: 'flex' }}
-                                      ></Grid>
-                                    )}
-
-                                    <Grid item xs={4} sx={{ display: 'flex' }}>
-                                      <Box
-                                        onClick={() =>
-                                          handleCopyToClipboard(
-                                            row.vaultPassword,
-                                          )
-                                        }
-                                        sx={{ cursor: 'pointer' }}
                                       >
-                                        <ContentCopyIcon />
-                                      </Box>
+                                        <Tooltip title='Remove from your received vault'>
+                                          <Box
+                                            onClick={() => {
+                                              handleVaultDelete(row.vaultId);
+                                            }}
+                                            sx={{ cursor: 'pointer' }}
+                                          >
+                                            <DeleteIcon />
+                                          </Box>
+                                        </Tooltip>
+                                      </Grid>
                                     </Grid>
-
-                                    <Grid item xs={4} sx={{ display: 'flex' }}>
-                                      <Box
-                                        onClick={() => {
-                                          handleVaultDelete(row.vaultId);
-                                        }}
-                                        sx={{ cursor: 'pointer' }}
-                                      >
-                                        <DeleteIcon />
-                                      </Box>
-                                    </Grid>
-                                  </Grid>
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  rowsPerPageOptions={[10, 25, 100]}
-                  component='div'
-                  count={decryptedVaults.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </>
-            )}
-          </Box>
+                                  </Box>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component='div'
+                    count={decryptedVaults.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </>
+              )}
+            </Box>
+          </Paper>
         </div>
       </Container>
     </>

@@ -19,7 +19,6 @@ const initialState: AuthState = {
     access_token: '',
     userId: '',
   },
-  isLoggedIn: false,
   message: null,
 };
 

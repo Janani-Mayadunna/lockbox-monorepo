@@ -13,35 +13,96 @@ import { Grid } from '@mui/material';
 import CustomizedMenus from '../options-menu/OptionsMenu';
 import VaultUpdateModal from '../modals/UpdateVaultModal';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
-import { getAllFoldersRequest, getVaultRequest } from '../../redux/actions';
+import {
+  getAllFoldersRequest,
+  getVaultByIdRequest,
+  getVaultRequest,
+} from '../../redux/actions';
 
 interface Column {
   id: 'image' | 'name' | 'username' | 'actions';
   label: string;
-  minWidth?: number;
+  minWidth?:
+    | {
+        xs: number;
+        sm: number;
+        md: number;
+        lg: number;
+      }
+    | number;
   align?: 'right' | 'center' | 'left';
+  display?: {
+    xs: 'none' | 'block';
+    sm: 'none' | 'block';
+    md: 'none' | 'revert';
+    lg: 'none' | 'revert';
+  };
+  p?: {
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+  };
   format?: (value: number) => string;
 }
 
 const columns: readonly Column[] = [
-  { id: 'image', label: '', minWidth: 80 },
+  {
+    id: 'image',
+    label: '',
+    minWidth: {
+      xs: 60,
+      sm: 80,
+      md: 90,
+      lg: 100,
+    },
+    p: {
+      xs: 2,
+      sm: 0,
+      md: 1,
+      lg: 2,
+    },
+  },
   {
     id: 'name',
     label: 'Alias',
-    minWidth: 120,
     align: 'left',
+    p: {
+      xs: 0,
+      sm: 0,
+      md: 1,
+      lg: 2,
+    },
+    minWidth: {
+      xs: 60,
+      sm: 90,
+      md: 100,
+      lg: 120,
+    },
   },
   {
     id: 'username',
     label: 'Username',
-    minWidth: 150,
+    minWidth: 160,
     align: 'left',
+    display: {
+      xs: 'none',
+      sm: 'none',
+      md: 'revert',
+      lg: 'revert',
+    },
   },
   {
     id: 'actions',
     label: '',
     minWidth: 100,
     align: 'center',
+    p: {
+      xs: 0,
+      sm: 0,
+      md: 1,
+      lg: 2,
+    },
   },
 ];
 
@@ -74,7 +135,7 @@ export default function UserVaultTable({
   };
 
   const handleUpdateModalOpen = async (data: string) => {
-    // dispatch(getVaultByIdRequest(data));
+    dispatch(getVaultByIdRequest(data));
 
     setSelectedRow(data);
     // setTimeout(() => {
@@ -100,7 +161,24 @@ export default function UserVaultTable({
   React.useEffect(() => {}, [selectedRow]);
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden', px: 4, py: 2 }}>
+    <Paper
+      sx={{
+        width: '100%',
+        overflow: 'hidden',
+        px: {
+          xs: 0,
+          sm: 0,
+          md: 2,
+          lg: 2,
+        },
+        py: {
+          xs: 0,
+          sm: 0,
+          md: 2,
+          lg: 2,
+        },
+      }}
+    >
       <VaultUpdateModal
         open={openUpdateModal}
         setOpenModal={setOpenUpdateModal}
@@ -114,11 +192,28 @@ export default function UserVaultTable({
         </Box>
       ) : (
         <>
-          <TableContainer sx={{ maxHeight: 500, maxWidth: 800 }}>
+          <TableContainer
+            sx={{
+              maxHeight: 500,
+              maxWidth: {
+                xs: 250,
+                sm: 300,
+                md: 600,
+                lg: 800,
+              },
+            }}
+          >
             <Table
               stickyHeader
               aria-label='sticky table'
-              sx={{ minWidth: 650 }}
+              sx={{
+                minWidth: {
+                  xs: 40,
+                  sm: 100,
+                  md: 300,
+                  lg: 650,
+                },
+              }}
             >
               <TableHead>
                 <TableRow>
@@ -126,10 +221,22 @@ export default function UserVaultTable({
                     <TableCell
                       key={column.id}
                       align={column.align}
-                      style={{
+                      sx={{
                         minWidth: column.minWidth,
                         fontWeight: 'bold',
                         fontSize: '1rem',
+                        display: {
+                          xs: column.display?.xs,
+                          sm: column.display?.sm,
+                          md: column.display?.md,
+                          lg: column.display?.lg,
+                        },
+                        p: {
+                          xs: column.p?.xs,
+                          sm: column.p?.sm,
+                          md: column.p?.md,
+                          lg: column.p?.lg,
+                        },
                       }}
                     >
                       {column.label}
@@ -184,13 +291,36 @@ export default function UserVaultTable({
                           >
                             {row.name}
                           </TableCell>
-                          <TableCell align='left'>{row.username}</TableCell>
+                          <TableCell
+                            sx={{
+                              display: {
+                                xs: columns[2].display?.xs,
+                                sm: columns[2].display?.sm,
+                                md: columns[2].display?.md,
+                                lg: columns[2].display?.lg,
+                              },
+                            }}
+                            align='left'
+                          >
+                            {row.username}
+                          </TableCell>
                           <TableCell align='center'>
                             <Box
                               sx={{
                                 display: 'flex',
                                 justifyContent: 'flex-end',
-                                ml: 6,
+                                ml: {
+                                  xs: 0,
+                                  sm: 1,
+                                  md: 4,
+                                  lg: 6,
+                                },
+                                p: {
+                                  xs: 0,
+                                  sm: 0,
+                                  md: 1,
+                                  lg: 2,
+                                },
                               }}
                             >
                               <Grid container spacing={0} columns={12}>
@@ -214,7 +344,7 @@ export default function UserVaultTable({
           <TablePagination
             rowsPerPageOptions={[10, 25, 100]}
             component='div'
-            count={vaults!.length}
+            count={vaults!.length || 0}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

@@ -6,12 +6,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ShareIcon from '@mui/icons-material/Share';
-import LaunchIcon from '@mui/icons-material/Launch';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Snackbar, Tooltip } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import DirectShareModal from '../modals/DirectShareModal';
+import ShareIcon from '@mui/icons-material/Share';
+import LaunchIcon from '@mui/icons-material/Launch';
 
 interface MenuParameters {
   password: string;
@@ -116,8 +116,10 @@ export default function CustomizedMenus({
     setOpenDirectShareModal(true);
   };
 
-  const handleLaunch = (link: string | URL ) => () => {
-    window.open(link, '_blank');
+  const handleLinkLaunch = (link: string) => () => {
+    if (link) {
+      window.open(link, '_blank');
+    }
   };
 
   return (
@@ -160,12 +162,13 @@ export default function CustomizedMenus({
         open={open}
         onClose={handleClose}
       >
-        {link? (
-          <MenuItem onClick={handleLaunch(link)}>
+        {link && (
+          <MenuItem onClick={handleLinkLaunch(link)}>
           <LaunchIcon />
           Launch
         </MenuItem>
-        ): null}
+        )}
+
         <MenuItem onClick={handleCopyToClipboard}>
           <FileCopyIcon />
           Copy Password

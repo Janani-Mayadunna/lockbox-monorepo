@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -24,7 +23,7 @@ import {
 } from '@mui/material';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../../../src/store';
-import { getVaultByIdRequest, updateVaultRequest } from '../../redux/actions';
+import { updateVaultRequest } from '../../redux/actions';
 import ENVIRONMENT from '../../../../../src/helpers/environment';
 
 const style = {
@@ -144,9 +143,6 @@ export default function VaultUpdateModal({
   };
 
   const handleUpdate = async (e: any) => {
-    if (!vaultData.username || !vaultData.password) {
-      return;
-    }
     let encryptedNote = '';
 
     e.preventDefault();
@@ -180,19 +176,15 @@ export default function VaultUpdateModal({
     };
 
     dispatch(updateVaultRequest(payload));
-  };
 
-  React.useEffect(() => {
-    if (open) {
-      dispatch(getVaultByIdRequest(data));
-    }
-  }, [dispatch, data, open]);
+    handleClose();
+  };
 
   React.useEffect(() => {
     if (singleVault) {
       setVaultData({
         category: singleVault.category,
-        name: singleVault.name,
+        name: singleVault.name ? singleVault.name : '',
         folder: singleVault.folder ? singleVault.folder : '',
         username: singleVault.username,
         password: singleVault.password,
@@ -240,9 +232,7 @@ export default function VaultUpdateModal({
               justifyContent: 'center',
               marginTop: '20px',
             }}
-          >
-            {/* <Typography variant='h5'>Add Vault</Typography> */}
-          </Box>
+          ></Box>
           <Box
             sx={{
               display: 'flex',
@@ -330,7 +320,9 @@ export default function VaultUpdateModal({
                             })
                           }
                         >
-                          <MenuItem value=''></MenuItem>
+                          <MenuItem value=''>
+                            <em>None</em>
+                          </MenuItem>
                           {folders.map((folder: IFolder) => (
                             <MenuItem key={folder._id} value={folder._id}>
                               {folder.folderName}

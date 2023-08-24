@@ -14,23 +14,31 @@ import MenuItem from '@mui/material/MenuItem';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../src/store';
 import { logoutRequest } from '../../../src/pages/auth/redux/actions';
-import { getLoggedIn } from '../../../src/helpers/request-interceptor';
+import { getCurrentUserData } from '../../../src/helpers/request-interceptor';
+import LogoutIcon from '@mui/icons-material/Logout';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const pages = [
   { title: 'Password Vault', path: '/dashboard' },
   { title: 'Received Vault', path: '/vault/received' },
 ];
-const settings = ['Profile', 'Password Vault', 'Logout'];
+
+const settings = [
+  { title: 'Profile', icon: <ManageAccountsIcon /> },
+  { title: 'Logout', icon: <LogoutIcon /> },
+];
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [isLogged, setIsLogged] = React.useState(false);
+  const [user, setUser] = React.useState({
+    name: '',
+  });
 
   React.useEffect(() => {
-    const isUserLogged = getLoggedIn();
-    setIsLogged(isUserLogged);
-  }, [isLogged]);
+    const userData = getCurrentUserData();
+    setUser(userData);
+  }, []);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null,
@@ -102,7 +110,7 @@ function ResponsiveAppBar() {
             LockBox
           </Typography>
 
-          {isLogged ? (
+          {user ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
                 size='large'
@@ -137,6 +145,7 @@ function ResponsiveAppBar() {
                     <Typography
                       textAlign='center'
                       component={Link}
+                      sx={{ textDecoration: 'none', color: 'black', p: 0.5 }}
                       to={page.path}
                     >
                       {page.title}
@@ -167,7 +176,7 @@ function ResponsiveAppBar() {
             LockBox
           </Typography>
 
-          {isLogged ? (
+          {user ? (
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
                 <Button
@@ -188,10 +197,13 @@ function ResponsiveAppBar() {
           )}
 
           <Box sx={{ flexGrow: 0 }}>
-            {isLogged ? (
+            {user ? (
               <Tooltip title='Open settings'>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt='Remy Sharp' src='/static/images/avatar/2.jpg' />
+                  <Avatar
+                    alt={user.name.toUpperCase()}
+                    src='/static/images/avatar/2.jpg'
+                  />
                 </IconButton>
               </Tooltip>
             ) : (
@@ -216,10 +228,14 @@ function ResponsiveAppBar() {
             >
               {settings.map((setting) => (
                 <MenuItem
-                  key={setting}
-                  onClick={() => handleSettingsItemClick(setting)}
+                  key={setting.title}
+                  onClick={() => handleSettingsItemClick(setting.title)}
                 >
-                  <Typography textAlign='center'>{setting}</Typography>
+                  {setting.icon}
+
+                  <Typography textAlign='center' sx={{ p: 1, ml: 2 }}>
+                    {setting.title}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
