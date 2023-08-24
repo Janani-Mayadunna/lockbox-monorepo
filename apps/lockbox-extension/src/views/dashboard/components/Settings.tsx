@@ -3,10 +3,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import React from 'react';
 import { logOut } from '../../../utils/api';
 import { useNavigate } from 'react-router-dom';
+import ElevateAppBar from '../../vaults/components/NavigationBar';
 
 type Props = {};
 
 const Settings = (props: Props) => {
+  const title = 'Settings';
   const navigate = useNavigate();
 
   const handleLogOut = async () => {
@@ -15,7 +17,8 @@ const Settings = (props: Props) => {
   };
   return (
     <div>
-      <h1>Settings</h1>
+      <ElevateAppBar title={title} />
+
       <Box>
         <Card
           onClick={() => handleLogOut()}

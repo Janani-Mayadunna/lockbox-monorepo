@@ -21,6 +21,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createVault, getFolders } from '../../../utils/api';
 import { IFolder } from '../../../interfaces/vault.interfaces';
+import ElevateAppBar from '../../vaults/components/NavigationBar';
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -45,6 +46,7 @@ const VaultsAdd = () => {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
 
+  const title = 'Add Item';
   const maxCharacters = 300;
   const navigate = useNavigate();
 
@@ -136,20 +138,17 @@ const VaultsAdd = () => {
           </Alert>
         )}
       </Snackbar>
-      <h1>Vaults Update</h1>
-      <button style={{ margin: '16px' }} onClick={() => navigate('/dashboard')}>
-        Back
-      </button>
+      <ElevateAppBar title={title} />
       <Box
         component='form'
         sx={{
           '& .MuiTextField-root': {
             mt: 0.7,
             mb: 0.7,
-            width: '40ch',
             display: 'flex',
             justifyContent: 'center',
           },
+          mt: '1rem',
         }}
         autoComplete='off'
       >
@@ -219,7 +218,7 @@ const VaultsAdd = () => {
               }
             />
           </FormControl>
-          <FormControl>
+          <FormControl size='small'>
             <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
               label='Username'
@@ -239,21 +238,20 @@ const VaultsAdd = () => {
           <FormControl
             sx={{
               m: 1,
-              display: 'flex',
               justifyContent: 'flex-start',
             }}
             variant='outlined'
           >
-            <InputLabel htmlFor='password'>Password</InputLabel>
-            <OutlinedInput
+            <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
               id='password'
               required
               type={showPassword ? 'text' : 'password'}
               size='small'
-              endAdornment={
-                <InputAdornment position='end'>
-                  <IconButton
+              InputProps={{
+                endAdornment: (
+                    <InputAdornment position='end'>
+                    <IconButton
                     aria-label='toggle password visibility'
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
@@ -261,8 +259,10 @@ const VaultsAdd = () => {
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
-                </InputAdornment>
-              }
+                    </InputAdornment>
+                ),
+              }}
+            
               label='Password'
               defaultValue={vaultData.password}
               onChange={(e) =>
