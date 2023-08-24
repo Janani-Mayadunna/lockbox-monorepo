@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Card, CardContent, Container } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useLocation, useNavigate } from 'react-router-dom';
+import ElevateAppBar from './components/NavigationBar';
 
 type Props = {};
 
@@ -12,12 +13,11 @@ const VaultsFiltered = (props: Props) => {
 
   return (
     <Container sx={{ height: '400px', minWidth: '300px', overflowY: 'scroll' }}>
-      <h1>Vaults Filtered</h1>
-      <button onClick={() => navigate('/dashboard')}>Back</button>
+      <ElevateAppBar title={title}  />
       <Box>
-        <Box>
-          <Typography>{title}</Typography>
-        </Box>
+        {/* <Typography>{title}</Typography> */}
+      </Box>
+      <Box>
         <Box>
           {vault?.map((vault: any) => (
             <Card
