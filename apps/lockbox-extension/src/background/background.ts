@@ -1,12 +1,32 @@
 import { logOut } from '../utils/api';
 import jwt_decode from 'jwt-decode';
 
+let isPortConnected = false;
 let popupOpen = true;
+
+console.log('background script running');
+
+// chrome.runtime.onStartup.addListener(() => {
+//   chrome.alarms.clearAll();
+//   chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
+// });
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === 'popupPort') {
+    isPortConnected = true;
+
+    port.onDisconnect.addListener(() => {
+      isPortConnected = false;
+    });
+  }
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
     case 'popupOpened':
       popupOpen = true;
+      console.log('popupOpen', popupOpen);
+
       break;
     case 'login':
       console.log('Received login action from popup');
@@ -188,11 +208,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         action: 'checkTokenValidity',
       });
       break;
-    case 'tokenExpired':
-      chrome.runtime.sendMessage({
-        action: 'replaceToLogin',
-      });
-      break;
+    // case 'tokenExpired':
+    //   chrome.runtime.sendMessage({
+    //     action: 'replaceToLogin',
+    //   });
+    //   break;
     default:
       break;
   }
@@ -201,19 +221,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-let isPortConnected = false;
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name === 'popupPort') {
-    isPortConnected = true;
 
-    port.onDisconnect.addListener(() => {
-      isPortConnected = false;
-    });
-
-    if (isPortConnected) {
-    }
-  }
-});
 
 function getValueFromStorage(key, callback) {
   chrome.storage.local.get([key], (result) => {
@@ -230,12 +238,12 @@ function getValueFromStorage(key, callback) {
 chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  console.log('popupOpen', popupOpen);
+  // console.log('popupOpen', popupOpen);
   if (alarm.name === 'tokenCheckAlarm') {
     getValueFromStorage('token', (token) => {
       if (token) {
         const user: { exp: number; iat: number } = jwt_decode(token);
-        const expirationBuffer = ((user.exp - user.iat) / 5) * 4;
+        const expirationBuffer = ((user.exp - user.iat) / 5) * 1;
         const currentTime = Math.floor(Date.now() / 1000);
 
         const remainingTime = user.exp - currentTime;
@@ -246,13 +254,25 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
         if (!isValid && alarm.name === 'tokenCheckAlarm') {
           chrome.alarms.clearAll();
+          //restart timer
+          chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
 
           chrome.runtime.sendMessage(
             {
-              action: 'tokenExpired',
+              action: 'replaceToLogin',
             },
-            (response) => {
-              console.log('response jj', response);
+            // due to the asynchronous nature of the messaging API, we need to handle the response
+            // when the popup is closed, the receiving end does not exist anymore
+            // therefore it throws an error saying receiving end doesnt exist
+            // handling connection closing before response received from popup
+            function (entry) {
+              if (chrome.runtime.lastError) {
+                console.warn(
+                  'No worries, your session expired and you got logged out. Please, log in again'
+                );
+              } else {
+                console.log('User logged out');
+              }
             }
           );
 
@@ -262,8 +282,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     });
   }
 });
-
-console.log('background script running');
 
 function extractDomain(url) {
   url = url.replace(/^(https?:\/\/)?/, ''); // Remove "https://"
@@ -353,5 +371,4 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //   });
 // });
 
-
- /* BUG - Handle the runtime error when listening end doesnt exist*/
+/* BUG - Handle the runtime error when listening end doesnt exist*/

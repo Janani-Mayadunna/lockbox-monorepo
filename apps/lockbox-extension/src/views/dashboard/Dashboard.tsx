@@ -11,11 +11,11 @@ import { logOut } from '../../utils/api';
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender) => {
     if (message.action === 'replaceToLogin') {
       setValidity(false);
     }
-    sendResponse({ response: 'dashboard' });
+    // sendResponse({ response: 'dashboard' });
   });
 
   const [validity, setValidity] = React.useState<boolean>(true);
@@ -28,8 +28,9 @@ const Dashboard = () => {
 
   React.useEffect(() => {
     if (!validity) {
-      logOut();
       navigate('/');
+
+      // logOut();
     }
   }, [validity]);
 

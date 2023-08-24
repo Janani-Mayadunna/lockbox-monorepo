@@ -27,7 +27,7 @@ interface IFolder {
 }
 
 const VaultsUpdate = (props: Props) => {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender) => {
     if (message.action === 'replaceToLogin') {
       setValidity(false);
     }
