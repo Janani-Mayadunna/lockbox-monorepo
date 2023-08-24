@@ -1,6 +1,6 @@
 async function authInterceptor(request: Request): Promise<Request> {
   chrome.runtime.sendMessage({ action: 'getToken' }, (response) => {
-    console.log('Background script response:', response);
+    // console.log('Background script response:', response);
     // when using use response.token
   });
 

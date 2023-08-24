@@ -11,42 +11,60 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Snackbar,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { backendUrl, getFolders, logOut } from '../../../utils/api';
-import { authorizedFetch } from '../../../utils/request-interceptor';
+import { useNavigate } from 'react-router-dom';
+import { createVault, getFolders } from '../../../utils/api';
+import { IFolder } from '../../../interfaces/vault.interfaces';
+import ElevateAppBar from '../../vaults/components/NavigationBar';
 
-type Props = {};
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+});
 
-interface IFolder {
-  _id: string;
-  folderName: string;
-}
-
-const VaultsUpdate = (props: Props) => {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'replaceToLogin') {
-      setValidity(false);
-    }
-  });
-  const { state } = useLocation();
-  const [folders, setFolders] = React.useState([]);
-  const [validity, setValidity] = React.useState<boolean>(true);
-  const [updatedData, setUpdatedData] = React.useState({
+const VaultsAdd = () => {
+  const [vaultData, setVaultData] = React.useState({
+    category: 'Login',
     name: '',
+    folder: '',
     username: '',
     password: '',
     link: '',
     note: '',
-    category: '',
-    folder: '',
   });
-
-  const navigate = useNavigate();
+  const [characterCount, setCharacterCount] = React.useState(0);
+  const [folders, setFolders] = React.useState([]);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+  const title = 'Update';
+  const maxCharacters = 300;
+  const navigate = useNavigate();
+
+  const getAllFolders = async () => {
+    const userFolder = await getFolders();
+    setFolders(userFolder);
+  };
+
+  // handler of snackbar
+  const handleSnackbarClose = (
+    e?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -56,165 +74,186 @@ const VaultsUpdate = (props: Props) => {
     event.preventDefault();
   };
 
-  const getAllFolders = async () => {
-    const userFolder = await getFolders();
-    setFolders(userFolder);
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setVaultData({ ...vaultData, [name]: value });
+    setCharacterCount(value.length);
   };
 
-  const handleUpdateVault = async () => {
-    console.log('in update');
-    const data = {
-      name: state.name,
-      username: state.username,
-      password: state.password,
-      link: state.link,
-      note: state.note,
-      category: state.category,
-      folder: state.folder,
-    };
-    console.log('data', data);
-
-    await authorizedFetch(`${backendUrl}/vault/${state._id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }).then((res) => {
-      console.log('res', res);
-      navigate('/dashboard');
+  const handleReset = () => {
+    setVaultData({
+      category: '',
+      name: '',
+      folder: '',
+      username: '',
+      password: '',
+      link: '',
+      note: '',
     });
+
+    setCharacterCount(0);
   };
 
-  // React.useEffect(() => {
-  //   console.log('state', state);
-  // }, [state]);
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    handleReset();
+
+    const success = await createVault(vaultData);
+
+    if (success) {
+      setIsSuccess(true);
+      setSnackbarOpen(true);
+    } else {
+      setIsSuccess(false);
+      setSnackbarOpen(true);
+    }
+  };
 
   React.useEffect(() => {
     getAllFolders();
   }, []);
 
-  React.useEffect(() => {
-    if (!validity) {
-      logOut();
-      navigate('/');
-    }
-  }, [validity]);
-
   return (
     <Container
-      sx={{ maxHeight: '400px', overflowY: 'scroll', overflowX: 'hidden' }}
+      sx={{ maxHeight: '400px', overflowY: 'scroll', overflowX: 'hidden', pt: 2, pb: 3 }}
     >
-      <h1>Vaults Update</h1>
-      <button style={{ margin: '16px' }} onClick={() => navigate('/dashboard')}>
-        Back
-      </button>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2500}
+        onClose={handleSnackbarClose}
+      >
+        {isSuccess ? (
+          <Alert
+            onClose={handleSnackbarClose}
+            severity='success'
+            sx={{ width: '90%' }}
+          >
+            Vault Added!
+          </Alert>
+        ) : (
+          <Alert
+            onClose={handleSnackbarClose}
+            severity='error'
+            sx={{ width: '90%' }}
+          >
+            Failed to add vault!
+          </Alert>
+        )}
+      </Snackbar>
+      <ElevateAppBar title={title} />
       <Box
         component='form'
         sx={{
           '& .MuiTextField-root': {
             mt: 0.7,
             mb: 0.7,
-            width: '40ch',
             display: 'flex',
             justifyContent: 'center',
           },
+          mt: '1rem',
         }}
         autoComplete='off'
       >
         <Stack spacing={1.5}>
           <FormControl size='small' sx={{ mt: 1.5 }}>
-            <TextField
-              select
-              size='small'
+            <InputLabel id='category_select'>Category</InputLabel>
+            <Select
               sx={{ backgroundColor: '#f0f4f8cc' }}
+              labelId='category_select'
               id='category'
-              name='category'
-              value={state.category}
+              value={vaultData.category}
               label='Category'
               onChange={(e) =>
-                setUpdatedData({ ...updatedData, category: e.target.value })
+                setVaultData({ ...vaultData, category: e.target.value })
               }
             >
-              <MenuItem value=''>
-                <em>None</em>
+              <MenuItem selected value='Login'>
+                Login
               </MenuItem>
-              <MenuItem value='Login'>Login</MenuItem>
-              <MenuItem value='Secret Note'>Secret Note</MenuItem>
-            </TextField>
+              <MenuItem value='Secret Note' disabled>
+                Secret Note
+              </MenuItem>
+            </Select>
           </FormControl>
 
-          {/* <FormControl size='small' sx={{ mt: 3 }}>
-            <TextField
-            select
+          <FormControl size='small' sx={{ mt: 3 }}>
+            <InputLabel id='folder_select'>Folder</InputLabel>
+            <Select
               sx={{ backgroundColor: '#f0f4f8cc' }}
+              labelId='folder_select'
               id='folder'
-              name='folder'
-              value={state.folder}
+              value={vaultData.folder}
               label='Folder'
               onChange={(e) =>
-                setUpdatedData({ ...updatedData, folder: e.target.value })
+                setVaultData({
+                  ...vaultData,
+                  folder: e.target.value,
+                })
               }
             >
-              <MenuItem value=''>
+              <MenuItem value='' selected>
+                <em>None</em>
               </MenuItem>
               {folders &&
                 folders.map((folder: IFolder) => (
-                  <MenuItem key={folder._id} value={folder._id}>
+                  <MenuItem key={folder.folderName} value={folder._id}>
                     {folder.folderName}
                   </MenuItem>
                 ))}
-            </TextField>
-          </FormControl> */}
-
+            </Select>
+          </FormControl>
           <Divider sx={{ mt: 2, mb: 2 }} />
-
           <FormControl>
             <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
               label='Alias'
               id='name'
+              required
               name='name'
               size='small'
-              defaultValue={state.name}
+              defaultValue={vaultData.name}
               onChange={(e) =>
-                setUpdatedData({ ...updatedData, name: e.target.value })
+                setVaultData({
+                  ...vaultData,
+                  name: e.target.value,
+                })
               }
             />
           </FormControl>
-          <FormControl>
+          <FormControl size='small'>
             <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
               label='Username'
               id='username'
+              required
               name='username'
               size='small'
-              defaultValue={state.username}
+              defaultValue={vaultData.username}
               onChange={(e) =>
-                setUpdatedData({ ...updatedData, username: e.target.value })
+                setVaultData({
+                  ...vaultData,
+                  username: e.target.value,
+                })
               }
             />
           </FormControl>
           <FormControl
             sx={{
               m: 1,
-              width: '25ch',
-              display: 'flex',
               justifyContent: 'flex-start',
             }}
             variant='outlined'
           >
-            <InputLabel htmlFor='outlined-adornment-password'>
-              Password
-            </InputLabel>
-            <OutlinedInput
+            <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
-              id='outlined-adornment-password'
+              id='password'
+              required
               type={showPassword ? 'text' : 'password'}
               size='small'
-              endAdornment={
-                <InputAdornment position='end'>
-                  <IconButton
+              InputProps={{
+                endAdornment: (
+                    <InputAdornment position='end'>
+                    <IconButton
                     aria-label='toggle password visibility'
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
@@ -222,26 +261,30 @@ const VaultsUpdate = (props: Props) => {
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
-                </InputAdornment>
-              }
+                    </InputAdornment>
+                ),
+              }}
+            
               label='Password'
-              value={state.password}
+              defaultValue={vaultData.password}
               onChange={(e) =>
-                setUpdatedData({ ...updatedData, password: e.target.value })
+                setVaultData({
+                  ...vaultData,
+                  password: e.target.value,
+                })
               }
             />
           </FormControl>
-
           <FormControl>
             <TextField
               sx={{ backgroundColor: '#f0f4f8cc' }}
               label='URI'
               id='link'
               name='link'
-              defaultValue={state.link}
+              defaultValue=''
               size='small'
               onChange={(e) =>
-                setUpdatedData({ ...updatedData, link: e.target.value })
+                setVaultData({ ...vaultData, link: e.target.value })
               }
             />
           </FormControl>
@@ -252,19 +295,71 @@ const VaultsUpdate = (props: Props) => {
               label='Notes'
               id='note'
               name='note'
-              defaultValue={state.note}
+              defaultValue={vaultData.note}
               size='small'
-              onChange={(e) =>
-                setUpdatedData({ ...updatedData, note: e.target.value })
-              }
+              onChange={handleNoteChange}
+              multiline
+              rows={4}
+              inputProps={{ maxLength: maxCharacters }}
             />
+            {characterCount <= 300 ? (
+              <Typography
+                variant='body2'
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  marginRight: '5px',
+                  color: 'green',
+                  marginBottom: '15px',
+                }}
+              >
+                Remaining Characters: {maxCharacters - vaultData.note.length} /
+                300
+              </Typography>
+            ) : (
+              <Typography
+                variant='body2'
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  color: 'red',
+                  marginRight: '5px',
+                  marginBottom: '15px',
+                }}
+              >
+                Passed maximum character count
+              </Typography>
+            )}
           </FormControl>
-          {/* button to save */}
-          <Button onClick={handleUpdateVault}>Save</Button>
+
+          <Button
+            type='submit'
+            onClick={handleSubmit}
+            variant='contained'
+            sx={{
+              marginBottom: '10px',
+              backgroundColor: '#007bff',
+              color: 'black',
+            }}
+          >
+            Submit
+          </Button>
+          <Button
+            type='reset'
+            onClick={() => handleReset()}
+            variant='contained'
+            sx={{
+              marginBottom: '10px',
+              backgroundColor: '#6c757d',
+              color: 'black',
+            }}
+          >
+            Reset
+          </Button>
         </Stack>
       </Box>
     </Container>
   );
 };
 
-export default VaultsUpdate;
+export default VaultsAdd;

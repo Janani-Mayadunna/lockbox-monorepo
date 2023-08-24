@@ -2,13 +2,15 @@ import { Box, Card, CardContent, Typography } from '@mui/material';
 import React from 'react';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { decryptTabVaults } from '../../../utils/api';
+import ElevateAppBar from '../../vaults/components/NavigationBar';
 
 const CurrentTabVaults: React.FC<{}> = () => {
+  const title = 'Suggested';
+
   const [tabVaults, setTabVaults] = React.useState<string[]>([]);
 
   const getTabVaults = async () => {
     const currentTabVaults = await decryptTabVaults();
-    // console.log('currentTabVaults', currentTabVaults);
     setTabVaults(currentTabVaults);
   };
 
@@ -38,7 +40,7 @@ const CurrentTabVaults: React.FC<{}> = () => {
 
   return (
     <div>
-      <h1>Current Tab Vaults</h1>
+      <ElevateAppBar title={title} />
 
       <Box>
         {tabVaults?.map((vault: any) => (
@@ -74,7 +76,7 @@ const CurrentTabVaults: React.FC<{}> = () => {
                   {vault.link?.split('//') && vault.link.split('//')[1] ? (
                     <img
                       src={`https://icons.bitwarden.net/${
-                        vault.link.split('//')[1]
+                        new URL(vault.link).hostname
                       }/icon.png`}
                       alt='logo'
                       style={{

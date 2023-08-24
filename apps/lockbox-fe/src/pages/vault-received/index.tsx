@@ -47,10 +47,10 @@ interface Column {
   minWidth?: number;
   align?: 'right' | 'center' | 'left';
   display?: {
-    xs: 'none' | 'block';
-    sm: 'none' | 'block';
-    md: 'none' | 'block';
-    lg: 'none' | 'block';
+    xs: 'none' | 'revert';
+    sm: 'none' | 'revert';
+    md: 'none' | 'revert';
+    lg: 'none' | 'revert';
   };
   format?: (value: number) => string;
 }
@@ -65,8 +65,8 @@ const columns: readonly Column[] = [
     display: {
       xs: 'none',
       sm: 'none',
-      md: 'block',
-      lg: 'block',
+      md: 'revert',
+      lg: 'revert',
     },
   },
   {
@@ -83,8 +83,8 @@ const columns: readonly Column[] = [
     display: {
       xs: 'none',
       sm: 'none',
-      md: 'block',
-      lg: 'block',
+      md: 'revert',
+      lg: 'revert',
     },
   },
   {

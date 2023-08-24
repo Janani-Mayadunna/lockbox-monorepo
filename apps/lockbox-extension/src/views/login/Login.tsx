@@ -16,12 +16,12 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 const Login = () => {
   const navigate = useNavigate();
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender) => {
     if (message.action === 'replaceToLogin') {
       setValidity(false);
-      location.href = 'popup.html';
+      // location.href = 'popup.html';
     }
-    sendResponse({ response: 'login' });
+    // sendResponse({ response: 'login' });
   });
 
   const [data, setData] = React.useState({

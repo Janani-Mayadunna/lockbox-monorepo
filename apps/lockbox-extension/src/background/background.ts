@@ -1,12 +1,32 @@
 import { logOut } from '../utils/api';
 import jwt_decode from 'jwt-decode';
 
+let isPortConnected = false;
 let popupOpen = true;
+
+console.log('background script running');
+
+// chrome.runtime.onStartup.addListener(() => {
+//   chrome.alarms.clearAll();
+//   chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
+// });
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === 'popupPort') {
+    isPortConnected = true;
+
+    port.onDisconnect.addListener(() => {
+      isPortConnected = false;
+    });
+  }
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
     case 'popupOpened':
       popupOpen = true;
+      console.log('popupOpen', popupOpen);
+
       break;
     case 'login':
       console.log('Received login action from popup');
@@ -57,10 +77,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getCurrentUser':
       chrome.storage.local.get(['currentUser'], (result) => {
-        console.log(
-          'Current User retrieved from chrome.storage.local:',
-          result.currentUser
-        );
+        // console.log(
+        //   'Current User retrieved from chrome.storage.local:',
+        //   result.currentUser
+        // );
         sendResponse({ currentUser: result.currentUser });
 
         chrome.runtime.sendMessage({
@@ -113,10 +133,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     case 'getAllVaults':
       chrome.storage.local.get(['userVaults'], (result) => {
-        console.log(
-          'All User Vaults retrieved from chrome.storage.local:',
-          result.userVaults
-        );
+        // console.log(
+        //   'All User Vaults retrieved from chrome.storage.local:',
+        //   result.userVaults
+        // );
 
         sendResponse({ userVaults: result.userVaults });
         chrome.runtime.sendMessage({
@@ -171,13 +191,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         },
       };
 
-      console.log('data', sendData);
+      // console.log('data', sendData);
 
       // send message to content script
       chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         var tab = tabs[0];
         chrome.tabs.sendMessage(tab.id, sendData, (response) => {
-          console.log('autofill', response);
+          // console.log('autofill', response);
         });
       });
       break;
@@ -188,11 +208,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         action: 'checkTokenValidity',
       });
       break;
-    case 'tokenExpired':
-      chrome.runtime.sendMessage({
-        action: 'replaceToLogin',
-      });
-      break;
     default:
       break;
   }
@@ -201,25 +216,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-let isPortConnected = false;
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name === 'popupPort') {
-    isPortConnected = true;
-
-    port.onDisconnect.addListener(() => {
-      isPortConnected = false;
-    });
-
-    if (isPortConnected) {
-    }
-  }
-});
-
-function getValueFromStorage(key, callback) {
+function getValueFromStorage(
+  key: any,
+  callback: { (token: string): void; (arg0: any): void }
+) {
   chrome.storage.local.get([key], (result) => {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError);
-      callback(undefined); // Or handle the error in some way
+      callback(undefined);
     } else {
       callback(result[key]);
     }
@@ -230,29 +234,40 @@ function getValueFromStorage(key, callback) {
 chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  console.log('popupOpen', popupOpen);
+  // console.log('popupOpen', popupOpen);
   if (alarm.name === 'tokenCheckAlarm') {
-    getValueFromStorage('token', (token) => {
+    getValueFromStorage('token', (token: string) => {
       if (token) {
         const user: { exp: number; iat: number } = jwt_decode(token);
         const expirationBuffer = ((user.exp - user.iat) / 5) * 4;
         const currentTime = Math.floor(Date.now() / 1000);
 
         const remainingTime = user.exp - currentTime;
-        console.log('remainingTime', remainingTime);
+        // console.log('remainingTime', remainingTime);
 
         const isValid = remainingTime > expirationBuffer;
-        console.log('isValid', isValid);
+        // console.log('isValid', isValid);
 
         if (!isValid && alarm.name === 'tokenCheckAlarm') {
           chrome.alarms.clearAll();
+          //restart timer
+          chrome.alarms.create('tokenCheckAlarm', { periodInMinutes: 1 / 60 });
 
           chrome.runtime.sendMessage(
             {
-              action: 'tokenExpired',
+              action: 'replaceToLogin',
             },
-            (response) => {
-              console.log('response jj', response);
+            // due to the asynchronous nature of the messaging API, we need to handle the response
+            // when the popup is closed, the receiving end does not exist anymore
+            // therefore it throws an error saying receiving end doesnt exist
+            // handling connection closing before response received from popup
+            function (_entry) {
+              if (chrome.runtime.lastError) {
+                // console.info(
+                //   'No worries, your session expired and you got logged out. Please, log in again'
+                // );
+                return;
+              }
             }
           );
 
@@ -263,9 +278,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-console.log('background script running');
-
-function extractDomain(url) {
+function extractDomain(url: string) {
   url = url.replace(/^(https?:\/\/)?/, ''); // Remove "https://"
   url = url.replace(/^www\./, ''); // Remove "www."
   const parts = url.split('/'); // Split the URL at the first "/"
@@ -277,8 +290,14 @@ function extractDomain(url) {
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.active) {
     if (tab.url?.startsWith('chrome://')) {
-      console.log('chrome://');
-    } else {
+      // console.log('chrome://');
+      return
+    } 
+    else if (tab.url?.startsWith('http://')) {
+      // console.log('permissions for http not granted');
+      return;
+    }
+    else {
       chrome.scripting.executeScript({
         target: { tabId: tabId },
         files: ['contentScript.js'],
@@ -352,6 +371,3 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     }
 //   });
 // });
-
-
- /* BUG - Handle the runtime error when listening end doesnt exist*/

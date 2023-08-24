@@ -23,11 +23,11 @@ import { useNavigate } from 'react-router-dom';
 const Vaults: React.FC<{}> = () => {
   const navigate = useNavigate();
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender) => {
     if (message.action === 'replaceToLogin') {
       setValidity(false);
     }
-    sendResponse({ response: 'filters' });
+    // sendResponse({ response: 'filters' });
   });
 
   const [validity, setValidity] = React.useState<boolean>(true);

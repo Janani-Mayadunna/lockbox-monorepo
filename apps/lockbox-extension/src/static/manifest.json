@@ -10,15 +10,22 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "LockBox Extension",
+    "default_title": "LockBox",
     "default_icon": "icon2.png"
   },
-  "permissions": ["storage", "tabs", "activeTab", "webNavigation", "scripting", "alarms"],
+  "permissions": [
+    "storage", 
+    "tabs", 
+    "activeTab", 
+    "webNavigation", 
+    "scripting", 
+    "alarms"
+  ],
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"
   },
   "host_permissions": [
-      "https://*/*"
+    "https://*/*"
   ]
 }
