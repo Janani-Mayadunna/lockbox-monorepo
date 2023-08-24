@@ -36,3 +36,13 @@ export interface ICreateVault {
   password: string;
   note?: string;
 }
+
+export interface IUpdateVault {
+  category?: string;
+  name: string;
+  folder?: string;
+  link?: string;
+  username: string;
+  password: string;
+  note?: string;
+}
