@@ -1,4 +1,4 @@
-import { ICreateVault } from '../interfaces/vault.interfaces';
+import { ICreateVault, IUpdateVault } from '../interfaces/vault.interfaces';
 import { generateVaultKey } from './crypto';
 import CustomCrypto from './custom-crypto';
 import {
@@ -300,8 +300,6 @@ export async function createVault(newVault: ICreateVault): Promise<boolean> {
 
   if (newVault.note !== '') {
     encryptedVaultNote = await CustomCrypto.encrypt(vaultKey, newVault.note);
-  } else {
-    encryptedVaultNote = '';
   }
 
   const response = await authorizedFetch(`${backendUrl}/vault`, {
@@ -323,6 +321,49 @@ export async function createVault(newVault: ICreateVault): Promise<boolean> {
 
   return success;
 }
+
+export const updateVault = async (id: string, updatedVault: IUpdateVault) => {
+  const vaultKey = await getVaultKey();
+  let encryptedVaultNote = '';
+  let encryptedVaultUsername = '';
+  let encryptedVaultPW = '';
+
+  if (updatedVault.password) {
+    encryptedVaultPW = await CustomCrypto.encrypt(
+      vaultKey,
+      updatedVault.password
+    );
+  }
+
+  if (updatedVault.username) {
+    encryptedVaultUsername = await CustomCrypto.encrypt(
+      vaultKey,
+      updatedVault.username
+    );
+  }
+
+  if (updatedVault.note) {
+    encryptedVaultNote = await CustomCrypto.encrypt(
+      vaultKey,
+      updatedVault.note
+    );
+  }
+
+  const response = await authorizedFetch(`${backendUrl}/vault/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...updatedVault,
+      password: encryptedVaultPW,
+      username: encryptedVaultUsername,
+      note: encryptedVaultNote,
+    }),
+  });
+
+  return response.status;
+};
 
 export const logOut = async () => {
   await chrome.storage.local.clear();

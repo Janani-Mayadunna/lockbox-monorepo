@@ -18,8 +18,8 @@ import {
 } from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createVault, getFolders } from '../../../utils/api';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { createVault, getFolders, updateVault } from '../../../utils/api';
 import { IFolder } from '../../../interfaces/vault.interfaces';
 import ElevateAppBar from '../../vaults/components/NavigationBar';
 
@@ -30,25 +30,36 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
-const VaultsAdd = () => {
+const VaultsUpdate = () => {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+
   const [vaultData, setVaultData] = React.useState({
-    category: 'Login',
-    name: '',
-    folder: '',
-    username: '',
-    password: '',
-    link: '',
-    note: '',
+    category: state ? state?.category : '',
+    name: state ? state?.name : '',
+    folder: state ? state?.folder : '',
+    username: state ? state?.username : '',
+    password: state ? state?.password : '',
+    link: state ? state?.link : '',
+    note: state ? state?.note : '',
   });
   const [characterCount, setCharacterCount] = React.useState(0);
   const [folders, setFolders] = React.useState([]);
   const [showPassword, setShowPassword] = React.useState(false);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [validity, setValidity] = React.useState<boolean>(true);
 
+  const id = state._id;
   const title = 'Update';
   const maxCharacters = 300;
-  const navigate = useNavigate();
+
+  chrome.runtime.onMessage.addListener((message, sender) => {
+    if (message.action === 'replaceToLogin') {
+      setValidity(false);
+    }
+    // sendResponse({ response: 'dashboard' });
+  });
 
   const getAllFolders = async () => {
     const userFolder = await getFolders();
@@ -96,11 +107,10 @@ const VaultsAdd = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    handleReset();
 
-    const success = await createVault(vaultData);
+    const success = await updateVault(id, vaultData);
 
-    if (success) {
+    if (success === 200) {
       setIsSuccess(true);
       setSnackbarOpen(true);
     } else {
@@ -110,12 +120,24 @@ const VaultsAdd = () => {
   };
 
   React.useEffect(() => {
+    if (!validity) {
+      navigate('/');
+    }
+  }, [validity]);
+
+  React.useEffect(() => {
     getAllFolders();
   }, []);
 
   return (
     <Container
-      sx={{ maxHeight: '400px', overflowY: 'scroll', overflowX: 'hidden', pt: 2, pb: 3 }}
+      sx={{
+        maxHeight: '400px',
+        overflowY: 'scroll',
+        overflowX: 'hidden',
+        pt: 2,
+        pb: 3,
+      }}
     >
       <Snackbar
         open={snackbarOpen}
@@ -156,34 +178,38 @@ const VaultsAdd = () => {
       >
         <Stack spacing={1.5}>
           <FormControl size='small' sx={{ mt: 1.5 }}>
-            <InputLabel id='category_select'>Category</InputLabel>
-            <Select
+            <TextField
+              select
               sx={{ backgroundColor: '#f0f4f8cc' }}
-              labelId='category_select'
               id='category'
               value={vaultData.category}
               label='Category'
+              size='small'
               onChange={(e) =>
                 setVaultData({ ...vaultData, category: e.target.value })
               }
             >
-              <MenuItem selected value='Login'>
-                Login
-              </MenuItem>
+              <MenuItem value='Login'>Login</MenuItem>
               <MenuItem value='Secret Note' disabled>
                 Secret Note
               </MenuItem>
-            </Select>
+            </TextField>
           </FormControl>
 
           <FormControl size='small' sx={{ mt: 3 }}>
-            <InputLabel id='folder_select'>Folder</InputLabel>
-            <Select
+            <TextField
+              select
               sx={{ backgroundColor: '#f0f4f8cc' }}
-              labelId='folder_select'
               id='folder'
-              value={vaultData.folder}
+              value={
+                vaultData.folder === undefined ||
+                vaultData.folder === null ||
+                folders.length === 0
+                  ? ''
+                  : vaultData.folder
+              }
               label='Folder'
+              size='small'
               onChange={(e) =>
                 setVaultData({
                   ...vaultData,
@@ -191,16 +217,16 @@ const VaultsAdd = () => {
                 })
               }
             >
-              <MenuItem value='' selected>
+              <MenuItem value=''>
                 <em>None</em>
               </MenuItem>
               {folders &&
                 folders.map((folder: IFolder) => (
-                  <MenuItem key={folder.folderName} value={folder._id}>
+                  <MenuItem key={folder._id} value={folder._id}>
                     {folder.folderName}
                   </MenuItem>
                 ))}
-            </Select>
+            </TextField>
           </FormControl>
           <Divider sx={{ mt: 2, mb: 2 }} />
           <FormControl>
@@ -252,19 +278,18 @@ const VaultsAdd = () => {
               size='small'
               InputProps={{
                 endAdornment: (
-                    <InputAdornment position='end'>
+                  <InputAdornment position='end'>
                     <IconButton
-                    aria-label='toggle password visibility'
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    edge='end'
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                    </InputAdornment>
+                      aria-label='toggle password visibility'
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge='end'
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
                 ),
               }}
-            
               label='Password'
               defaultValue={vaultData.password}
               onChange={(e) =>
@@ -281,7 +306,7 @@ const VaultsAdd = () => {
               label='URI'
               id='link'
               name='link'
-              defaultValue=''
+              value={vaultData.link}
               size='small'
               onChange={(e) =>
                 setVaultData({ ...vaultData, link: e.target.value })
@@ -342,11 +367,11 @@ const VaultsAdd = () => {
               color: 'black',
             }}
           >
-            Submit
+            Save
           </Button>
           <Button
             type='reset'
-            onClick={() => handleReset()}
+            // onClick={() => handleReset()}
             variant='contained'
             sx={{
               marginBottom: '10px',
@@ -354,7 +379,7 @@ const VaultsAdd = () => {
               color: 'black',
             }}
           >
-            Reset
+            Autofill
           </Button>
         </Stack>
       </Box>
@@ -362,4 +387,4 @@ const VaultsAdd = () => {
   );
 };
 
-export default VaultsAdd;
+export default VaultsUpdate;
