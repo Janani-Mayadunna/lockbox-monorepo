@@ -9,6 +9,8 @@ import { ICreateVaultResponse } from './interfaces/vault.interfaces';
 import { Vault } from './schemas/vault.schema';
 import { UpdateVaultDto } from './dto/update-vault.dto';
 import { deleteVaultDto } from './dto/delete-vault.dto';
+import { CategoryTypes } from '../../enum/vault.enum';
+import { UserFolder } from '../user-folder/schemas/user-folder.schema';
 
 describe('VaultController', () => {
   let controller: VaultController;
@@ -25,6 +27,10 @@ describe('VaultController', () => {
       deleteOneUserVault: jest.fn(),
       shareVaultPassword: jest.fn(),
       verifyShareLink: jest.fn(),
+      getReceivedVaults: jest.fn(),
+      getOtherUserPublicKey: jest.fn(),
+      directShareVaultPassword: jest.fn(),
+      computeSecret: jest.fn(),
     };
 
     mockAuthService = {};
@@ -61,6 +67,7 @@ describe('VaultController', () => {
   });
 
   const userId: string = faker.database.mongodbObjectId();
+  const mockUserFolder: UserFolder = {} as UserFolder;
 
   describe('createVault', () => {
     it('should create a vault', async () => {
@@ -68,6 +75,10 @@ describe('VaultController', () => {
         link: faker.internet.url(),
         username: faker.internet.userName(),
         password: faker.internet.password(),
+        category: CategoryTypes.LOGIN,
+        folder: mockUserFolder,
+        name: faker.lorem.word(),
+        note: faker.lorem.word(),
       };
 
       const expectedResult: ICreateVaultResponse = {} as ICreateVaultResponse;
@@ -85,16 +96,37 @@ describe('VaultController', () => {
 
   describe('getAllUserVaults', () => {
     it('should get all user vaults', async () => {
+      const category = faker.lorem.word();
+      const folder = faker.lorem.word();
+      const name = faker.person.fullName();
+      const username = faker.internet.displayName();
+
+      const where: any = {};
+      if (category) where.category = new RegExp(category.toString(), 'i');
+      if (folder) where.folder = new RegExp(folder.toString(), 'i');
+      if (name) where.name = new RegExp(name.toString(), 'i');
+      if (username) where.username = new RegExp(username.toString(), 'i');
+
+      const options = where;
+
       const expectedResult: Vault[] = [] as Vault[];
 
       jest
         .spyOn(mockVaultService, 'getAllUserVaults')
         .mockResolvedValue(expectedResult);
 
-      const result = await controller.getAllUserVaults(userId);
+      await controller.getAllUserVaults(
+        category,
+        folder,
+        name,
+        username,
+        userId,
+      );
 
-      expect(mockVaultService.getAllUserVaults).toHaveBeenCalledWith(userId);
-      expect(result).toEqual(expectedResult);
+      expect(mockVaultService.getAllUserVaults).toHaveBeenCalledWith(
+        userId,
+        options,
+      );
     });
   });
 
@@ -195,6 +227,43 @@ describe('VaultController', () => {
         userId,
         deleteVaultData,
       );
+      expect(result).toEqual(expectedResult);
+    });
+  });
+
+  describe('getReceivedVaults', () => {
+    it('should get received vaults', async () => {
+      const expectedResult: any = {};
+
+      jest
+        .spyOn(mockVaultService, 'getReceivedVaults')
+        .mockResolvedValue(expectedResult);
+
+      const result = await controller.getReceivedVaults(userId);
+
+      expect(mockVaultService.getReceivedVaults).toHaveBeenCalledWith(userId);
+
+      expect(result).toEqual(expectedResult);
+    });
+  });
+
+  describe('computeSecret', () => {
+    it('should compute secret', async () => {
+      const email: string = faker.internet.email();
+
+      const expectedResult: string = faker.string.uuid();
+
+      jest
+        .spyOn(mockVaultService, 'computeSecret')
+        .mockResolvedValue(expectedResult);
+
+      const result = await controller.computeSecret(userId, { email });
+
+      expect(mockVaultService.computeSecret).toHaveBeenCalledWith(
+        email,
+        userId,
+      );
+
       expect(result).toEqual(expectedResult);
     });
   });

@@ -35,11 +35,4 @@ export class UserFolderController {
   ): Promise<ICreateFolderResponse> {
     return await this.folderService.createFolder(folder, userId);
   }
-
-  // get all vaults in a folder
-  //   @Get('/vaults')
-  //   @UseGuards(AuthGuard('jwt'))
-  //   async getAllVaultsInFolder(@getCurrentUserId() userId: string): Promise<any> {
-  //     return await this.folderService.getAllVaultsInFolder(userId);
-  //   }
 }
