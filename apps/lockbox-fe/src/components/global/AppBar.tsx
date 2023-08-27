@@ -17,6 +17,7 @@ import { logoutRequest } from '../../../src/pages/auth/redux/actions';
 import { getCurrentUserData } from '../../../src/helpers/request-interceptor';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import AppLogo from '../../assets/images/logo.png'
 
 const pages = [
   { title: 'Password Vault', path: '/dashboard' },
@@ -86,7 +87,7 @@ function ResponsiveAppBar() {
               marginRight: '1rem',
               marginLeft: '1rem',
             }}
-            src='https://clipart.coolclips.com/480/vectors/tf05191/CoolClips_vc017972.png'
+            src={AppLogo}
             alt='logo'
           />
 
