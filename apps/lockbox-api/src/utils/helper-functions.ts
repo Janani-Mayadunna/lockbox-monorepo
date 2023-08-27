@@ -1,7 +1,10 @@
 import * as crypto from 'crypto';
+import { nanoid } from 'nanoid';
 
 export function generateSalt() {
-  return crypto.randomBytes(64).toString('hex');
+  const salt = nanoid(16);
+  return salt;
+  // return crypto.randomBytes(64).toString('hex');
 }
 
 export function generateUserKeyPair(): any {
