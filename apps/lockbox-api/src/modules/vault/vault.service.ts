@@ -57,7 +57,6 @@ export class VaultService {
 
     if (vault.folder) {
       const selectedFolder = await this.folderModel.findById(vault.folder);
-      console.log('vault folder', vault.folder);
 
       if (!selectedFolder) {
         logger.error(`Folder not found with id: ${vault.folder}`);
@@ -275,9 +274,9 @@ export class VaultService {
 
       OtherUser.sharedVault.push(newSharedVaultData);
       await OtherUser.save();
-      logger.info(
-        `Shared vault password with ${createSharedVaultData.receiverEmail}`,
-      );
+      // logger.info(
+      //   `Shared vault password with ${createSharedVaultData.receiverEmail}`,
+      // );
 
       return true;
     }
