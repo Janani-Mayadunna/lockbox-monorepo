@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+import {nanoid} from 'nanoid';
+
 export default class CustomCrypto {
   private static iteration = 100000;
   private static encryptionAlgorithm = 'AES-GCM';
@@ -61,14 +63,18 @@ export default class CustomCrypto {
     data: string,
   ): Promise<string> {
     try {
-      // generate random salt
-      const salt = window.crypto.getRandomValues(
-        new Uint8Array(CustomCrypto.saltLength),
-      );
+      // const salt = window.crypto.getRandomValues(
+      //   new Uint8Array(CustomCrypto.saltLength),
+      // );
 
-      const iv = window.crypto.getRandomValues(
-        new Uint8Array(CustomCrypto.ivLength),
-      );
+      // const iv = window.crypto.getRandomValues(
+      //   new Uint8Array(CustomCrypto.ivLength),
+      // );
+      const saltStr = nanoid(16);
+      const salt = new TextEncoder().encode(saltStr);
+
+      const ivStr = nanoid(12);
+      const iv = new TextEncoder().encode(ivStr);
 
       // create master key from vaultKey(secretkey)
       const passwordKey = await CustomCrypto.getPasswordKey(secretKey);

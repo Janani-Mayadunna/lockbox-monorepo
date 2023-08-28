@@ -1,11 +1,8 @@
 import CryptoJS from 'crypto-js';
 
 export function hashPassword(password: string) {
-  // (`${email}:${password}`)
   let hashedPassword = CryptoJS.SHA256(password);
 
-  // stetching the password
-  // the advatage of this is, that it will take a long time to brute force and it will be hard to guess the password
   for (let i = 0; i < 10000; i++) {
     hashedPassword = CryptoJS.SHA256(hashedPassword.toString());
   }

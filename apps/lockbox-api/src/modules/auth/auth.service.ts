@@ -28,7 +28,7 @@ export class AuthService {
 
     const hashedPassword = await argon2.hash(`${email}:${password}`);
 
-    if (salt !== '') {
+    if (salt) {
       userSalt = salt;
     } else {
       userSalt = generateSalt();
