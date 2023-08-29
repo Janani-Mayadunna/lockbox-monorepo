@@ -12,12 +12,17 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import DirectShareModal from '../modals/DirectShareModal';
 import ShareIcon from '@mui/icons-material/Share';
 import LaunchIcon from '@mui/icons-material/Launch';
+import { authorizedFetch } from '../../../../../src/helpers/request-interceptor';
+import ENVIRONMENT from '../../../../../src/helpers/environment';
+import { getVaultRequest } from '../../redux/actions';
+import { useAppDispatch } from '../../../../../src/store';
 
 interface MenuParameters {
   password: string;
   username: string;
   link?: string;
   alias: string;
+  id: string;
 }
 
 const StyledMenu = styled((props: MenuProps) => (
@@ -77,7 +82,10 @@ export default function CustomizedMenus({
   username,
   link,
   alias,
+  id,
 }: MenuParameters) {
+  const dispatch = useAppDispatch();
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [openDirectShareModal, setOpenDirectShareModal] = React.useState(false);
@@ -121,6 +129,26 @@ export default function CustomizedMenus({
       window.open(link, '_blank');
     }
   };
+
+  const handleDelete = (id: string) => {
+    const payload = {
+      id,
+    }
+    authorizedFetch(`${ENVIRONMENT.BACKEND_API}/vault/delete`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }).then((res) => {
+      if (res.status === 200) {
+        handleClose();
+    dispatch(getVaultRequest('', ''));
+        
+      }
+    });
+  };
+
 
   return (
     <div>
@@ -182,7 +210,7 @@ export default function CustomizedMenus({
         </Tooltip>
 
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => handleDelete(id)}>
           <DeleteIcon />
           Delete
         </MenuItem>
