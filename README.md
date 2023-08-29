@@ -4,7 +4,7 @@
 
 ### Getting Started
 Clone the repository 
-git clone https://github.com/Janani-Mayadunna/lockbox-monorepo.git
+`git clone https://github.com/Janani-Mayadunna/lockbox-monorepo.git`
  
 Globally install pnpm package manager
 `npm install -g pnpm`
