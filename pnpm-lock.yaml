@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      nanoid:
+        specifier: ^3.0.0
+        version: 3.3.6
     devDependencies:
       husky:
         specifier: ^8.0.3
