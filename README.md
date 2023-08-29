@@ -1,29 +1,18 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### LockBox Web Application and Chrome Extension
 
-### What is this repository for? ###
+### Getting Started
+Clone the repository 
+git clone https://github.com/Janani-Mayadunna/lockbox-monorepo.git
+ 
+Globally install pnpm package manager
+`npm install -g pnpm`
+ 
+Install all dependencies by running the command `pnpm install` in the root of the monorepo
+ 
+To run both frontend and backend at the same time run `pnpm dev` command
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+To build both workspaces `pnpm build`
 
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+To test `pnpm test`
